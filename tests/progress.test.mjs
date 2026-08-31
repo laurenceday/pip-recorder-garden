@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { parseCompletedLessons, serialiseCompletedLessons } from '../src/lib/progress.ts';
+import { parseCompletedLessons, PROGRESS_STORAGE_KEY, serialiseCompletedLessons } from '../src/lib/progress.ts';
 
 const validIds = new Set(['meet-b', 'meet-a', 'meet-g']);
 
@@ -16,3 +16,7 @@ test('saved progress fails closed on malformed or oversized values', () => {
   assert.equal(parseCompletedLessons('x'.repeat(16_385), validIds).size, 0);
 });
 
+test('mission play does not widen the one versioned progress key', () => {
+  assert.equal(PROGRESS_STORAGE_KEY, 'pip-recorder-garden.completed.v1');
+  assert.deepEqual(Object.keys({ [PROGRESS_STORAGE_KEY]: serialiseCompletedLessons(new Set(['meet-b'])) }), [PROGRESS_STORAGE_KEY]);
+});

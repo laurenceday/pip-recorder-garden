@@ -2,9 +2,9 @@
 
 ![Pip’s Recorder Garden: a robin playing recorder among musical stepping stones](public/social-card.png)
 
-Pip’s Recorder Garden is a static, interactive course for a young beginner playing a soprano or descant recorder in C with Baroque fingering. It has twelve open lessons, large fingering pictures, optional guide tones and private microphone feedback.
+Pip’s Recorder Garden is a static, interactive course for a young beginner playing a soprano or descant recorder in C with Baroque fingering. It has twelve open lessons. Each one is a short musical mission: hear the whole pattern, copy it in a way that suits today, make a tiny tune or finish without one, then stop or replay by choice.
 
-The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Every lesson has a grown-up completion route when listening is unavailable or simply unhelpful.
+The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
 ## Run it locally
 
@@ -31,13 +31,12 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 ## Play a lesson
 
 1. Choose any lesson on the garden path. Nothing is locked.
-2. Check the fingering picture. Filled holes are covered; outlined holes are open.
-3. Use **Hear note** if a reference helps. Sound never starts by itself.
-4. Press **Let Pip listen** and let the adult handle the browser permission prompt.
-5. Play gently. Pip reports quiet, uncertain, close, a different note, or a stable match in words as well as colour.
-6. Press **Stop listening** whenever you like. Changing lesson, hiding the tab or completing the activity also stops every microphone track.
+2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
+3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
+4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
+5. Finish the turn. Choose **Stop here for today**, **Play this mission again** or **Back to the garden path**. The site never moves to the next lesson by itself.
 
-The guide tone and microphone cannot run together. Starting either one stops the other first.
+Guide playback and the microphone cannot run together. Starting either one stops the other first. Guide playback also stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.
 
 ## The twelve lessons
 
@@ -56,13 +55,13 @@ The guide tone and microphone cannot run together. Starting either one stops the
 | 11 | Morning Robin | second original tune | 4 |
 | 12 | C to C | explore the complete natural octave | 5 |
 
-The sequence scorer checks pitch order and stable notes. It deliberately does not pretend to grade rhythm, articulation, breath, posture or musical expression.
+The optional sequence helper checks pitch order and stable notes. The rhythm activity compares only the broad timing shape of taps. Neither pretends to grade articulation, breath, posture, expression or learning.
 
 ## Microphone and saved-data boundary
 
 Once its static files have loaded, the child-facing application has no network request, audio recorder, analytics, account, camera, IndexedDB, socket, beacon or service worker. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
 
-The only saved value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, detected frequency history, score, streak, timestamp or permission state. **Forget saved progress** clears it from that browser.
+The only saved value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, made tune, tap timing, chosen route, attempt count, detected frequency history, score, streak, timestamp or permission state. **Forget saved progress** clears it from that browser.
 
 GitHub Pages serves over HTTPS, which allows browsers to offer microphone permission. Permission remains a browser and device decision; the site still works with diagrams, guide tones and adult-assisted completion when access is denied.
 
@@ -70,12 +69,17 @@ GitHub Pages serves over HTTPS, which allows browsers to offer microphone permis
 
 The synthetic tests establish detector behaviour, not hardware behaviour. Her father should make this short acceptance pass on each intended browser:
 
-- open lesson 1 and confirm the permission prompt appears only after **Let Pip listen**;
+- at a phone-sized viewport, confirm the active lesson appears before the twelve-choice garden path and the child controls are comfortable to tap;
+- open lesson 8, press **Hear the whole pattern**, and confirm B, A, A, B sounds once with the matching note stones pulsing;
+- stop the lesson pattern part-way through and confirm sound stops at once;
+- make a two-to-four-note tune, confirm note choices freeze while it sounds, then use **Stop my tune**;
+- open lesson 1 and confirm the permission prompt appears only after choosing **Play to Pip** and pressing **Let Pip listen**;
 - play B at a comfortable distance and confirm quiet, uncertain and matched states make sense in that room;
 - press **Stop listening** and confirm the browser’s live-microphone indicator clears;
 - start listening again, switch lesson, then hide the tab and confirm the indicator clears both times;
-- deny permission once and confirm the grown-up completion route remains usable;
-- play a guide tone and confirm the site is not listening at the same time;
+- deny permission once and complete a turn through rhythm, fingering or grown-up co-play;
+- play a guide pattern and confirm the site is not listening at the same time;
+- finish a turn and confirm the choices are stop, replay and garden, with no automatic progression;
 - keep device volume conversational and take a break whenever the child wants one.
 
 ## Add an idea
@@ -166,7 +170,7 @@ npm run test:report    # receipted TAP result in .elenchus/node-test.json
 npm run verify:local   # check, production build and dependency audit
 ```
 
-The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
+The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
 
 ## How the design was chosen
 
@@ -179,7 +183,7 @@ The study followed a fixed path:
 5. Build the risky pure parts first, using synthesized audio and hostile model fixtures, before adding permission or interface code.
 6. Keep publication, Pages settings and real-device claims separate from a green local build.
 
-The receipted study, runbook and current corrections live under `docs/research/`. The main decisions are recorded under `docs/decisions/`.
+The receipted studies, runbooks and current corrections live under `docs/research/`. [ADR-004](docs/decisions/ADR-004-guided-mission-loop.md) records why every lesson now uses one guided mission instead of a mini-game arcade or an unguided composition screen.
 
 ## Primary sources
 
