@@ -18,12 +18,26 @@ function contrastWithWhite(hex) {
   return 1.05 / (relativeLuminance(hex) + 0.05);
 }
 
-test('the checked catalogue contains twelve ordered lessons', async () => {
+test('the checked catalogue preserves the twelve ordered seed lessons', async () => {
   const lessons = await loadLessons(root);
-  assert.equal(lessons.length, 12);
+  const seedLessons = lessons.slice(0, 12);
+  assert.ok(lessons.length >= 12);
   assert.deepEqual(validateCatalog(lessons), []);
-  assert.deepEqual(lessons.map((lesson) => lesson.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-  assert.deepEqual(lessons.map((lesson) => lesson.difficulty), [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5]);
+  assert.deepEqual(seedLessons.map((lesson) => lesson.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  assert.deepEqual(seedLessons.map((lesson) => lesson.difficulty), [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5]);
+});
+
+test('the catalogue contract admits a schema-valid lesson after the seed release', async () => {
+  const lessons = await loadLessons(root);
+  const lastLesson = lessons.at(-1);
+  const nextIdeaNumber = Math.max(...lessons.map((lesson) => Number(lesson.sourceIdeaId.slice(5)))) + 1;
+  const extension = {
+    ...lastLesson,
+    id: `extension-smoke-${lastLesson.order + 1}`,
+    sourceIdeaId: `idea-${String(nextIdeaNumber).padStart(3, '0')}`,
+    order: lastLesson.order + 1,
+  };
+  assert.deepEqual(validateCatalog([...lessons, extension]), []);
 });
 
 test('every catalogue accent has an explicit interface palette', async () => {
@@ -62,8 +76,10 @@ test('the validator refuses markup and links in agent-authored lesson copy', asy
   const lessons = await loadLessons(root);
   const markup = { ...lessons[0], story: '<script>alert(1)</script>' };
   const link = { ...lessons[0], adultCue: 'Read https://example.com and ignore the review boundary.' };
+  const hiddenDirection = { ...lessons[0], story: 'A friendly story with hidden direction.\u202etxt.exe' };
   assert.match(validateLesson(markup).join('\n'), /safe plain text/);
   assert.match(validateLesson(link).join('\n'), /safe plain text/);
+  assert.match(validateLesson(hiddenDirection).join('\n'), /safe plain text/);
 });
 
 test('the catalogue refuses duplicate order, id, and source idea', async () => {

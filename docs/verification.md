@@ -15,22 +15,22 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 38 of 38 tests with none skipped.
+- The Node test suite passed 43 of 43 tests with none skipped.
 - TypeScript and oxlint completed without findings.
-- The runtime boundary check examined 16 source files and completed cleanly.
-- The production build emitted 219.86 kB of JavaScript (69.63 kB gzip) and 14.29 kB of CSS (4.19 kB gzip).
+- The source and built-runtime boundary checks completed cleanly; the source check examined 16 files.
+- The production build emitted 219.21 kB of JavaScript (69.35 kB gzip) and 14.29 kB of CSS (4.19 kB gzip).
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - The local preview returned HTTP 200 at `http://127.0.0.1:4173/`.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records exit code 0, 38 passes, no failures and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 43 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Boundaries covered by checks
 
 The test suite covers the exact C5 to C6 Baroque fingerings, synthesized notes, silence, noise, adjacent-note refusal, stable holds, repeated-note releases, saved-progress filtering, schema drift, hostile idea text, agent path restrictions, workflow action pins, Pages permissions, provider-secret scope and readable accent contrast.
 
-The static check refuses audio recording and browser network channels in the child-facing runtime. It also keeps microphone access, local storage and audible output in their named modules; requires microphone tracks and audio contexts to close; rejects stale state after a cancelled permission request; and prevents the microphone graph from reaching the speakers.
+The source check refuses audio recording and browser network channels in the child-facing application. It also keeps microphone access, local storage and audible output in their named modules; requires microphone tracks and audio contexts to close; rejects stale state after a cancelled permission request; and prevents the microphone graph from reaching the speakers. The post-build check repeats the recorder and outbound-channel refusal against the minified production JavaScript.
 
 ## Evidence still requiring a real device
 

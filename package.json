@@ -12,6 +12,7 @@
     "dev": "vite --host 127.0.0.1",
     "prebuild": "npm run generate",
     "build": "vite build",
+    "postbuild": "node scripts/check-built-boundaries.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:report": "node scripts/emit-node-test-report.mjs .elenchus/node-test.json",
@@ -21,7 +22,8 @@
     "check": "npm run generate && npm run generate:check && npm run test && npm run typecheck && npm run lint && npm run check:boundaries",
     "audit": "npm --userconfig /dev/null audit --audit-level=moderate",
     "verify:local": "npm run check && npm run build && npm run audit",
-    "agent:propose": "node scripts/propose-lessons.mjs"
+    "agent:propose": "node scripts/propose-lessons.mjs",
+    "check-agent-diff": "node scripts/check-agent-diff.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

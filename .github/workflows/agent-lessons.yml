@@ -16,11 +16,6 @@ on:
         description: Provider model identifier
         required: false
         type: string
-      base_url:
-        description: HTTPS API base URL; loopback HTTP requires a self-hosted runner
-        required: false
-        type: string
-
 permissions:
   contents: write
   pull-requests: write
@@ -49,7 +44,7 @@ jobs:
         env:
           LESSON_AGENT_PROVIDER: ${{ inputs.provider || vars.LESSON_AGENT_PROVIDER || 'openai-compatible' }}
           LESSON_AGENT_MODEL: ${{ inputs.model || vars.LESSON_AGENT_MODEL }}
-          LESSON_AGENT_BASE_URL: ${{ inputs.base_url || vars.LESSON_AGENT_BASE_URL }}
+          LESSON_AGENT_BASE_URL: ${{ vars.LESSON_AGENT_BASE_URL }}
           LESSON_AGENT_API_KEY: ${{ secrets.LESSON_AGENT_API_KEY }}
         run: npm run agent:propose
       - name: Refuse changes outside lesson proposals

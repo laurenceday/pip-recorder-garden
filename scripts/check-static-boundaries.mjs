@@ -65,6 +65,16 @@ if (microphone.includes('analyser.connect') || microphone.includes('source.conne
 if (!/catch \(error\) \{\s*if \(run !== runRef\.current\) return;/.test(microphone)) {
   throw new Error('a cancelled microphone request must not publish stale state');
 }
+const streamOwnership = microphone.indexOf('streamRef.current = stream');
+const contextOwnership = microphone.indexOf('contextRef.current = context');
+const contextResume = microphone.indexOf('await context.resume()');
+if (streamOwnership === -1 || contextOwnership === -1 || contextResume === -1
+  || streamOwnership > contextResume || contextOwnership > contextResume) {
+  throw new Error('microphone resources must belong to the stop path before the first cancellable audio await');
+}
+if (!microphone.includes('await context.resume();\n      if (run !== runRef.current) return;')) {
+  throw new Error('a stopped audio-context resume must not restart listening');
+}
 
 const app = contents.get('src/App.tsx') ?? '';
 if (!app.includes('tone.stop();\n    void microphone.start()')) throw new Error('starting the microphone must stop the guide tone first');
