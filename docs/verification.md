@@ -15,16 +15,16 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 65 of 65 tests with none skipped.
+- The Node test suite passed 67 of 67 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 20 files.
-- The production build emitted 232.79 kB of JavaScript (72.82 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232798 bytes, below the 300000-byte ceiling.
+- The production build emitted 232.82 kB of JavaScript (72.82 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232827 bytes, below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 65 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 67 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Guided mission evidence
 

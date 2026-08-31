@@ -240,3 +240,14 @@ test('the standing mission decision documents the optional no-tune participation
   ]);
   for (const record of [decision, readme, verification]) assert.match(record, /Finish without a tune/);
 });
+
+test('guide-audio failure names only recovery routes that remain available', async () => {
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /Guide sound is unavailable here\. Use the note and fingering pictures, or choose Copy without sound\. A grown-up can join you\./);
+  assert.doesNotMatch(app, /moving note stones/);
+});
+
+test('the README opening flow makes the no-tune participation route explicit', async () => {
+  const readme = await readFile(path.join(root, 'README.md'), 'utf8');
+  assert.match(readme, /make a tiny tune or finish without one, then stop or replay by choice/);
+});

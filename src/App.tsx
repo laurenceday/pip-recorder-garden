@@ -197,7 +197,7 @@ export default function App() {
       const finished = await tone.playPattern(lesson.pattern);
       if (finished) setMissionPhase('copy');
     } catch {
-      setGuideIssue('Guide sound is unavailable here. You can follow the moving note stones or copy with a grown-up.');
+      setGuideIssue('Guide sound is unavailable here. Use the note and fingering pictures, or choose Copy without sound. A grown-up can join you.');
     }
   };
 
