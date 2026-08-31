@@ -2,7 +2,7 @@
 
 ![Pip’s Recorder Garden: a robin playing recorder among musical stepping stones](public/social-card.png)
 
-Pip’s Recorder Garden is a static, interactive course for a young beginner playing a soprano or descant recorder in C with Baroque fingering. It has twelve open lessons. Each one is a short musical mission: hear the whole pattern, copy it in a way that suits today, make a tiny tune, then stop or replay by choice.
+Pip’s Recorder Garden is a static, interactive course for a young beginner playing a soprano or descant recorder in C with Baroque fingering. It has twelve open lessons. Each one is a short musical mission: hear the whole pattern, copy it in a way that suits today, make a tiny tune or finish without one, then stop or replay by choice.
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
