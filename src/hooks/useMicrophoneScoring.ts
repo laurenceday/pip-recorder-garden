@@ -113,6 +113,7 @@ export function useMicrophoneScoring({ expected, toleranceCents, onAssessment }:
       };
       frameRef.current = requestAnimationFrame(listen);
     } catch (error) {
+      if (run !== runRef.current) return;
       releaseResources();
       const name = error instanceof DOMException ? error.name : '';
       if (name === 'NotAllowedError' || name === 'SecurityError') {

@@ -10,7 +10,7 @@
   --line: #ded5c1;
   --leaf: #4c795d;
   --leaf-dark: #315940;
-  --periwinkle: #6674b8;
+  --periwinkle: #5664a8;
   --shadow: 0 20px 55px rgb(70 55 34 / 10%);
 }
 
@@ -89,11 +89,11 @@ button:focus-visible, summary:focus-visible, a:focus-visible, [tabindex="-1"]:fo
   background: var(--paper-bright);
   box-shadow: var(--shadow);
 }
-.accent-periwinkle { --accent: #6674b8; --accent-soft: #eceefd; }
-.accent-sky { --accent: #4085a4; --accent-soft: #e5f3f7; }
-.accent-marigold { --accent: #c58a1f; --accent-soft: #fff2cf; }
-.accent-leaf { --accent: #4f7e5f; --accent-soft: #e8f3e7; }
-.accent-coral { --accent: #d46852; --accent-soft: #fde9e3; }
+.accent-periwinkle { --accent: #5664a8; --accent-soft: #eceefd; }
+.accent-sky { --accent: #276e8e; --accent-soft: #e5f3f7; }
+.accent-marigold { --accent: #8b6114; --accent-soft: #fff2cf; }
+.accent-leaf { --accent: #3e684d; --accent-soft: #e8f3e7; }
+.accent-rose { --accent: #a94f49; --accent-soft: #fde9e7; }
 
 .story-panel {
   position: relative;
@@ -247,8 +247,10 @@ button.note-stone { cursor: pointer; }
 .listening-card--listening .listen-orbit i:nth-of-type(2), .listening-card--matched .listen-orbit i:nth-of-type(2) { animation-delay: .25s; }
 .listening-card--listening .listen-orbit i:nth-of-type(3), .listening-card--matched .listen-orbit i:nth-of-type(3) { animation-delay: .5s; }
 @keyframes listen-pulse { 0% { transform: scale(.72); opacity: .55; } 75%, 100% { transform: scale(1.15); opacity: .05; } }
-.growth-meter { height: 10px; margin: .55rem 0 1.35rem; overflow: hidden; border-radius: 999px; background: rgb(76 70 91 / 11%); }
-.growth-meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), #78a965); transition: width .18s ease-out; }
+.growth-meter { width: 100%; height: 10px; margin: .55rem 0 1.35rem; overflow: hidden; appearance: none; border: 0; border-radius: 999px; background: rgb(76 70 91 / 11%); }
+.growth-meter::-webkit-progress-bar { border-radius: inherit; background: rgb(76 70 91 / 11%); }
+.growth-meter::-webkit-progress-value { border-radius: inherit; background: linear-gradient(90deg, var(--accent), #78a965); transition: inline-size .18s ease-out; }
+.growth-meter::-moz-progress-bar { border-radius: inherit; background: linear-gradient(90deg, var(--accent), #78a965); transition: inline-size .18s ease-out; }
 .listen-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 .button {
   min-height: 50px;

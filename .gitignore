@@ -12,11 +12,6 @@
 /coverage
 /.elenchus/
 
-# next.js
-/.next/
-/.vinext/
-/out/
-
 # misc
 .DS_Store
 *.pem
@@ -30,11 +25,8 @@ yarn-error.log*
 # local environment
 .env*
 
-# deployment and generated files
-.vercel
-next-env.d.ts
+# build and generated files
 /dist/
 src/generated/lessons.json
-/.wrangler/
 /outputs/
 /work/

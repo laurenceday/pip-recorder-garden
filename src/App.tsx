@@ -42,7 +42,7 @@ function microphoneMessage(
   }
   if (assessment.kind === 'quiet') return { heading: 'Pip is listening', detail: `Play one gentle ${label} when you are ready.`, mood: 'listening' };
   if (assessment.kind === 'uncertain') return { heading: 'I heard a sound', detail: 'Try softer air, seal the holes, or move a little nearer.', mood: 'near' };
-  if (assessment.kind === 'matched') return { heading: `Yes — ${label}!`, detail: 'Keep it floating gently until the flower opens.', mood: 'matched' };
+  if (assessment.kind === 'matched') return { heading: `Yes, ${label}!`, detail: 'Keep it floating gently until the flower opens.', mood: 'matched' };
   if (assessment.kind === 'near') {
     const direction = assessment.cents > 0 ? 'a little softer' : 'with a touch more steady air';
     return { heading: 'Very close', detail: `Try ${direction}. No rush.`, mood: 'near' };
@@ -60,7 +60,6 @@ export default function App() {
   const [explorerTarget, setExplorerTarget] = useState<NoteName>(lesson.pattern[0].note);
   const sequenceRef = useRef(sequence);
   const exploredRef = useRef(explored);
-  const explorerTargetRef = useRef(explorerTarget);
   const { completed, markComplete, resetProgress } = useProgress(LESSON_IDS);
   const tone = useGuideTone();
   const isExplorer = lesson.kind === 'explore';
@@ -89,7 +88,6 @@ export default function App() {
       return true;
     }
     const nextTarget = lesson.pattern.find((step) => !nextExplored.has(step.note))?.note ?? lesson.pattern[0].note;
-    explorerTargetRef.current = nextTarget;
     setExplorerTarget(nextTarget);
     const resetSequence = createSequenceState();
     sequenceRef.current = resetSequence;
@@ -125,7 +123,6 @@ export default function App() {
     const resetExplored = new Set<NoteName>();
     sequenceRef.current = resetSequence;
     exploredRef.current = resetExplored;
-    explorerTargetRef.current = nextLesson.pattern[0].note;
     setSequence(resetSequence);
     setExplored(resetExplored);
     setExplorerTarget(nextLesson.pattern[0].note);
@@ -138,7 +135,6 @@ export default function App() {
   const chooseExplorerNote = (note: NoteName) => {
     microphone.stop();
     tone.stop();
-    explorerTargetRef.current = note;
     setExplorerTarget(note);
     const resetSequence = createSequenceState();
     sequenceRef.current = resetSequence;
@@ -170,7 +166,6 @@ export default function App() {
     const resetExplored = new Set<NoteName>();
     sequenceRef.current = resetSequence;
     exploredRef.current = resetExplored;
-    explorerTargetRef.current = lesson.pattern[0].note;
     setSequence(resetSequence);
     setExplored(resetExplored);
     setExplorerTarget(lesson.pattern[0].note);
@@ -221,9 +216,14 @@ export default function App() {
               <p className="eyebrow">Private microphone helper</p>
               <h2 id="listen-title">{feedback.heading}</h2>
               <p className="feedback-detail" aria-live="polite">{feedback.detail}</p>
-              <div className="growth-meter" aria-label={`Lesson progress ${Math.round(progress * 100)} percent`}>
-                <span style={{ width: `${Math.max(4, progress * 100)}%` }} />
-              </div>
+              <progress
+                className="growth-meter"
+                aria-label="Lesson progress"
+                max={100}
+                value={Math.round(progress * 100)}
+              >
+                {Math.round(progress * 100)}%
+              </progress>
               <div className="listen-actions">
                 {microphone.phase === 'listening' || microphone.phase === 'requesting' ? (
                   <button className="button button--stop" type="button" onClick={microphone.stop}>Stop listening</button>

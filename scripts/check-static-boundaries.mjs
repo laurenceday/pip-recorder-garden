@@ -62,10 +62,12 @@ for (const required of [
 if (microphone.includes('analyser.connect') || microphone.includes('source.connect(context.destination)')) {
   throw new Error('the microphone graph must not connect to audible output');
 }
+if (!/catch \(error\) \{\s*if \(run !== runRef\.current\) return;/.test(microphone)) {
+  throw new Error('a cancelled microphone request must not publish stale state');
+}
 
 const app = contents.get('src/App.tsx') ?? '';
 if (!app.includes('tone.stop();\n    void microphone.start()')) throw new Error('starting the microphone must stop the guide tone first');
 if (!app.includes('microphone.stop();\n    void tone.play(expected)')) throw new Error('playing a guide tone must stop the microphone first');
 
 console.log(`static boundaries clean: ${files.length} runtime source files`);
-

@@ -1,7 +1,8 @@
 import type { NoteName } from './lib/recorder.ts';
 
 export type LessonKind = 'hold' | 'sequence' | 'explore';
-export type LessonAccent = 'periwinkle' | 'sky' | 'marigold' | 'leaf' | 'coral';
+export type LessonAccent = 'periwinkle' | 'sky' | 'marigold' | 'leaf' | 'rose';
+export type LessonChapter = 'First sounds' | 'Finger steps' | 'Echoes' | 'Little tunes' | 'Explore';
 
 export interface LessonPatternStep {
   note: NoteName;
@@ -15,7 +16,7 @@ export interface Lesson {
   order: number;
   title: string;
   shortTitle: string;
-  chapter: string;
+  chapter: LessonChapter;
   kind: LessonKind;
   difficulty: number;
   story: string;
@@ -28,4 +29,3 @@ export interface Lesson {
   tips: string[];
   accent: LessonAccent;
 }
-

@@ -9,8 +9,9 @@ interface LessonTrailProps {
 
 const CHAPTER_ICONS: Record<string, string> = {
   'First sounds': '🌱',
+  'Finger steps': '🐾',
   Echoes: '💧',
-  Tunes: '🌼',
+  'Little tunes': '🌼',
   Explore: '🪶',
 };
 
@@ -50,4 +51,3 @@ export function LessonTrail({ lessons, selectedId, completed, onSelect }: Lesson
     </nav>
   );
 }
-

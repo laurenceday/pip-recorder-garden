@@ -4,7 +4,7 @@ import { validateCatalog, validateLesson } from './lesson-contract.mjs';
 
 const IDEA_LINE = /^- \[([ xX])\] (idea-[0-9]{3}): (.+)$/;
 const LOOPBACK = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
-export const PROVIDERS = Object.freeze(['github-models', 'openai-compatible', 'anthropic']);
+export const PROVIDERS = Object.freeze(['openai-compatible', 'anthropic']);
 
 export function parseIdeaInbox(markdown) {
   if (typeof markdown !== 'string' || Buffer.byteLength(markdown) > 65_536 || markdown.includes('\0')) {
@@ -13,6 +13,7 @@ export function parseIdeaInbox(markdown) {
   const ideas = [];
   const seen = new Set();
   let fence = null;
+  let section = '';
   for (const [index, line] of markdown.split(/\r?\n/).entries()) {
     const fenceMatch = /^\s*(`{3,}|~{3,})/.exec(line);
     if (fenceMatch) {
@@ -22,10 +23,16 @@ export function parseIdeaInbox(markdown) {
       continue;
     }
     if (fence !== null) continue;
+    const heading = /^##\s+(.+?)\s*$/.exec(line);
+    if (heading) {
+      section = heading[1];
+      continue;
+    }
     if (!line.startsWith('- [')) continue;
     const match = IDEA_LINE.exec(line);
     if (!match) throw new Error(`idea inbox line ${index + 1} is malformed`);
     const [, marker, id, text] = match;
+    if (marker === ' ' && section !== 'Inbox') throw new Error(`pending ${id} must be under the Inbox heading`);
     if (seen.has(id)) throw new Error(`idea inbox repeats ${id}`);
     if (text.length < 4 || text.length > 500) throw new Error(`${id} text must be 4 to 500 characters`);
     seen.add(id);
@@ -37,15 +44,28 @@ export function parseIdeaInbox(markdown) {
 }
 
 export function markIdeasComplete(markdown, ideaIds) {
-  let next = markdown;
-  for (const id of ideaIds) {
-    const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const matcher = new RegExp(`^- \\[ \\] (${escaped}): `, 'm');
-    const matches = next.match(new RegExp(matcher.source, 'gm')) ?? [];
-    if (matches.length !== 1) throw new Error(`cannot mark ${id}; expected one pending inbox line`);
-    next = next.replace(matcher, '- [x] $1: ');
+  const wanted = new Set(ideaIds);
+  if (wanted.size !== ideaIds.length) throw new Error('cannot mark the same idea more than once');
+  const counts = new Map(ideaIds.map((id) => [id, 0]));
+  let fence = null;
+  const lines = markdown.split(/\r?\n/).map((line) => {
+    const fenceMatch = /^\s*(`{3,}|~{3,})/.exec(line);
+    if (fenceMatch) {
+      const marker = fenceMatch[1][0];
+      if (fence === null) fence = marker;
+      else if (fence === marker) fence = null;
+      return line;
+    }
+    if (fence !== null) return line;
+    const match = IDEA_LINE.exec(line);
+    if (!match || match[1] !== ' ' || !wanted.has(match[2])) return line;
+    counts.set(match[2], (counts.get(match[2]) ?? 0) + 1);
+    return `- [x] ${match[2]}: ${match[3]}`;
+  });
+  for (const [id, count] of counts) {
+    if (count !== 1) throw new Error(`cannot mark ${id}; expected one pending inbox line`);
   }
-  return next;
+  return lines.join('\n');
 }
 
 export function buildAgentPrompt({ ideas, schema, existingLessons }) {
@@ -133,17 +153,14 @@ export function validateProposalBatch(payload, selectedIdeas, existingLessons) {
 }
 
 export function resolveProviderConfig(environment = process.env) {
-  const provider = environment.LESSON_AGENT_PROVIDER || 'github-models';
+  const provider = environment.LESSON_AGENT_PROVIDER || 'openai-compatible';
   if (!PROVIDERS.includes(provider)) throw new Error(`unsupported lesson agent provider: ${provider}`);
   const model = environment.LESSON_AGENT_MODEL?.trim();
   if (!model || model.length > 160) throw new Error('LESSON_AGENT_MODEL is required and must be at most 160 characters');
 
   let endpoint;
   let apiKey;
-  if (provider === 'github-models') {
-    endpoint = environment.LESSON_AGENT_BASE_URL || 'https://models.github.ai/inference/chat/completions';
-    apiKey = environment.GITHUB_TOKEN;
-  } else if (provider === 'anthropic') {
+  if (provider === 'anthropic') {
     endpoint = environment.LESSON_AGENT_BASE_URL || 'https://api.anthropic.com/v1/messages';
     apiKey = environment.LESSON_AGENT_API_KEY;
   } else {
@@ -217,7 +234,7 @@ export async function requestAgentText(config, prompt, fetchImplementation = fet
     redirect: 'error',
   });
   const raw = await readResponseText(response);
-  if (!response.ok) throw new Error(`lesson agent returned HTTP ${response.status}: ${raw.slice(0, 500)}`);
+  if (!response.ok) throw new Error(`lesson agent returned HTTP ${response.status}`);
 
   let envelope;
   try {

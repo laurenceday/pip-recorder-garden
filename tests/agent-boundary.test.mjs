@@ -16,8 +16,9 @@ test('the idea inbox has twelve completed seed ideas and no pending work', async
 });
 
 test('idea parsing refuses malformed and duplicate entries', () => {
-  assert.throws(() => parseIdeaInbox('- [ ] idea-1: too short'), /malformed/);
-  assert.throws(() => parseIdeaInbox('- [ ] idea-013: first\n- [ ] idea-013: second'), /repeats/);
+  assert.throws(() => parseIdeaInbox('## Inbox\n- [ ] idea-1: too short'), /malformed/);
+  assert.throws(() => parseIdeaInbox('## Inbox\n- [ ] idea-013: first\n- [ ] idea-013: second'), /repeats/);
+  assert.throws(() => parseIdeaInbox('## Notes\n- [ ] idea-013: misplaced'), /under the Inbox/);
   assert.throws(() => parseIdeaInbox('```text\n- [ ] idea-013: example'), /unclosed fenced block/);
 });
 
@@ -27,8 +28,9 @@ test('idea parsing ignores examples inside fenced code blocks', () => {
 });
 
 test('only exact pending idea lines can be marked complete', () => {
-  const source = '- [ ] idea-013: Make a gentle high C lesson.\n';
-  assert.equal(markIdeasComplete(source, ['idea-013']), '- [x] idea-013: Make a gentle high C lesson.\n');
+  const source = '```text\n- [ ] idea-013: example only\n```\n## Inbox\n- [ ] idea-013: Make a gentle high C lesson.\n';
+  const expected = '```text\n- [ ] idea-013: example only\n```\n## Inbox\n- [x] idea-013: Make a gentle high C lesson.\n';
+  assert.equal(markIdeasComplete(source, ['idea-013']), expected);
   assert.throws(() => markIdeasComplete(source, ['idea-014']), /expected one/);
 });
 
@@ -61,6 +63,7 @@ test('prompt isolates untrusted idea data from fixed policy', async () => {
 
 test('provider configuration allows HTTPS and local Qwen but refuses remote HTTP', () => {
   assert.deepEqual(resolveProviderConfig({ LESSON_AGENT_PROVIDER: 'openai-compatible', LESSON_AGENT_MODEL: 'qwen', LESSON_AGENT_BASE_URL: 'http://127.0.0.1:11434/v1' }).provider, 'openai-compatible');
+  assert.throws(() => resolveProviderConfig({ LESSON_AGENT_PROVIDER: 'github-models', LESSON_AGENT_MODEL: 'retired' }), /unsupported/);
   assert.throws(() => resolveProviderConfig({ LESSON_AGENT_PROVIDER: 'openai-compatible', LESSON_AGENT_MODEL: 'qwen', LESSON_AGENT_BASE_URL: 'http://example.com/v1', LESSON_AGENT_API_KEY: 'secret' }), /must use HTTPS/);
   assert.throws(() => resolveProviderConfig({ LESSON_AGENT_PROVIDER: 'anthropic', LESSON_AGENT_MODEL: 'claude' }), /requires a credential/);
 });

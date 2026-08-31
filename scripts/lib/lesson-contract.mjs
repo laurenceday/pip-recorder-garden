@@ -30,6 +30,7 @@ export const LESSON_KEYS = Object.freeze([
 
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const IDEA_ID = /^idea-[0-9]{3}$/;
+const UNSAFE_TEXT = /[<>`]|https?:\/\/|www\./i;
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -37,6 +38,12 @@ function isRecord(value) {
 
 function boundedString(value, minimum, maximum) {
   return typeof value === 'string' && value.length >= minimum && value.length <= maximum;
+}
+
+function safeBoundedString(value, minimum, maximum) {
+  return boundedString(value, minimum, maximum)
+    && !UNSAFE_TEXT.test(value)
+    && ![...value].some((character) => character.codePointAt(0) < 32);
 }
 
 function integerBetween(value, minimum, maximum) {
@@ -62,15 +69,15 @@ export function validateLesson(value, label = 'lesson') {
   if (!boundedString(value.id, 3, 48) || !ID.test(value.id)) errors.push(`${label}.id must be kebab-case and 3 to 48 characters`);
   if (typeof value.sourceIdeaId !== 'string' || !IDEA_ID.test(value.sourceIdeaId)) errors.push(`${label}.sourceIdeaId must match idea-NNN`);
   if (!integerBetween(value.order, 1, 999)) errors.push(`${label}.order must be an integer from 1 to 999`);
-  if (!boundedString(value.title, 3, 56)) errors.push(`${label}.title must be 3 to 56 characters`);
-  if (!boundedString(value.shortTitle, 1, 22)) errors.push(`${label}.shortTitle must be 1 to 22 characters`);
+  if (!safeBoundedString(value.title, 3, 56)) errors.push(`${label}.title must be safe plain text of 3 to 56 characters`);
+  if (!safeBoundedString(value.shortTitle, 1, 22)) errors.push(`${label}.shortTitle must be safe plain text of 1 to 22 characters`);
   if (!CHAPTERS.includes(value.chapter)) errors.push(`${label}.chapter is unsupported`);
   if (!KINDS.includes(value.kind)) errors.push(`${label}.kind is unsupported`);
   if (!integerBetween(value.difficulty, 1, 5)) errors.push(`${label}.difficulty must be an integer from 1 to 5`);
-  if (!boundedString(value.story, 12, 180)) errors.push(`${label}.story must be 12 to 180 characters`);
-  if (!boundedString(value.childCue, 5, 130)) errors.push(`${label}.childCue must be 5 to 130 characters`);
-  if (!boundedString(value.adultCue, 8, 220)) errors.push(`${label}.adultCue must be 8 to 220 characters`);
-  if (!boundedString(value.successCue, 3, 100)) errors.push(`${label}.successCue must be 3 to 100 characters`);
+  if (!safeBoundedString(value.story, 12, 180)) errors.push(`${label}.story must be safe plain text of 12 to 180 characters`);
+  if (!safeBoundedString(value.childCue, 5, 130)) errors.push(`${label}.childCue must be safe plain text of 5 to 130 characters`);
+  if (!safeBoundedString(value.adultCue, 8, 220)) errors.push(`${label}.adultCue must be safe plain text of 8 to 220 characters`);
+  if (!safeBoundedString(value.successCue, 3, 100)) errors.push(`${label}.successCue must be safe plain text of 3 to 100 characters`);
 
   if (!Array.isArray(value.pattern) || value.pattern.length < 1 || value.pattern.length > 16) {
     errors.push(`${label}.pattern must contain 1 to 16 notes`);
@@ -92,7 +99,7 @@ export function validateLesson(value, label = 'lesson') {
     errors.push(`${label}.tips must contain 1 to 3 strings`);
   } else {
     value.tips.forEach((tip, index) => {
-      if (!boundedString(tip, 4, 110)) errors.push(`${label}.tips[${index}] must be 4 to 110 characters`);
+      if (!safeBoundedString(tip, 4, 110)) errors.push(`${label}.tips[${index}] must be safe plain text of 4 to 110 characters`);
     });
   }
   if (!ACCENTS.includes(value.accent)) errors.push(`${label}.accent is unsupported`);
