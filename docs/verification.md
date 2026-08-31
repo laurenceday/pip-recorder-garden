@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 41 of 41 tests with none skipped.
+- The Node test suite passed 43 of 43 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 16 files.
 - The production build emitted 219.21 kB of JavaScript (69.35 kB gzip) and 14.29 kB of CSS (4.19 kB gzip).
@@ -24,7 +24,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 - The local preview returned HTTP 200 at `http://127.0.0.1:4173/`.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records exit code 0, 41 passes, no failures and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 43 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Boundaries covered by checks
 
