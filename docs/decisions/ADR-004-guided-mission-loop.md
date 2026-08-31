@@ -12,7 +12,7 @@ A five-year-old beginner needs a short, recognisable turn with several ways to j
 
 ## Decision
 
-Every lesson uses the same four-part mission: hear the complete lesson pattern, copy it by recorder, fingering puzzle, rhythm tap or grown-up co-play, make a two-to-four-note pattern from that lesson’s notes, then choose to stop, replay or return to the garden. The interface never advances to another lesson by itself.
+Every lesson uses the same four-part mission: hear the complete lesson pattern, copy it by recorder, fingering puzzle, rhythm tap or grown-up co-play, enter a bounded maker turn, then choose to stop, replay or return to the garden. The ordinary maker route uses two to four notes from that lesson. “Finish without a tune” is an explicit participation exit for a child who wants to stop there. The interface never advances to another lesson by itself.
 
 Whole-pattern playback is user-started and has an adjacent stop control. Note onsets, releases and the visual pulse all come from one deterministic schedule. Playback and microphone listening stop one another before starting. Both stop on lesson change, completion, hidden tab and teardown.
 

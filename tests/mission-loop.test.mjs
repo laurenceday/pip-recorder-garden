@@ -111,7 +111,7 @@ test('every lesson offers a closed in-memory maker vocabulary', () => {
 
 test('the guide hook owns resume failure, stop, hidden-tab and teardown cleanup', async () => {
   const source = await readFile(path.join(root, 'src', 'hooks', 'useGuideTone.ts'), 'utf8');
-  assert.match(source, /contextRef\.current = context;\s*try \{\s*await context\.resume\(\);\s*\} catch \(error\) \{/);
+  assert.match(source, /contextRef\.current = context;\s*(?:setPlayback\(startGuidePlayback\(null\)\);\s*)?try \{\s*await context\.resume\(\);\s*\} catch \(error\) \{/);
   assert.match(source, /catch \(error\) \{\s*if \(run !== runRef\.current\) return false;\s*releaseResources\(\);\s*setPlayback\(stopGuidePlayback\('stopped'\)\);\s*throw error;/);
   assert.match(source, /document\.visibilityState === 'hidden'\) stop\('hidden'\)/);
   assert.match(source, /useEffect\(\(\) => \(\) => \{[\s\S]*releaseResources\(\);[\s\S]*resolveRef\.current\?\.\(false\)/);
@@ -193,4 +193,50 @@ test('route-agnostic completion celebrates participation without claiming perfor
   const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
   assert.match(app, /<h2>A flower grew for this musical turn!<\/h2>/);
   assert.doesNotMatch(app, /<h2>\{lesson\.successCue\}<\/h2>/);
+});
+
+test('guide highlights use the same start delay as audible Web Audio onsets', async () => {
+  const [missionLoop, guide] = await Promise.all([
+    readFile(path.join(root, 'src', 'lib', 'mission-loop.ts'), 'utf8'),
+    readFile(path.join(root, 'src', 'hooks', 'useGuideTone.ts'), 'utf8'),
+  ]);
+  assert.match(missionLoop, /export const GUIDE_START_DELAY_MS = 40;/);
+  assert.match(guide, /context\.currentTime \+ \(GUIDE_START_DELAY_MS \/ 1_000\)/);
+  assert.match(guide, /event\.onsetMs \+ GUIDE_START_DELAY_MS/);
+  assert.match(guide, /durationMs \+ GUIDE_START_DELAY_MS/);
+});
+
+test('guide controls lock before audio-context resume can yield without highlighting a note early', async () => {
+  assert.deepEqual(startGuidePlayback(null), { running: true, currentIndex: null, reason: 'playing' });
+  const [app, guide] = await Promise.all([
+    readFile(path.join(root, 'src', 'App.tsx'), 'utf8'),
+    readFile(path.join(root, 'src', 'hooks', 'useGuideTone.ts'), 'utf8'),
+  ]);
+  const lockedAt = guide.indexOf('setPlayback(startGuidePlayback(null))');
+  const resumeAt = guide.indexOf('await context.resume()');
+  assert.ok(lockedAt !== -1 && lockedAt < resumeAt);
+  assert.match(guide, /await context\.resume\(\);\s*\} catch[\s\S]*if \(run !== runRef\.current\) return false;/);
+  assert.match(app, /tone\.playing && missionPhase === 'model'\s*\? tone\.currentStep/);
+  assert.match(app, /tone\.playing \? \(\s*<button[^>]*onClick=\{\(\) => tone\.stop\(\)\}>Stop the pattern<\/button>/);
+  assert.match(app, /<button className="button button--soft" type="button" disabled=\{tone\.playing\} onClick=\{\(\) => setMissionPhase\('copy'\)\}>Copy without sound<\/button>/);
+});
+
+test('scripted mission navigation respects the reduced-motion preference', async () => {
+  const missionLoop = await import('../src/lib/mission-loop.ts');
+  assert.equal(typeof missionLoop.missionScrollBehavior, 'function');
+  if (typeof missionLoop.missionScrollBehavior !== 'function') return;
+  assert.equal(missionLoop.missionScrollBehavior(true), 'auto');
+  assert.equal(missionLoop.missionScrollBehavior(false), 'smooth');
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /window\.matchMedia\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+  assert.equal((app.match(/behavior: preferredScrollBehavior\(\)/g) ?? []).length, 3);
+});
+
+test('the standing mission decision documents the optional no-tune participation exit', async () => {
+  const [decision, readme, verification] = await Promise.all([
+    readFile(path.join(root, 'docs', 'decisions', 'ADR-004-guided-mission-loop.md'), 'utf8'),
+    readFile(path.join(root, 'README.md'), 'utf8'),
+    readFile(path.join(root, 'docs', 'verification.md'), 'utf8'),
+  ]);
+  for (const record of [decision, readme, verification]) assert.match(record, /Finish without a tune/);
 });

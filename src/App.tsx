@@ -11,7 +11,7 @@ import { useGuideTone } from './hooks/useGuideTone.ts';
 import { useMicrophoneScoring } from './hooks/useMicrophoneScoring.ts';
 import { useProgress } from './hooks/useProgress.ts';
 import { advanceSequence, createSequenceState, sequenceProgress, type SequenceObservation } from './lib/lesson-state.ts';
-import { lessonPatternNotes, notesToPattern } from './lib/mission-loop.ts';
+import { lessonPatternNotes, missionScrollBehavior, notesToPattern } from './lib/mission-loop.ts';
 import type { PitchAssessment } from './lib/pitch.ts';
 import { NOTE_NAMES, RECORDER_NOTES, type NoteName } from './lib/recorder.ts';
 import type { Lesson } from './types.ts';
@@ -25,6 +25,10 @@ type CopyActivity = 'choose' | 'microphone' | 'fingering' | 'rhythm';
 function initialLessonId(): string {
   const hash = window.location.hash.slice(1);
   return LESSON_IDS.includes(hash) ? hash : LESSONS[0].id;
+}
+
+function preferredScrollBehavior(): 'auto' | 'smooth' {
+  return missionScrollBehavior(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 
 function observationFrom(assessment: PitchAssessment, atMs: number): SequenceObservation {
@@ -140,7 +144,7 @@ export default function App() {
 
   const sessionComplete = missionPhase === 'complete';
   const currentPatternIndex = tone.playing && missionPhase === 'model'
-    ? (tone.currentStep ?? 0)
+    ? tone.currentStep
     : copyActivity === 'fingering'
       ? fingeringIndex
       : isExplorer
@@ -174,7 +178,7 @@ export default function App() {
     resetMission(nextLesson);
     setSelectedId(lessonId);
     document.querySelector<HTMLElement>('#lesson')?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: preferredScrollBehavior() });
   };
 
   const chooseExplorerNote = (note: NoteName) => {
@@ -238,13 +242,13 @@ export default function App() {
     tone.stop();
     resetMission();
     document.querySelector<HTMLElement>('#lesson')?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: preferredScrollBehavior() });
   };
 
   const returnToGarden = () => {
     microphone.stop();
     tone.stop('complete');
-    document.querySelector<HTMLElement>('#garden-path')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelector<HTMLElement>('#garden-path')?.scrollIntoView({ behavior: preferredScrollBehavior(), block: 'start' });
     document.querySelector<HTMLElement>('#garden-path')?.focus({ preventScroll: true });
   };
 

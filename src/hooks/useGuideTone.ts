@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   createPatternSchedule,
+  GUIDE_START_DELAY_MS,
   guidePlaybackAt,
   startGuidePlayback,
   stopGuidePlayback,
@@ -46,6 +47,7 @@ export function useGuideTone() {
     const run = runRef.current;
     const context = new AudioContext();
     contextRef.current = context;
+    setPlayback(startGuidePlayback(null));
     try {
       await context.resume();
     } catch (error) {
@@ -57,7 +59,7 @@ export function useGuideTone() {
     if (run !== runRef.current) return false;
 
     try {
-      const now = context.currentTime + 0.04;
+      const now = context.currentTime + (GUIDE_START_DELAY_MS / 1_000);
       oscillatorsRef.current = [];
       for (const event of schedule) {
         const oscillator = context.createOscillator();
@@ -76,12 +78,10 @@ export function useGuideTone() {
         oscillator.start(onset);
         oscillator.stop(release + 0.01);
       }
-      setPlayback(startGuidePlayback());
-
       for (const event of schedule) {
         timersRef.current.push(window.setTimeout(() => {
           if (run === runRef.current) setPlayback(guidePlaybackAt(schedule, event.onsetMs));
-        }, event.onsetMs));
+        }, event.onsetMs + GUIDE_START_DELAY_MS));
       }
 
       return new Promise<boolean>((resolve) => {
@@ -93,7 +93,7 @@ export function useGuideTone() {
           resolveRef.current = null;
           setPlayback(guidePlaybackAt(schedule, durationMs));
           resolve(true);
-        }, durationMs + 60));
+        }, durationMs + GUIDE_START_DELAY_MS));
       });
     } catch (error) {
       if (run !== runRef.current) return false;
