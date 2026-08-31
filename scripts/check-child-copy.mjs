@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { lstat, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
@@ -18,6 +18,9 @@ const MAX_CHILD_RENDER_SOURCES = 32;
 const CHILD_ENTRY = 'src/components/ChildStage.tsx';
 const CHILD_CONTRACT = 'src/lib/child-copy.ts';
 const CHILD_STYLES = 'src/styles.css';
+const CHECKER_SOURCE = 'scripts/check-child-copy.mjs';
+const PACKAGE_MANIFEST = 'package.json';
+const PACKAGE_LOCK = 'package-lock.json';
 const VISIBLE_STRING_ATTRIBUTES = new Set([
   'alt',
   'aria-description',
@@ -63,17 +66,36 @@ function jsxTagsWithin(node, sourceFile) {
   return tags;
 }
 
-function containsJsx(node) {
-  let found = false;
-  const visit = (child) => {
-    if (child !== node && (ts.isJsxElement(child) || ts.isJsxSelfClosingElement(child) || ts.isJsxFragment(child))) {
-      found = true;
-      return;
-    }
-    if (!found) ts.forEachChild(child, visit);
-  };
-  visit(node);
-  return found;
+function unwrappedExpression(node) {
+  let current = node;
+  while (ts.isParenthesizedExpression(current)) current = current.expression;
+  return current;
+}
+
+function validateChildOutputExpression(node, sourceFile, fileName) {
+  const expression = unwrappedExpression(node);
+  if (ts.isJsxElement(expression) || ts.isJsxSelfClosingElement(expression) || ts.isJsxFragment(expression)) return [];
+  const text = expression.getText(sourceFile).trim();
+  if (ALLOWED_CHILD_EXPRESSIONS.has(text)) return [];
+  if (expression.kind === ts.SyntaxKind.NullKeyword
+    || expression.kind === ts.SyntaxKind.TrueKeyword
+    || expression.kind === ts.SyntaxKind.FalseKeyword) return [];
+  if (ts.isConditionalExpression(expression)) {
+    return [
+      ...validateChildOutputExpression(expression.whenTrue, sourceFile, fileName),
+      ...validateChildOutputExpression(expression.whenFalse, sourceFile, fileName),
+    ];
+  }
+  if (ts.isCallExpression(expression)
+    && ts.isPropertyAccessExpression(expression.expression)
+    && expression.expression.expression.getText(sourceFile) === 'notes'
+    && expression.expression.name.text === 'map'
+    && expression.arguments.length === 1
+    && ts.isArrowFunction(expression.arguments[0])) {
+    const body = expression.arguments[0].body;
+    if (!ts.isBlock(body)) return validateChildOutputExpression(body, sourceFile, fileName);
+  }
+  return [`${fileName} contains dynamic child copy outside the closed interface: ${text}`];
 }
 
 function validateChildRenderSource(source, fileName) {
@@ -87,11 +109,14 @@ function validateChildRenderSource(source, fileName) {
     if (ts.isJsxText(node) && node.text.trim()) {
       findings.push(`${fileName} contains raw child copy: ${JSON.stringify(node.text.trim())}`);
     }
-    if (ts.isJsxAttribute(node) && VISIBLE_STRING_ATTRIBUTES.has(node.name.text)) {
+    const attributeName = ts.isJsxAttribute(node) ? String(node.name.text).toLowerCase() : '';
+    if (ts.isJsxAttribute(node) && VISIBLE_STRING_ATTRIBUTES.has(attributeName)) {
       if (node.initializer && ts.isStringLiteral(node.initializer) && node.initializer.text) {
-        findings.push(`${fileName} contains raw child copy in ${node.name.text}: ${JSON.stringify(node.initializer.text)}`);
+        findings.push(`${fileName} contains raw child copy in ${attributeName}: ${JSON.stringify(node.initializer.text)}`);
       } else if (node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
-        findings.push(`${fileName} contains dynamic child copy in ${node.name.text}`);
+        findings.push(`${fileName} contains dynamic child copy in ${attributeName}`);
+      } else if (!node.initializer) {
+        findings.push(`${fileName} contains implicit child copy in ${attributeName}`);
       }
     }
     if (ts.isJsxSpreadAttribute(node)) findings.push(`${fileName} contains a prop spread`);
@@ -106,11 +131,8 @@ function validateChildRenderSource(source, fileName) {
     }
     if (ts.isJsxExpression(node) && node.parent
       && (ts.isJsxElement(node.parent) || ts.isJsxFragment(node.parent))
-      && node.expression && !containsJsx(node.expression)) {
-      const expression = node.expression.getText(sourceFile).trim();
-      if (!ALLOWED_CHILD_EXPRESSIONS.has(expression)) {
-        findings.push(`${fileName} contains dynamic child copy outside the closed interface: ${expression}`);
-      }
+      && node.expression) {
+      findings.push(...validateChildOutputExpression(node.expression, sourceFile, fileName));
     }
     if (ts.isReturnStatement(node) && node.expression
       && (ts.isStringLiteral(node.expression) || ts.isNoSubstitutionTemplateLiteral(node.expression))) {
@@ -118,7 +140,8 @@ function validateChildRenderSource(source, fileName) {
     }
     if (ts.isCallExpression(node)) {
       const call = node.expression.getText(sourceFile);
-      if (/(?:^|\.)(?:createElement|createPortal|insertAdjacentHTML|write)$/.test(call)) {
+      if (node.expression.kind === ts.SyntaxKind.ImportKeyword
+        || /(?:^|\.)(?:createElement|createPortal|insertAdjacentHTML|lazy|require|write)$/.test(call)) {
         findings.push(`${fileName} contains an imperative render escape: ${call}`);
       }
     }
@@ -143,14 +166,35 @@ async function readBoundedRegularFile(filePath) {
 export function validateChildStageSource(source) {
   const findings = validateChildRenderSource(source, CHILD_ENTRY);
   if (typeof source !== 'string' || source.length === 0) return ['child stage source is missing'];
-  if (!source.includes('data-copy-role="child"')) findings.push('child stage is missing its child role marker');
-  if (!source.includes('childCopyFor(state)')) findings.push('child stage does not resolve copy through the closed state map');
-  if (!source.includes('data-child-copy-id={`${state}.title`}')) findings.push('child title is not joined to its manifest id');
-  if (!source.includes('data-child-copy-id={`${state}.action`}')) findings.push('child action is not joined to its manifest id');
-  if (!source.includes('data-child-copy-id={`${state}.exit`}')) findings.push('child exit is not joined to its manifest id');
-  if (!source.includes('data-child-copy-id={`all.note.${note.toLowerCase()}`}')) findings.push('child note is not joined to its manifest id');
+  const sourceFile = parseTsx(source, CHILD_ENTRY);
+  let roleMarkers = 0;
+  let closedCopyCalls = 0;
+  const copyIds = new Map();
+  const inspectContract = (node) => {
+    if (ts.isJsxAttribute(node) && String(node.name.text).toLowerCase() === 'data-copy-role'
+      && node.initializer && ts.isStringLiteral(node.initializer) && node.initializer.text === 'child') roleMarkers += 1;
+    if (ts.isJsxAttribute(node) && String(node.name.text).toLowerCase() === 'data-child-copy-id'
+      && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+      const value = node.initializer.expression.getText(sourceFile);
+      copyIds.set(value, (copyIds.get(value) ?? 0) + 1);
+    }
+    if (ts.isCallExpression(node) && node.expression.getText(sourceFile) === 'childCopyFor'
+      && node.arguments.length === 1 && node.arguments[0].getText(sourceFile) === 'state') closedCopyCalls += 1;
+    ts.forEachChild(node, inspectContract);
+  };
+  inspectContract(sourceFile);
+  if (roleMarkers !== 1) findings.push('child stage is missing its one child role marker');
+  if (closedCopyCalls !== 1) findings.push('child stage does not resolve copy once through the closed state map');
+  for (const [label, expression] of [
+    ['title', '`${state}.title`'],
+    ['action', '`${state}.action`'],
+    ['exit', '`${state}.exit`'],
+    ['note', '`all.note.${note.toLowerCase()}`'],
+  ]) {
+    if (copyIds.get(expression) !== 1) findings.push(`child ${label} is not joined once to its manifest id`);
+  }
 
-  const imports = importsFrom(parseTsx(source, CHILD_ENTRY));
+  const imports = importsFrom(sourceFile);
   const allowedImports = new Set(['./GardenMark.tsx', '../lib/child-copy.ts']);
   for (const imported of imports) {
     if (!allowedImports.has(imported)) findings.push(`child stage imports an undeclared render path: ${imported}`);
@@ -161,7 +205,9 @@ export function validateChildStageSource(source) {
   ]) {
     if (pattern[1].test(source)) findings.push(`child stage contains ${pattern[0]}`);
   }
-  if (!/interface ChildStageProps \{\s*state: ChildCopyState;\s*notes: readonly ChildNoteLetter\[\];\s*onAction: \(\) => void;\s*onBack: \(\) => void;\s*\}/.test(source)) {
+  const propsInterface = sourceFile.statements.find((statement) => ts.isInterfaceDeclaration(statement)
+    && statement.name.text === 'ChildStageProps');
+  if (!propsInterface || !/interface ChildStageProps \{\s*state: ChildCopyState;\s*notes: readonly ChildNoteLetter\[\];\s*onAction: \(\) => void;\s*onBack: \(\) => void;\s*\}/.test(propsInterface.getText(sourceFile))) {
     findings.push('child stage props are outside the closed state, note and action interface');
   }
   return findings;
@@ -171,9 +217,32 @@ export function validateRoleMountSource(appSource, grownUpSource) {
   const findings = [];
   const appFile = parseTsx(appSource, 'src/App.tsx');
   const grownUpFile = parseTsx(grownUpSource, 'src/components/GrownUpSetup.tsx');
-  const grownUpRole = [...grownUpSource.matchAll(/data-copy-role\s*=\s*["']grown-up["']/g)].length;
+  let grownUpRole = 0;
+  const countGrownUpRole = (node) => {
+    if (ts.isJsxAttribute(node) && String(node.name.text).toLowerCase() === 'data-copy-role'
+      && node.initializer && ts.isStringLiteral(node.initializer) && node.initializer.text === 'grown-up') grownUpRole += 1;
+    ts.forEachChild(node, countGrownUpRole);
+  };
+  countGrownUpRole(grownUpFile);
   if (grownUpRole !== 1) findings.push('grown-up tree is missing its one role marker');
   if (jsxTagsWithin(grownUpFile, grownUpFile).includes('ChildStage')) findings.push('grown-up tree mounts the child stage');
+  if (importsFrom(grownUpFile).some((imported) => /(?:^|\/)ChildStage\.tsx$/.test(imported))) {
+    findings.push('grown-up tree imports the child stage under another name');
+  }
+
+  const exactNamedImportCount = (sourceFile, moduleName, importedName, localName) => sourceFile.statements
+    .filter(ts.isImportDeclaration)
+    .filter((statement) => ts.isStringLiteral(statement.moduleSpecifier) && statement.moduleSpecifier.text === moduleName)
+    .flatMap((statement) => statement.importClause?.namedBindings && ts.isNamedImports(statement.importClause.namedBindings)
+      ? statement.importClause.namedBindings.elements : [])
+    .filter((element) => (element.propertyName?.text ?? element.name.text) === importedName && element.name.text === localName)
+    .length;
+  if (exactNamedImportCount(appFile, './components/ChildStage.tsx', 'ChildStage', 'ChildStage') !== 1) {
+    findings.push('App does not import ChildStage under its exact name and path');
+  }
+  if (exactNamedImportCount(appFile, './components/GrownUpSetup.tsx', 'GrownUpSetup', 'GrownUpSetup') !== 1) {
+    findings.push('App does not import GrownUpSetup under its exact name and path');
+  }
 
   const childMounts = [];
   const grownUpMounts = [];
@@ -210,12 +279,18 @@ export function validateRoleMountSource(appSource, grownUpSource) {
   const grownUpReturn = statements.slice(childBranchIndex + 1).find(ts.isReturnStatement);
   const childReturnTags = childReturn?.expression ? jsxTagsWithin(childReturn.expression, appFile) : [];
   const grownUpReturnTags = grownUpReturn?.expression ? jsxTagsWithin(grownUpReturn.expression, appFile) : [];
+  const childReturnExpression = childReturn?.expression ? unwrappedExpression(childReturn.expression) : null;
+  const grownUpReturnExpression = grownUpReturn?.expression ? unwrappedExpression(grownUpReturn.expression) : null;
   if (!childReturn || childReturnTags.filter((tag) => tag === 'ChildStage').length !== 1
-    || childReturnTags.includes('GrownUpSetup') || childBranch?.elseStatement) {
+    || childReturnTags.includes('GrownUpSetup') || childBranch?.elseStatement
+    || !childReturnExpression || !ts.isJsxSelfClosingElement(childReturnExpression)
+    || jsxTagName(childReturnExpression, appFile) !== 'ChildStage') {
     findings.push('App does not return only the child tree from its child-mode branch');
   }
   if (!grownUpReturn || grownUpReturnTags.filter((tag) => tag === 'GrownUpSetup').length !== 1
-    || grownUpReturnTags.includes('ChildStage')) {
+    || grownUpReturnTags.includes('ChildStage') || !grownUpReturnExpression
+    || !ts.isJsxElement(grownUpReturnExpression)
+    || jsxTagName(grownUpReturnExpression.openingElement, appFile) !== 'GrownUpSetup') {
     findings.push('App does not return only the grown-up tree after its child-mode branch');
   }
   return findings;
@@ -226,6 +301,9 @@ export function validateChildStylesSource(source) {
   const masked = source.replace(/\/\*[\s\S]*?\*\//g, '');
   if (/\\/.test(masked)) findings.push('child copy stylesheet contains escaped tokens');
   if (/(?:@import|url\s*\()/i.test(masked)) findings.push('child copy stylesheet contains an uninspectable artwork source');
+  if (/(?:^|[;{}])\s*(?:list-style(?:-type)?|quotes)\s*:\s*["']/i.test(masked)) {
+    findings.push('child copy stylesheet contains generated marker copy');
+  }
   for (const match of masked.matchAll(/(?:^|[;{}])\s*content\s*:\s*([^;}]+)/gi)) {
     const value = match[1].trim();
     if (!['""', "''", 'none', 'normal'].includes(value)) {
@@ -281,6 +359,44 @@ function assertSourcesMatchCommit(root, commit, sources) {
   }
 }
 
+async function writeReportSafely(root, reportPath, bytes) {
+  let directory = root;
+  for (const part of ['.hexaemeron', 'reports', 'conformance']) {
+    directory = path.join(directory, part);
+    try {
+      await mkdir(directory, { mode: 0o700 });
+    } catch (error) {
+      if (!error || typeof error !== 'object' || error.code !== 'EEXIST') throw error;
+    }
+    const stat = await lstat(directory);
+    if (!stat.isDirectory() || stat.isSymbolicLink()) {
+      throw new Error(`copy report directory must not be a symlink: ${directory}`);
+    }
+  }
+  try {
+    const reportStat = await lstat(reportPath);
+    if (!reportStat.isFile() || reportStat.isSymbolicLink()) {
+      throw new Error('copy report output must be a regular file and not a symlink');
+    }
+  } catch (error) {
+    if (!error || typeof error !== 'object' || error.code !== 'ENOENT') throw error;
+  }
+  const temporary = path.join(directory, `.${path.basename(reportPath)}.${randomUUID()}.tmp`);
+  let operationError;
+  try {
+    await writeFile(temporary, bytes, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+    await rename(temporary, reportPath);
+  } catch (error) {
+    operationError = error;
+  }
+  try {
+    await unlink(temporary);
+  } catch (error) {
+    if ((!error || typeof error !== 'object' || error.code !== 'ENOENT') && !operationError) operationError = error;
+  }
+  if (operationError) throw operationError;
+}
+
 function parseArguments(argv) {
   const values = new Map();
   for (let index = 0; index < argv.length; index += 2) {
@@ -312,12 +428,18 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     grownUp: path.join(root, 'src', 'components', 'GrownUpSetup.tsx'),
     contract: path.join(root, 'src', 'lib', 'child-copy.ts'),
     styles: path.join(root, 'src', 'styles.css'),
+    checker: path.join(root, CHECKER_SOURCE),
+    packageManifest: path.join(root, PACKAGE_MANIFEST),
+    packageLock: path.join(root, PACKAGE_LOCK),
   };
-  const [appSource, grownUpSource, contractSource, stylesSource, childRender] = await Promise.all([
+  const [appSource, grownUpSource, contractSource, stylesSource, checkerSource, packageManifest, packageLock, childRender] = await Promise.all([
     readBoundedRegularFile(paths.app),
     readBoundedRegularFile(paths.grownUp),
     readBoundedRegularFile(paths.contract),
     readBoundedRegularFile(paths.styles),
+    readBoundedRegularFile(paths.checker),
+    readBoundedRegularFile(paths.packageManifest),
+    readBoundedRegularFile(paths.packageLock),
     collectChildRenderSources(root),
   ]);
   const childSource = childRender.sources.get(CHILD_ENTRY) ?? '';
@@ -337,6 +459,9 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     ['src/components/GrownUpSetup.tsx', grownUpSource],
     [CHILD_CONTRACT, contractSource],
     [CHILD_STYLES, stylesSource],
+    [CHECKER_SOURCE, checkerSource],
+    [PACKAGE_MANIFEST, packageManifest],
+    [PACKAGE_LOCK, packageLock],
     ...childRender.sources,
   ]);
   assertSourcesMatchCommit(root, commit, boundSources);
@@ -352,11 +477,11 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     manifestEntries: CHILD_COPY_MANIFEST.length,
     lexicon: CHILD_LEXICON,
     rejectedTokens: [],
+    runtime: { node: process.version, typescript: ts.version },
     sourceFiles,
     sourceSha256: Object.fromEntries(sourceFiles.map((file) => [file, digest(boundSources.get(file))])),
   };
-  await mkdir(path.dirname(reportPath), { recursive: true });
-  await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'w', mode: 0o600 });
+  await writeReportSafely(root, reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(`child copy clean: ${CHILD_COPY_MANIFEST.length} manifest entries, ${CHILD_LEXICON.length} lexicon tokens, 4 declared states`);
   return report;
 }

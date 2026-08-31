@@ -264,6 +264,12 @@ export default function App() {
         ? 'ready'
         : 'done';
   const childNotes = childNoteLetters(lesson.pattern.map((step) => step.note));
+  const enterChildMode = () => {
+    microphone.stop();
+    tone.stop('stopped');
+    resetMission();
+    setChildMode(true);
+  };
   const leaveChildMode = () => {
     microphone.stop();
     tone.stop('stopped');
@@ -293,7 +299,7 @@ export default function App() {
   }
 
   return (
-    <GrownUpSetup onStart={() => { resetMission(); setChildMode(true); }}>
+    <GrownUpSetup onStart={enterChildMode}>
       <>
       <a className="skip-link" href="#lesson">Skip to this lesson</a>
       <header className="site-header">

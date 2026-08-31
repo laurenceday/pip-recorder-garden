@@ -15,3 +15,21 @@ Elenchus verdict: guarded
 | S1-R1-03 | medium | docs/verification.md | The Step 1 record retained the earlier 67-test, 20-source and 232827-byte evidence after the current run passed 75 tests over 23 sources and emitted 235492 bytes; it also did not distinguish the pending child geometry and legacy Pages boundaries from passed evidence. | fixed in this commit |
 
 Leads not pursued: No OCR claim covers words drawn as inline vector paths; GardenMark was manually reviewed as copy-free, external or generated artwork now fails closed, and later artwork needs the same review. No real child, assistive technology, microphone, recorder, room or public deployment was available to this local round. Layout, quiet-flow and live Pages work belong to their source-bound later steps rather than this copy-role fix.
+
+## Step 1, round 2 -- 2026-08-31T20:46:32Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=not-applicable; mobile-scroll=not-applicable; text-scale-crop=not-applicable; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=not-applicable; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical recorder, microphone, room, volume, comfort or learning outcome; words drawn as vector paths or pixels; browser runtime beyond the prior independent observation; Step 2 no-scroll, text-scale, orientation, safe-area and 64-pixel target criteria; Step 3 quiet route and progressive play flow; Step 4 public built-artifact boot. The full reviewed source surface was the conditional role mount, grown-up role root, closed copy contract, global generated-content rules, all transitive child TSX imports, checker source and locked package contract. The prior 391 by 844 observation remains 876 pixels of document height with 50-pixel actions, so mobile scrolling and target geometry remain visibly pending Step 2.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S1-R2-01 | high | scripts/check-child-copy.mjs | Composite JSX expressions could hide a raw fallback because any expression containing JSX was skipped; comments could spoof role and interface checks; import aliases and sibling return nodes could evade the claimed one-role tree. | fixed in this commit |
+| S1-R2-02 | high | src/App.tsx | Start child play changed role without first stopping an active microphone or guide-tone owner, so capture or sound could survive into the child tree. | fixed in this commit |
+| S1-R2-03 | medium | scripts/check-child-copy.mjs | The report did not bind its checker or dependency lock and could follow an existing report-output symlink, leaving both the checking program and destination outside the receipt. | fixed in this commit |
+
+Leads not pursued: The checker admits only its named JSX expression grammar and rejects dynamic imports, imperative render paths, generated CSS text and uninspectable artwork, but it does not OCR inline paths, canvas pixels or image bytes; later artwork therefore still needs human review. Git object integrity, the local executable and the installed Node toolchain remain the local verification trust base. No real child, assistive technology, recorder, microphone, room or public deployment was available. Layout, quiet-flow and live Pages behaviour remain owned by their source-bound later steps, and the legacy Pages setting still requires separate user authority.

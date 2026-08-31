@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -22,6 +22,9 @@ const checkerArguments = [
   '--report', '.hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json',
 ];
 const fixtureFiles = [
+  'package-lock.json',
+  'package.json',
+  'scripts/check-child-copy.mjs',
   'src/App.tsx',
   'src/components/ChildStage.tsx',
   'src/components/GardenMark.tsx',
@@ -103,9 +106,17 @@ test('the child component refuses raw and dynamic accessible copy', async () => 
     '<input value="Recorder" />',
     '<button children="Recorder" />',
     '<div aria-description="Recorder" />',
+    '<div TITLE="Recorder" />',
   ]) {
     assert.match(validateChildStageSource(`${source}\n${bypass}`).join('\n'), /raw child copy/);
   }
+  assert.match(
+    validateChildStageSource(`${source}\n<div>{ok ? <span>{copy.title}</span> : "Recorder"}</div>`).join('\n'),
+    /dynamic child copy.*Recorder/,
+  );
+  const commentSpoof = source.replace('data-copy-role="child"', 'className="child"')
+    + '\n// data-copy-role="child"';
+  assert.match(validateChildStageSource(commentSpoof).join('\n'), /child role marker/);
 });
 
 test('the child component refuses opposite-role copy and undeclared imports', async () => {
@@ -124,6 +135,26 @@ test('App conditionally mounts one child tree or one grown-up tree', async () =>
   assert.match(validateRoleMountSource(app.replace('notes={childNotes}', 'message={guideIssue}'), grownUp).join('\n'), /closed child interface/);
   const fakeConditional = 'function App() { if (childMode) {} <ChildStage state={state} notes={notes} onAction={run} onBack={back} />; return <GrownUpSetup />; }';
   assert.match(validateRoleMountSource(fakeConditional, grownUp).join('\n'), /return only the child tree/);
+  const siblingMount = `
+    import { ChildStage } from './components/ChildStage.tsx';
+    import { GrownUpSetup } from './components/GrownUpSetup.tsx';
+    function App() {
+      if (childMode) return <><ChildStage state={state} notes={notes} onAction={run} onBack={back} /><div /></>;
+      return <GrownUpSetup></GrownUpSetup>;
+    }
+  `;
+  assert.match(validateRoleMountSource(siblingMount, grownUp).join('\n'), /return only the child tree/);
+  const aliasedChild = app.replace(
+    "import { ChildStage } from './components/ChildStage.tsx';",
+    "import { GrownUpSetup as ChildStage } from './components/GrownUpSetup.tsx';",
+  );
+  assert.match(validateRoleMountSource(aliasedChild, grownUp).join('\n'), /exact name and path/);
+});
+
+test('entering child mode stops microphone and guide ownership first', async () => {
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /const enterChildMode = \(\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*resetMission\(\);\s*setChildMode\(true\);\s*\};/);
+  assert.match(app, /<GrownUpSetup onStart=\{enterChildMode\}>/);
 });
 
 test('the copy gate follows imported child components', async () => {
@@ -156,10 +187,36 @@ test('the conformance report refuses source bytes outside its named commit', asy
   });
 });
 
+test('the conformance report binds its checker and dependency contract', async () => {
+  await withCommittedFixture(null, async (fixture) => {
+    const file = path.join(fixture, 'scripts', 'check-child-copy.mjs');
+    const source = await readFile(file, 'utf8');
+    await writeFile(file, `${source}\n// dirty checker specimen\n`);
+  }, async (fixture) => {
+    await assert.rejects(runChildCopyCheck(checkerArguments, fixture), /does not match commit.*check-child-copy/);
+  });
+});
+
+test('the conformance report refuses a symlink output', async () => {
+  await withCommittedFixture(null, async (fixture) => {
+    const directory = path.join(fixture, '.hexaemeron', 'reports', 'conformance');
+    const target = path.join(fixture, 'symlink-target.json');
+    await mkdir(directory, { recursive: true });
+    await writeFile(target, 'sentinel\n');
+    await symlink(target, path.join(directory, 'one-screen-play-loop--rendered-child-copy-approved.json'));
+  }, async (fixture) => {
+    await assert.rejects(runChildCopyCheck(checkerArguments, fixture), /output must be a regular file and not a symlink/);
+    assert.equal(await readFile(path.join(fixture, 'symlink-target.json'), 'utf8'), 'sentinel\n');
+  });
+});
+
 test('a clean report digests the complete child render surface', async () => {
   await withCommittedFixture(null, null, async (fixture) => {
     const report = await runChildCopyCheck(checkerArguments, fixture);
     assert.deepEqual(report.sourceFiles, [
+      'package-lock.json',
+      'package.json',
+      'scripts/check-child-copy.mjs',
       'src/App.tsx',
       'src/components/ChildStage.tsx',
       'src/components/GardenMark.tsx',
@@ -168,5 +225,6 @@ test('a clean report digests the complete child render surface', async () => {
       'src/styles.css',
     ]);
     assert.deepEqual(Object.keys(report.sourceSha256), report.sourceFiles);
+    assert.deepEqual(report.runtime, { node: process.version, typescript: '5.9.3' });
   });
 });

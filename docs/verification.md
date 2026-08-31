@@ -15,16 +15,16 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 79 of 79 tests with none skipped.
+- The Node test suite passed 82 of 82 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
-- The production build emitted 235.49 kB of JavaScript (73.58 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 235492 bytes, below the 300000-byte ceiling.
+- The production build emitted 235.52 kB of JavaScript (73.59 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 235525 bytes, below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 79 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 82 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Guided mission evidence
 
@@ -60,6 +60,6 @@ node scripts/check-child-copy.mjs \
   --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
 ```
 
-The report records a commit-bound digest for `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `App` must return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written.
+The report records a commit-bound digest for its checker, `package.json`, `package-lock.json`, `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus the Node and TypeScript versions, four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `App` must import the two role roots under their exact names and return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open or composite child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written. Existing output files and every report-path directory are checked as regular, non-symlink filesystem entries before an atomic replacement.
 
 The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.

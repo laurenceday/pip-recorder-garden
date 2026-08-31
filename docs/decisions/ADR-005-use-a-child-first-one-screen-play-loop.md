@@ -16,7 +16,7 @@ Use `one-screen-play-loop`. `App` conditionally mounts one of two React trees. `
 
 The first child-copy contract admits exactly `a`, `b`, `back`, `c`, `d`, `done`, `e`, `f`, `g`, `pip`, `play`, `stop` and `try`. Case does not widen the list. Visible copy and accessible names share one deterministic 19-entry manifest over four states: `ready`, `playing`, `done` and `error`. Lesson note names become the letters A to G before they cross into the child tree. No lesson title, story, cue, error message or other open string may cross that interface.
 
-The child entry models the chosen note pattern with **Play**, gives **Stop** while sound runs, gives **Try** after a guide failure and uses **Done** or **Back** to return to grown-up mode. This step establishes the copy boundary without changing the lesson schema, saved progress or audio ownership.
+The child entry models the chosen note pattern with **Play**, gives **Stop** while sound runs, gives **Try** after a guide failure and uses **Done** or **Back** to return to grown-up mode. Entering and leaving the child tree first stops both microphone and guide-tone owners. This step establishes the copy boundary without changing the lesson schema, saved progress or audio ownership.
 
 ## Alternatives
 
@@ -28,7 +28,7 @@ Keeping the old interface unchanged was rejected because it did not answer the f
 
 ## Consequences
 
-- Child copy additions require a reviewed lexicon and manifest change. The checker follows the child component import closure, includes CSS in the commit-bound source digest and rejects unknown tokens, punctuation disguises, generated copy, uninspectable artwork, dynamic accessible names, open error text, opposite-role imports and undeclared states.
+- Child copy additions require a reviewed lexicon and manifest change. The checker follows the child component import closure, includes its own source, the dependency lock and CSS in the commit-bound digest, and rejects unknown tokens, punctuation disguises, generated copy, uninspectable artwork, open or composite child expressions, dynamic accessible names, open error text, opposite-role imports and undeclared states.
 - Grown-up prose remains unrestricted inside its separately mounted tree.
 - The existing twelve lessons, progress key, microphone boundary, guide-tone lifecycle and full mission remain available in grown-up mode.
 - The repository proves conformance to the declared list, not readability for one child. A real child read-through remains required.

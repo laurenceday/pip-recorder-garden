@@ -38,7 +38,7 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
 5. Finish the turn. Choose **Stop here for today**, **Play this mission again** or **Back to the garden path**. The site never moves to the next lesson by itself.
 
-Guide playback and the microphone cannot run together. Starting either one stops the other first. Guide playback also stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.
+Guide playback and the microphone cannot run together. Starting either one stops the other first. Opening or leaving child play also stops both owners before changing views. Guide playback stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.
 
 ## The twelve lessons
 
@@ -175,7 +175,7 @@ node scripts/check-child-copy.mjs --candidate one-screen-play-loop --criterion r
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
 
-The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds every inspected byte to the reported commit and refuses open visible or accessible attributes, dynamic error text, opposite-role imports and undeclared states. This is a repository copy rule, not proof that one child can read every admitted word.
+The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds its own checker, dependency lock and every inspected render byte to the reported commit, and refuses open visible or accessible expressions, dynamic error text, opposite-role imports and undeclared states. It records the Node and TypeScript versions and writes only through checked, non-symlink report paths. This is a repository copy rule, not proof that one child can read every admitted word.
 
 ## How the design was chosen
 
