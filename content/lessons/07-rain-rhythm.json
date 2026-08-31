@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "rain-rhythm",
+  "sourceIdeaId": "idea-007",
+  "order": 7,
+  "title": "Tap the rain rhythm",
+  "shortTitle": "B rhythm",
+  "chapter": "Echoes",
+  "kind": "sequence",
+  "difficulty": 3,
+  "story": "Three B raindrops land: quick, quick, and long.",
+  "childCue": "Copy B, B, B. Let the last B stay a little longer.",
+  "adultCue": "Pitch order is scored; rhythm is modelled but not graded. Leave a small release so repeated notes can be heard separately.",
+  "successCue": "Pitter, patter, plooosh!",
+  "pattern": [{ "note": "B5", "beats": 1 }, { "note": "B5", "beats": 1 }, { "note": "B5", "beats": 2 }],
+  "stableMs": 400,
+  "toleranceCents": 95,
+  "tips": ["Use a new doo for each drop.", "The long drop can still feel easy."],
+  "accent": "sky"
+}

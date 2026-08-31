@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "three-note-echo",
+  "sourceIdeaId": "idea-009",
+  "order": 9,
+  "title": "Echo through the trees",
+  "shortTitle": "B A G echo",
+  "chapter": "Echoes",
+  "kind": "sequence",
+  "difficulty": 3,
+  "story": "The echo wanders past three trees before it finds the garden gate.",
+  "childCue": "Play B, A, G, G, A, B.",
+  "adultCue": "The two G notes need a release between them. Let the child choose a comfortable tempo.",
+  "successCue": "All three trees answered!",
+  "pattern": [{ "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "G5", "beats": 1 }, { "note": "G5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 2 }],
+  "stableMs": 375,
+  "toleranceCents": 90,
+  "tips": ["Add fingers on the way down.", "Lift fingers on the way home."],
+  "accent": "leaf"
+}

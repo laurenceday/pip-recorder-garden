@@ -1,0 +1,52 @@
+## Step 1, round 1 -- 2026-08-31T10:17:17Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: false-pitch-match=reviewed; child-frustration=reviewed; audio-privacy=reviewed; permission-denial=reviewed; feedback-loop=reviewed; fingering-drift=reviewed; progress-pressure=reviewed; pages-subpath=reviewed; model-output=reviewed; idea-injection=reviewed; workflow-authority=reviewed; schedule-drift=reviewed; dependency-advisories=reviewed
+
+Not checked: real microphone hardware and acoustic room behaviour; hosted GitHub Actions and Pages; live publication and cache behaviour; future agent-provider behaviour beyond fixture and protocol boundaries
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S1-R1-01 | medium | `src/hooks/useMicrophoneScoring.ts` | During suspended audio-context resume, Stop found no owned stream or context. Once resume returned, start proceeded to listening despite the intervening Stop. | fixed and guarded in this commit |
+| S1-R1-02 | high | `.github/workflows/agent-lessons.yml` | Manual dispatch accepted an arbitrary provider base URL in the same step as the provider credential, allowing a dispatcher to redirect the secret to another HTTPS endpoint. | fixed and guarded in this commit |
+| S1-R1-03 | medium | `scripts/lib/lesson-contract.mjs` | Agent-authored lesson text admitted invisible and bidirectional Unicode controls that could make reviewed copy display differently from its stored bytes. | fixed and guarded in this commit |
+| S1-R1-04 | medium | `scripts/lib/agent-boundary.mjs` | Malformed lesson entries reached catalogue sorting, and arbitrary large order values passed validation instead of using the next consecutive position. | fixed and guarded in this commit |
+| S1-R1-05 | medium | `vite.config.ts` | The default module-preload shim added `fetch` to the production bundle even though the source-only boundary check claimed the child-facing runtime had no outbound channel. | fixed and guarded in this commit |
+
+Leads not pursued: pitch accuracy and permission-indicator teardown still require real-device observation; schedule reliability and Pages cache behaviour require hosted runs; no microphone recording or outbound microphone-data path was found in source or emitted JavaScript; no mutable workflow action or dependency advisory was found; the reviewed lesson provider is intentionally allowed to receive idea and schema prompt data, but never microphone or child data.
+
+## Step 1, round 2 -- 2026-08-31T10:27:18Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: false-pitch-match=reviewed; child-frustration=reviewed; audio-privacy=reviewed; permission-denial=reviewed; feedback-loop=reviewed; fingering-drift=reviewed; progress-pressure=reviewed; pages-subpath=reviewed; model-output=reviewed; idea-injection=reviewed; workflow-authority=reviewed; schedule-drift=reviewed; dependency-advisories=reviewed
+
+Not checked: real microphone hardware and acoustic room behaviour; hosted GitHub Actions and Pages; live publication and cache behaviour; future agent-provider behaviour beyond fixture and protocol boundaries
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S1-R2-01 | high | `tests/catalog.test.mjs`, `tests/agent-boundary.test.mjs` | The verification gate required exactly 12 lessons and exactly 12 completed ideas, so adding a pending idea or a valid thirteenth lesson made CI reject the extension workflow. | fixed in this commit; isolated parent-red fixture reproduced |
+| S1-R2-02 | high | `package.json` | The proposal workflow invoked `npm run check-agent-diff`, but the package declared no such script, so every lesson-writing run stopped before verification or pull-request creation. | fixed and guarded in this commit |
+
+Leads not pursued: Elenchus guards the missing package command; the obsolete exact-12 assertion is a test-only defect evidenced separately by an isolated run at `4357197` that wrote `idea-013`, accepted exactly two allowed paths, generated 13 lessons, then reproduced `13 !== 12`; the fixed-tree replay wrote the same proposal, kept both diff gates to two allowed paths, passed 43 tests, built 13 lessons and found no dependency advisory; real microphone hardware, hosted workflows, live Pages cache behaviour, and non-fixture provider responses remain outside this round.
+
+## Step 1, round 3 -- 2026-08-31T10:34:40Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: false-pitch-match=reviewed; child-frustration=reviewed; audio-privacy=reviewed; permission-denial=reviewed; feedback-loop=reviewed; fingering-drift=reviewed; progress-pressure=reviewed; pages-subpath=reviewed; model-output=reviewed; idea-injection=reviewed; workflow-authority=reviewed; schedule-drift=reviewed; dependency-advisories=reviewed
+
+Not checked: real microphone hardware and acoustic room behaviour; hosted GitHub Actions and Pages; live publication and cache behaviour; future agent-provider behaviour beyond fixture and protocol boundaries
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: no new finding remained after re-reading microphone ownership and teardown, storage, lesson validation, agent writes, workflow authority, relative Pages assets and emitted JavaScript; the base catalogue passes 43 tests and the isolated extension replay passes the same suite with 13 lessons and exactly two allowed changed paths; hardware acoustics, hosted runs, publication cache behaviour and future provider responses remain explicit manual or external evidence boundaries.

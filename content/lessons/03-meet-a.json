@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "meet-a",
+  "sourceIdeaId": "idea-003",
+  "order": 3,
+  "title": "Plant the A seed",
+  "shortTitle": "Meet A",
+  "chapter": "First sounds",
+  "kind": "hold",
+  "difficulty": 1,
+  "story": "A golden seed needs one calm A before it can sprout.",
+  "childCue": "Keep thumb and hole 1 down. Add hole 2, then play A.",
+  "adultCue": "Help the second left-hand finger land without the first finger or thumb lifting.",
+  "successCue": "A tiny golden shoot appeared!",
+  "pattern": [{ "note": "A5", "beats": 4 }],
+  "stableMs": 650,
+  "toleranceCents": 105,
+  "tips": ["Add one finger below B.", "Let every fingertip feel heavy and soft."],
+  "accent": "marigold"
+}

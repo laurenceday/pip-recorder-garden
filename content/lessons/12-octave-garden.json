@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "octave-garden",
+  "sourceIdeaId": "idea-012",
+  "order": 12,
+  "title": "Open the octave garden",
+  "shortTitle": "C to C",
+  "chapter": "Explore",
+  "kind": "explore",
+  "difficulty": 5,
+  "story": "Eight stepping stones cross the whole natural octave from low C to high C.",
+  "childCue": "Choose any stone, inspect its holes, hear it, then see whether the garden recognises it.",
+  "adultCue": "This is an explorer, not a one-sitting test. Baroque F is the forked 0-1-2-3-4-6-7 pattern; both halves of split holes are covered.",
+  "successCue": "You explored every natural note in the garden!",
+  "pattern": [{ "note": "C5", "beats": 1 }, { "note": "D5", "beats": 1 }, { "note": "E5", "beats": 1 }, { "note": "F5", "beats": 1 }, { "note": "G5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 1 }, { "note": "C6", "beats": 2 }],
+  "stableMs": 450,
+  "toleranceCents": 120,
+  "tips": ["Explore one new stone at a time.", "Forked F is the Baroque clue."],
+  "accent": "marigold"
+}
