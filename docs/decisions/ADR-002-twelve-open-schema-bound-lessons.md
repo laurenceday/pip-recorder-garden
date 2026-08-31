@@ -26,6 +26,7 @@ A short three-lesson demonstration was rejected because the requested result is 
 - No fixed session length is imposed; the child may stop or choose another lesson.
 - New lesson fields require a deliberate schema, validator, renderer and documentation change.
 - Exact fingerings, ordering and difficulty remain executable regression evidence.
+- [ADR-004](ADR-004-guided-mission-loop.md) defines the shared hear, copy, make and stop interaction without changing the lesson catalogue contract.
 
 ## Evidence
 

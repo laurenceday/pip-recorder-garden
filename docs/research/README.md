@@ -8,3 +8,5 @@ Two facts changed during the build:
 - The generated dependency graph was replaced. The final application uses React and Vite without Tailwind, Vinext or a Cloudflare runtime, and the locked graph is checked again during verification.
 
 Current operation belongs in the root `README.md`. Durable product choices belong in `docs/decisions/`.
+
+`guided-mission-study.md` and `guided-mission-runbook.md` preserve the later design gate for the reusable hear, copy, make and stop lesson loop. [ADR-004](../decisions/ADR-004-guided-mission-loop.md) is the standing decision derived from that record.

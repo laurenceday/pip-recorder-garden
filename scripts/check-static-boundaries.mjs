@@ -28,6 +28,7 @@ const forbiddenRuntimeAPIs = [
   ['outbound fetch', /\bfetch\s*\(/],
   ['XML HTTP', /\bXMLHttpRequest\b/],
   ['web socket', /\bWebSocket\b/],
+  ['peer connection', /\bRTCPeerConnection\b/],
   ['event stream', /\bEventSource\b/],
   ['beacon', /\bsendBeacon\b/],
   ['indexed database', /\bindexedDB\b/],
@@ -77,7 +78,33 @@ if (!microphone.includes('await context.resume();\n      if (run !== runRef.curr
 }
 
 const app = contents.get('src/App.tsx') ?? '';
-if (!app.includes('tone.stop();\n    void microphone.start()')) throw new Error('starting the microphone must stop the guide tone first');
-if (!app.includes('microphone.stop();\n    void tone.play(expected)')) throw new Error('playing a guide tone must stop the microphone first');
+if (!/const startListening = \(\) => \{[\s\S]*?tone\.stop\(\);[\s\S]*?microphone\.start\(\)/.test(app)) {
+  throw new Error('starting the microphone must stop guide playback first');
+}
+if (!/const playModel = async \(\) => \{[\s\S]*?microphone\.stop\(\);[\s\S]*?tone\.playPattern\(lesson\.pattern\)/.test(app)) {
+  throw new Error('playing the lesson model must stop the microphone first');
+}
+if (!/const playMadePattern = \(notes[\s\S]*?microphone\.stop\(\);[\s\S]*?tone\.playPattern\(notesToPattern/.test(app)) {
+  throw new Error('playing a made pattern must stop the microphone first');
+}
+
+const guide = contents.get('src/hooks/useGuideTone.ts') ?? '';
+for (const required of [
+  'releaseResources()',
+  "document.visibilityState === 'hidden'",
+  'await context.resume()',
+  "setPlayback(stopGuidePlayback('stopped'))",
+  'context.close()',
+]) {
+  if (!guide.includes(required)) throw new Error(`guide playback lifecycle is missing: ${required}`);
+}
+if (!/catch \(error\) \{[\s\S]*releaseResources\(\);[\s\S]*setPlayback\(stopGuidePlayback\('stopped'\)\)/.test(guide)) {
+  throw new Error('guide audio resume failure must release its owned context and return to stopped state');
+}
+
+const progress = contents.get('src/lib/progress.ts') ?? '';
+if ((progress.match(/pip-recorder-garden\.completed\.v1/g) ?? []).length !== 1) {
+  throw new Error('the runtime must retain exactly one versioned completed-lesson storage key');
+}
 
 console.log(`static boundaries clean: ${files.length} runtime source files`);

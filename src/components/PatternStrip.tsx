@@ -11,7 +11,7 @@ interface PatternStripProps {
 
 export function PatternStrip({ pattern, currentIndex, complete, onSelectNote, explored }: PatternStripProps) {
   return (
-    <div className="pattern-strip" aria-label="Notes in this lesson">
+    <div className="pattern-strip" aria-label="Notes in this lesson" aria-live="polite">
       {pattern.map((step, index) => {
         const isCurrent = !complete && index === currentIndex;
         const isDone = complete || (explored ? explored.has(step.note) : index < currentIndex);
@@ -36,7 +36,7 @@ export function PatternStrip({ pattern, currentIndex, complete, onSelectNote, ex
           );
         }
         return (
-          <div className={`note-stone ${isCurrent ? 'note-stone--current' : ''} ${isDone ? 'note-stone--done' : ''}`} key={`${step.note}-${index}`}>
+          <div className={`note-stone ${isCurrent ? 'note-stone--current' : ''} ${isDone ? 'note-stone--done' : ''}`} key={`${step.note}-${index}`} aria-current={isCurrent ? 'step' : undefined}>
             {content}
           </div>
         );
@@ -44,4 +44,3 @@ export function PatternStrip({ pattern, currentIndex, complete, onSelectNote, ex
     </div>
   );
 }
-
