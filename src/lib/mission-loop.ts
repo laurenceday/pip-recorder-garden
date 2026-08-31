@@ -3,6 +3,7 @@ import { NOTE_NAMES, type NoteName } from './recorder.ts';
 
 export const GUIDE_BEAT_MS = 560;
 export const GUIDE_GAP_MS = 70;
+export const GUIDE_START_DELAY_MS = 40;
 export const MIN_MADE_PATTERN_NOTES = 2;
 export const MAX_MADE_PATTERN_NOTES = 4;
 
@@ -63,8 +64,8 @@ export function createPatternSchedule(
   });
 }
 
-export function startGuidePlayback(): GuidePlaybackState {
-  return { running: true, currentIndex: 0, reason: 'playing' };
+export function startGuidePlayback(currentIndex: number | null = 0): GuidePlaybackState {
+  return { running: true, currentIndex, reason: 'playing' };
 }
 
 export function guidePlaybackAt(schedule: readonly GuideEvent[], elapsedMs: number): GuidePlaybackState {
@@ -78,6 +79,10 @@ export function guidePlaybackAt(schedule: readonly GuideEvent[], elapsedMs: numb
 
 export function stopGuidePlayback(reason: Exclude<GuideStopReason, 'idle' | 'playing' | 'finished'> = 'stopped'): GuidePlaybackState {
   return { running: false, currentIndex: null, reason };
+}
+
+export function missionScrollBehavior(prefersReducedMotion: boolean): 'auto' | 'smooth' {
+  return prefersReducedMotion ? 'auto' : 'smooth';
 }
 
 export function lessonPatternNotes(pattern: readonly LessonPatternStep[]): NoteName[] {

@@ -3,7 +3,7 @@ import type { LessonPatternStep } from '../types.ts';
 
 interface PatternStripProps {
   pattern: readonly LessonPatternStep[];
-  currentIndex: number;
+  currentIndex: number | null;
   complete: boolean;
   onSelectNote?: (note: NoteName) => void;
   explored?: ReadonlySet<NoteName>;
@@ -13,8 +13,8 @@ export function PatternStrip({ pattern, currentIndex, complete, onSelectNote, ex
   return (
     <div className="pattern-strip" aria-label="Notes in this lesson" aria-live="polite">
       {pattern.map((step, index) => {
-        const isCurrent = !complete && index === currentIndex;
-        const isDone = complete || (explored ? explored.has(step.note) : index < currentIndex);
+        const isCurrent = currentIndex !== null && !complete && index === currentIndex;
+        const isDone = complete || (explored ? explored.has(step.note) : currentIndex !== null && index < currentIndex);
         const content = (
           <>
             <strong>{RECORDER_NOTES[step.note].label}</strong>
