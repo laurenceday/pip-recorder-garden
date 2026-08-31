@@ -17,7 +17,7 @@ const CHAPTER_ICONS: Record<string, string> = {
 
 export function LessonTrail({ lessons, selectedId, completed, onSelect }: LessonTrailProps) {
   return (
-    <nav className="lesson-trail" aria-label="Twelve recorder lessons">
+    <nav className="lesson-trail" id="garden-path" tabIndex={-1} aria-label="Twelve recorder lessons">
       <div className="trail-heading">
         <div>
           <span className="eyebrow">Garden path</span>

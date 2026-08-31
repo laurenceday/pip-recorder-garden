@@ -139,8 +139,8 @@ button:focus-visible, summary:focus-visible, a:focus-visible, [tabindex="-1"]:fo
   letter-spacing: .14em;
   text-transform: uppercase;
 }
-h1, h2, p { margin-top: 0; }
-h1, h2 { font-family: Georgia, "Times New Roman", serif; font-weight: 650; letter-spacing: -.025em; }
+h1, h2, h3, p { margin-top: 0; }
+h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 650; letter-spacing: -.025em; }
 h1 { max-width: 760px; margin-bottom: .85rem; font-size: clamp(2.25rem, 5vw, 4.6rem); line-height: .98; }
 .story-copy { max-width: 680px; margin-bottom: 1.7rem; color: #565365; font-size: clamp(1.05rem, 1.7vw, 1.3rem); line-height: 1.55; }
 .child-cue {
@@ -157,6 +157,32 @@ h1 { max-width: 760px; margin-bottom: .85rem; font-size: clamp(2.25rem, 5vw, 4.6
 .child-cue p { margin: 0; line-height: 1.5; }
 .child-cue strong { display: block; margin-bottom: .15rem; color: var(--accent); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
 
+.mission-map {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .45rem;
+  margin: 1.3rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mission-map li {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem;
+  padding: .55rem .65rem;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--muted);
+  background: rgb(255 253 248 / 74%);
+  font-size: .75rem;
+  font-weight: 800;
+  text-align: center;
+}
+.mission-map li[aria-current="step"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.mission-map li.mission-map--done { border-color: #a6c3a5; color: var(--leaf-dark); background: #f0f7eb; }
+
 .pattern-strip { display: flex; gap: .65rem; margin-top: 1.5rem; padding-bottom: .35rem; overflow-x: auto; scrollbar-width: thin; }
 .note-stone {
   position: relative;
@@ -169,13 +195,136 @@ h1 { max-width: 760px; margin-bottom: .85rem; font-size: clamp(2.25rem, 5vw, 4.6
   text-align: left;
   box-shadow: 0 5px 0 #e6ddcc;
 }
-button.note-stone { cursor: pointer; }
+button.note-stone { min-height: 64px; cursor: pointer; }
 .note-stone strong, .note-stone small { display: block; }
 .note-stone strong { color: #3f3d52; font-size: .95rem; }
 .note-stone small { margin-top: .15rem; color: var(--muted); font-size: .68rem; }
 .note-stone > span { position: absolute; top: .5rem; right: .55rem; color: var(--leaf); font-weight: 900; }
 .note-stone--current { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 38%, white); }
 .note-stone--done { border-color: #a6c3a5; background: #f0f7eb; }
+
+.model-card,
+.pattern-maker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 2rem clamp(1.4rem, 4vw, 4rem);
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, white);
+  border-radius: 26px;
+  background: linear-gradient(145deg, #fff, var(--accent-soft));
+}
+.model-card .eyebrow, .pattern-maker .eyebrow { margin-top: 0; }
+.model-card h2, .pattern-maker h2 { margin-bottom: .55rem; font-size: clamp(1.65rem, 3vw, 2.5rem); }
+.model-card p, .pattern-maker p { max-width: 650px; color: #5e5b6d; line-height: 1.5; }
+
+.copy-chooser,
+.mission-activity {
+  min-height: 360px;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, white);
+  border-radius: 26px;
+  background: linear-gradient(145deg, #fff, var(--accent-soft));
+}
+.copy-chooser .eyebrow, .mission-activity .eyebrow { margin-top: 0; }
+.copy-chooser h2, .mission-activity h3 { margin-bottom: .55rem; font-size: clamp(1.55rem, 3vw, 2.35rem); }
+.copy-chooser > p, .mission-activity > p { color: #5e5b6d; line-height: 1.5; }
+.copy-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin: 1rem 0; }
+.copy-choice {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  gap: .2rem;
+  padding: .8rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fffaf0;
+  box-shadow: 0 5px 0 #ded5c1;
+  cursor: pointer;
+  text-align: center;
+}
+.copy-choice:hover { transform: translateY(-2px); }
+.copy-choice > span { font-size: 1.5rem; }
+.copy-choice strong, .copy-choice small { display: block; }
+.copy-choice small { color: var(--muted); font-size: .7rem; }
+.co-play-prompt {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .7rem;
+  margin: 1.1rem 0 .55rem;
+  padding: .85rem;
+  border-radius: 16px;
+  color: #555263;
+  background: rgb(255 255 255 / 68%);
+  line-height: 1.45;
+}
+.co-play-prompt .button { margin-left: auto; }
+
+.hole-board { display: grid; grid-template-columns: repeat(4, minmax(52px, 1fr)); gap: .65rem; margin: 1rem 0; }
+.hole-button {
+  min-width: 52px;
+  min-height: 58px;
+  border: 3px solid #6f5a48;
+  border-radius: 50%;
+  color: #5d5046;
+  background: #fffaf0;
+  font-weight: 850;
+  cursor: pointer;
+}
+.hole-button--covered { border-color: #353449; color: white; background: var(--accent); }
+.mission-feedback { min-height: 1.6rem; color: #555263; font-weight: 750; line-height: 1.45; }
+.mission-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .7rem; }
+
+.rhythm-pad {
+  width: 100%;
+  min-height: 112px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .7rem;
+  margin: 1rem 0;
+  border: 2px solid var(--accent);
+  border-radius: 24px;
+  color: white;
+  background: var(--accent);
+  box-shadow: 0 8px 0 color-mix(in srgb, var(--accent) 62%, #24263a);
+  font-size: 1.1rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+.rhythm-pad > span { font-size: 2rem; }
+.rhythm-pad:disabled { border-color: #aaa59b; color: #5c5965; background: #e5dfd4; box-shadow: 0 6px 0 #c9c1b5; cursor: default; }
+
+.pattern-maker { grid-template-columns: 1fr; }
+.made-pattern { display: grid; grid-template-columns: repeat(4, minmax(58px, 110px)); gap: .65rem; }
+.made-note {
+  min-height: 62px;
+  display: grid;
+  place-items: center;
+  padding: .5rem;
+  border: 2px solid var(--accent);
+  border-radius: 18px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 850;
+  text-align: center;
+}
+.made-note--empty { border-style: dashed; border-color: var(--line); color: #aaa59b; background: #fffdf8; }
+.made-note--current { color: white; background: var(--accent); transform: translateY(-4px); }
+.maker-note-buttons { display: flex; flex-wrap: wrap; gap: .65rem; }
+.note-choice {
+  min-height: 50px;
+  padding: .7rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 15px;
+  color: var(--accent);
+  background: #fff;
+  font-weight: 820;
+  cursor: pointer;
+}
+.note-choice:disabled, .button:disabled { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
 
 .practice-grid {
   display: grid;
@@ -288,9 +437,12 @@ button.note-stone { cursor: pointer; }
 .grown-up-card > div { max-width: 760px; padding: .25rem .15rem 1.25rem; color: #5f5c69; line-height: 1.55; }
 .grown-up-card h2 { color: var(--ink); font-size: 1.3rem; }
 .grown-up-card li + li { margin-top: .25rem; }
-.text-button { padding: .35rem 0; border: 0; color: #376a4a; background: transparent; font-weight: 800; text-decoration: underline; text-underline-offset: .22rem; cursor: pointer; }
+.text-button { min-height: 44px; padding: .6rem .15rem; border: 0; color: #376a4a; background: transparent; font-weight: 800; text-decoration: underline; text-underline-offset: .22rem; cursor: pointer; }
 .text-button:disabled { color: #aaa59b; cursor: not-allowed; text-decoration: none; }
 .lesson-nav { display: flex; justify-content: space-between; padding-top: 1.1rem; }
+.success-card--mission { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+.success-card--mission .mission-actions { grid-column: 1 / -1; }
+.success-card--mission .button { margin-left: 0; }
 
 .lesson-trail {
   position: sticky;
@@ -312,6 +464,7 @@ button.note-stone { cursor: pointer; }
 .lesson-trail ol { display: grid; gap: .48rem; margin: 0; padding: 0; list-style: none; }
 .trail-item { --accent: var(--leaf); --accent-soft: #e8f3e7; }
 .trail-item button {
+  min-height: 58px;
   width: 100%;
   display: grid;
   grid-template-columns: 38px 1fr auto;
@@ -352,7 +505,8 @@ button.note-stone { cursor: pointer; }
 
 @media (max-width: 1050px) {
   .page-shell { grid-template-columns: 1fr; }
-  .lesson-trail { position: static; max-height: none; grid-row: 1; }
+  .lesson-stage { grid-row: 1; }
+  .lesson-trail { position: static; max-height: none; grid-row: 2; }
   .lesson-trail ol { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .trail-item button { grid-template-columns: 34px 1fr; }
   .trail-leaves { display: none; }
@@ -369,11 +523,17 @@ button.note-stone { cursor: pointer; }
   .trail-copy small { display: none; }
   .trail-copy strong { white-space: normal; }
   .story-panel { padding-top: 1.55rem; }
+  .mission-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   h1 { font-size: clamp(2.2rem, 12vw, 3.3rem); }
   .practice-grid { grid-template-columns: 1fr; }
   .fingering { min-height: 0; grid-template-columns: 130px 1fr; }
   .fingering svg { max-height: 250px; }
   .listening-card { min-height: 330px; }
+  .model-card { grid-template-columns: 1fr; }
+  .copy-choice-grid { grid-template-columns: 1fr; }
+  .copy-choice { min-height: 76px; grid-template-columns: auto 1fr; place-items: center start; text-align: left; }
+  .copy-choice > span { grid-row: 1 / 3; }
+  .co-play-prompt .button { width: 100%; margin-left: 0; }
   .listen-orbit { width: 64px; height: 64px; opacity: .75; }
   .success-card { align-items: flex-start; flex-wrap: wrap; }
   .success-card .button { width: 100%; margin-left: 0; }
@@ -385,6 +545,11 @@ button.note-stone { cursor: pointer; }
   .fingering { grid-template-columns: 105px 1fr; padding: .8rem; }
   .fingering figcaption strong { font-size: 1.25rem; }
   .listen-actions .button { width: 100%; }
+  .model-card .button, .pattern-maker .button, .mission-activity .button { width: 100%; }
+  .made-pattern { grid-template-columns: repeat(4, minmax(48px, 1fr)); }
+  .made-note { min-height: 56px; padding: .3rem; font-size: .78rem; }
+  .maker-note-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .note-choice { width: 100%; }
   .lesson-nav { gap: .8rem; }
 }
 @media (prefers-reduced-motion: reduce) {
