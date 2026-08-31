@@ -29,15 +29,15 @@
     "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "minLength": 3, "maxLength": 48 },
     "sourceIdeaId": { "type": "string", "pattern": "^idea-[0-9]{3}$" },
     "order": { "type": "integer", "minimum": 1, "maximum": 999 },
-    "title": { "type": "string", "minLength": 3, "maxLength": 56, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
-    "shortTitle": { "type": "string", "minLength": 1, "maxLength": 22, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
+    "title": { "type": "string", "minLength": 3, "maxLength": 56, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
+    "shortTitle": { "type": "string", "minLength": 1, "maxLength": 22, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
     "chapter": { "enum": ["First sounds", "Finger steps", "Echoes", "Little tunes", "Explore"] },
     "kind": { "enum": ["hold", "sequence", "explore"] },
     "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
-    "story": { "type": "string", "minLength": 12, "maxLength": 180, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
-    "childCue": { "type": "string", "minLength": 5, "maxLength": 130, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
-    "adultCue": { "type": "string", "minLength": 8, "maxLength": 220, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
-    "successCue": { "type": "string", "minLength": 3, "maxLength": 100, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" },
+    "story": { "type": "string", "minLength": 12, "maxLength": 180, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
+    "childCue": { "type": "string", "minLength": 5, "maxLength": 130, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
+    "adultCue": { "type": "string", "minLength": 8, "maxLength": 220, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
+    "successCue": { "type": "string", "minLength": 3, "maxLength": 100, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" },
     "pattern": {
       "type": "array",
       "minItems": 1,
@@ -58,7 +58,7 @@
       "type": "array",
       "minItems": 1,
       "maxItems": 3,
-      "items": { "type": "string", "minLength": 4, "maxLength": 110, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F<>`]+$" }
+      "items": { "type": "string", "minLength": 4, "maxLength": 110, "pattern": "^(?!.*(?:https?://|www\\.))[^\\u0000-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u206F\\uFEFF<>`]+$" }
     },
     "accent": { "enum": ["marigold", "periwinkle", "rose", "sky", "leaf"] }
   }

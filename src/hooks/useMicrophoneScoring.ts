@@ -80,15 +80,16 @@ export function useMicrophoneScoring({ expected, toleranceCents, onAssessment }:
         stream.getTracks().forEach((track) => track.stop());
         return;
       }
+      streamRef.current = stream;
       const context = new AudioContext();
+      contextRef.current = context;
       await context.resume();
+      if (run !== runRef.current) return;
       const source = context.createMediaStreamSource(stream);
       const analyser = context.createAnalyser();
       analyser.fftSize = 4096;
       analyser.smoothingTimeConstant = 0;
       source.connect(analyser);
-      streamRef.current = stream;
-      contextRef.current = context;
       sourceRef.current = source;
       const samples = new Float32Array(analyser.fftSize);
       let lastProcessedAt = -Infinity;

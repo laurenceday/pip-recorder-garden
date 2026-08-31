@@ -127,6 +127,7 @@ export function validateProposalBatch(payload, selectedIdeas, existingLessons) {
   const existingIdeaIds = new Set(existingLessons.map((lesson) => lesson.sourceIdeaId));
   const maximumOrder = Math.max(0, ...existingLessons.map((lesson) => lesson.order));
   const maximumDifficulty = Math.max(1, ...existingLessons.map((lesson) => lesson.difficulty));
+  const expectedOrders = new Set(selectedIdeas.map((_, index) => maximumOrder + index + 1));
   const proposedIds = new Set();
   const proposedIdeas = new Set();
   const proposedOrders = new Set();
@@ -137,7 +138,9 @@ export function validateProposalBatch(payload, selectedIdeas, existingLessons) {
     if (!wantedIdeas.has(lesson.sourceIdeaId)) errors.push(`proposal[${index}] does not name a selected idea`);
     if (existingIds.has(lesson.id) || proposedIds.has(lesson.id)) errors.push(`proposal lesson id is not new: ${lesson.id}`);
     if (existingIdeaIds.has(lesson.sourceIdeaId) || proposedIdeas.has(lesson.sourceIdeaId)) errors.push(`proposal idea is not new: ${lesson.sourceIdeaId}`);
-    if (lesson.order <= maximumOrder || proposedOrders.has(lesson.order)) errors.push(`proposal order must be new and greater than ${maximumOrder}`);
+    if (!expectedOrders.has(lesson.order) || proposedOrders.has(lesson.order)) {
+      errors.push(`proposal orders must be the next ${selectedIdeas.length} consecutive catalogue position(s)`);
+    }
     if (lesson.difficulty < maximumDifficulty) errors.push(`proposal difficulty must be at least ${maximumDifficulty}`);
     proposedIds.add(lesson.id);
     proposedIdeas.add(lesson.sourceIdeaId);
@@ -147,7 +150,8 @@ export function validateProposalBatch(payload, selectedIdeas, existingLessons) {
   for (const ideaId of wantedIdeas) {
     if (!proposedIdeas.has(ideaId)) errors.push(`proposal omitted ${ideaId}`);
   }
-  const combined = [...existingLessons, ...payload.lessons].sort((left, right) => left.order - right.order);
+  const validLessonObjects = payload.lessons.filter((lesson) => lesson !== null && typeof lesson === 'object' && !Array.isArray(lesson));
+  const combined = [...existingLessons, ...validLessonObjects].sort((left, right) => left.order - right.order);
   errors.push(...validateCatalog(combined));
   return [...new Set(errors)];
 }

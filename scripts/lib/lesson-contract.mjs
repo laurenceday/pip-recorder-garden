@@ -30,7 +30,7 @@ export const LESSON_KEYS = Object.freeze([
 
 const ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const IDEA_ID = /^idea-[0-9]{3}$/;
-const UNSAFE_TEXT = /[<>`]|https?:\/\/|www\./i;
+const UNSAFE_TEXT = /[<>`]|https?:\/\/|www\.|[\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/iu;
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);

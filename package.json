@@ -12,6 +12,7 @@
     "dev": "vite --host 127.0.0.1",
     "prebuild": "npm run generate",
     "build": "vite build",
+    "postbuild": "node scripts/check-built-boundaries.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:report": "node scripts/emit-node-test-report.mjs .elenchus/node-test.json",
