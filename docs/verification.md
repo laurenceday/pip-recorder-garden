@@ -15,26 +15,26 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 56 of 56 tests with none skipped.
+- The Node test suite passed 61 of 61 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 20 files.
-- The production build emitted 232.07 kB of JavaScript (72.69 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232070 bytes, below the 300000-byte ceiling.
+- The production build emitted 232.65 kB of JavaScript (72.76 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232658 bytes, below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 56 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 61 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Guided mission evidence
 
 - Pure tests schedule every onset, release and beat in lesson 8’s B-A-A-B model, including a quiet gap between its repeated A notes.
 - Guide state tests cover natural finish, user stop, hidden tab, lesson change, completion and teardown. Source checks also require a rejected `AudioContext.resume()` to close its owned context and return to a visible stopped state.
 - Rhythm tests accept the same broad shape at a different tempo, distinguish a clearly different shape and fail closed on malformed taps.
-- Pattern-maker tests enforce two-to-four-note bounds, current-lesson notes, frozen controls during playback and an explicit stop action.
+- Pattern-maker tests enforce two-to-four-note bounds, current-lesson notes, frozen controls during playback, an explicit stop action and a participation exit before a tune is ready.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The local development demo was also exercised at 390 by 844 CSS pixels without requesting microphone permission. The active lesson began at 91 CSS pixels and the garden path began below it at 1189 CSS pixels. No visible child lesson control measured below 44 by 44 CSS pixels. Lesson 8 visibly advanced through B, A, A and B before moving from **Hear it** to **Copy it**. Equal rhythm taps reached the maker; its add, undo and finish controls froze while B-A sounded; **Stop my tune** restored them. Finishing left the same lesson selected and offered only **Stop here for today**, **Play this mission again** and **Back to the garden path**. The browser console had no warning or error.
+The local development demo was also exercised at 390 by 844 CSS pixels without requesting microphone permission. The active lesson began at 91 CSS pixels and the garden path began below it at 1189 CSS pixels. No visible child lesson control measured below 44 by 44 CSS pixels. Lesson 8 visibly advanced through B, A, A and B before moving from **Hear it** to **Copy it**. Fingering and rhythm both returned to the route chooser; **Play to Pip** opened the ready card without requesting permission; and the empty maker offered **Finish without a tune**. Equal rhythm taps reached the maker; its add, undo and finish controls froze while B-A sounded; **Stop my tune** restored them. Route-agnostic completion used the participation-only heading **A flower grew for this musical turn!** Finishing left the same lesson selected and offered only **Stop here for today**, **Play this mission again** and **Back to the garden path**. The browser console had no warning or error.
 
 ## Boundaries covered by checks
 

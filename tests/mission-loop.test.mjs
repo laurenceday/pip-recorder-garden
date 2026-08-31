@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import test from 'node:test';
-import catalogue from '../src/generated/lessons.json' with { type: 'json' };
 import {
   addMadePatternNote,
   compareRhythm,
@@ -17,6 +16,14 @@ import {
 } from '../src/lib/mission-loop.ts';
 
 const root = process.cwd();
+const lessonDirectory = path.join(root, 'content', 'lessons');
+const catalogue = {
+  lessons: (await Promise.all(
+    (await readdir(lessonDirectory))
+      .filter((name) => name.endsWith('.json'))
+      .map(async (name) => JSON.parse(await readFile(path.join(lessonDirectory, name), 'utf8'))),
+  )).sort((left, right) => left.order - right.order),
+};
 const lessonEight = catalogue.lessons.find((lesson) => lesson.id === 'two-note-echo');
 
 test('the lesson 8 guide schedules the complete B A A B model', () => {
@@ -148,4 +155,42 @@ test('the fingering route promises the maker only after its final pattern note',
   ]);
   assert.match(app, /isLast=\{fingeringIndex === lesson\.pattern\.length - 1\}/);
   assert.match(mission, /isLast \? 'Picture matched — make a tune' : 'Picture matched — next note'/);
+});
+
+test('fingering progress and explorer controls stay aligned with the active copy route', async () => {
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /copyActivity === 'fingering'\s*\? fingeringIndex\s*:\s*isExplorer/);
+  assert.match(app, /onSelectNote=\{isExplorer && missionPhase === 'copy' && copyActivity === 'microphone' \? chooseExplorerNote : undefined\}/);
+  assert.match(app, /explored=\{isExplorer && missionPhase === 'copy' && copyActivity === 'microphone' \? explored : undefined\}/);
+});
+
+test('choosing microphone copy does not request permission until the listen action', async () => {
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /className="copy-choice" type="button" onClick=\{\(\) => setCopyActivity\('microphone'\)\}/);
+  assert.equal((app.match(/onClick=\{startListening\}/g) ?? []).length, 1);
+  assert.match(app, />Let Pip listen<\/button>/);
+});
+
+test('microphone-free copy activities can return to the route chooser', async () => {
+  const [app, fingering, rhythm] = await Promise.all([
+    readFile(path.join(root, 'src', 'App.tsx'), 'utf8'),
+    readFile(path.join(root, 'src', 'components', 'FingeringMission.tsx'), 'utf8'),
+    readFile(path.join(root, 'src', 'components', 'RhythmEcho.tsx'), 'utf8'),
+  ]);
+  assert.match(app, /<FingeringMission[\s\S]*?onChooseAnother=\{\(\) => setCopyActivity\('choose'\)\}[\s\S]*?\/>/);
+  assert.match(app, /<RhythmEcho[\s\S]*?onChooseAnother=\{\(\) => setCopyActivity\('choose'\)\}[\s\S]*?\/>/);
+  assert.match(fingering, /onClick=\{onChooseAnother\}>Choose another way<\/button>/);
+  assert.match(rhythm, /onClick=\{onChooseAnother\}>Choose another way<\/button>/);
+  assert.doesNotMatch(rhythm, /Listen again/);
+});
+
+test('the maker offers a participation exit before two notes are chosen', async () => {
+  const maker = await readFile(path.join(root, 'src', 'components', 'PatternMaker.tsx'), 'utf8');
+  assert.match(maker, /!ready && \(\s*<button className="button button--soft" type="button" onClick=\{onComplete\}>Finish without a tune<\/button>/);
+});
+
+test('route-agnostic completion celebrates participation without claiming performance', async () => {
+  const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
+  assert.match(app, /<h2>A flower grew for this musical turn!<\/h2>/);
+  assert.doesNotMatch(app, /<h2>\{lesson\.successCue\}<\/h2>/);
 });

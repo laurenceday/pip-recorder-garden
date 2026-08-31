@@ -33,7 +33,7 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 1. Choose any lesson on the garden path. Nothing is locked.
 2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
 3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
-4. Make a two-to-four-note tune from the notes in that lesson. Hear it, stop it, change it and play it yourself as often as you like.
+4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
 5. Finish the turn. Choose **Stop here for today**, **Play this mission again** or **Back to the garden path**. The site never moves to the next lesson by itself.
 
 Guide playback and the microphone cannot run together. Starting either one stops the other first. Guide playback also stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.

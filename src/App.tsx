@@ -141,9 +141,11 @@ export default function App() {
   const sessionComplete = missionPhase === 'complete';
   const currentPatternIndex = tone.playing && missionPhase === 'model'
     ? (tone.currentStep ?? 0)
-    : isExplorer
-      ? Math.max(0, lesson.pattern.findIndex((step) => step.note === explorerTarget))
-      : sequence.index;
+    : copyActivity === 'fingering'
+      ? fingeringIndex
+      : isExplorer
+        ? Math.max(0, lesson.pattern.findIndex((step) => step.note === explorerTarget))
+        : sequence.index;
   const copyProgress = isExplorer
     ? Math.min(1, (explored.size + (sequence.completed ? 1 : sequence.heldMs / lesson.stableMs)) / NOTE_NAMES.length)
     : sequenceProgress(sequence, lesson.pattern.length, lesson.stableMs);
@@ -279,8 +281,8 @@ export default function App() {
               pattern={lesson.pattern}
               currentIndex={currentPatternIndex}
               complete={sessionComplete}
-              onSelectNote={isExplorer && missionPhase === 'copy' ? chooseExplorerNote : undefined}
-              explored={isExplorer && missionPhase === 'copy' ? explored : undefined}
+              onSelectNote={isExplorer && missionPhase === 'copy' && copyActivity === 'microphone' ? chooseExplorerNote : undefined}
+              explored={isExplorer && missionPhase === 'copy' && copyActivity === 'microphone' ? explored : undefined}
             />
           </div>
 
@@ -312,7 +314,7 @@ export default function App() {
                   <h2 id="copy-title">Recorder, fingers or rhythm?</h2>
                   <p>All three paths reach the same flower. Pip’s microphone helper is optional.</p>
                   <div className="copy-choice-grid">
-                    <button className="copy-choice" type="button" onClick={startListening}><span aria-hidden="true">🎵</span><strong>Play to Pip</strong><small>Optional microphone</small></button>
+                    <button className="copy-choice" type="button" onClick={() => setCopyActivity('microphone')}><span aria-hidden="true">🎵</span><strong>Play to Pip</strong><small>Optional microphone</small></button>
                     <button className="copy-choice" type="button" onClick={() => setCopyActivity('fingering')}><span aria-hidden="true">●</span><strong>Finger puzzle</strong><small>No microphone</small></button>
                     <button className="copy-choice" type="button" onClick={() => setCopyActivity('rhythm')}><span aria-hidden="true">👏</span><strong>Tap the rhythm</strong><small>No microphone</small></button>
                   </div>
@@ -349,10 +351,17 @@ export default function App() {
                   note={fingeringExpected}
                   isLast={fingeringIndex === lesson.pattern.length - 1}
                   onComplete={finishFingeringStep}
+                  onChooseAnother={() => setCopyActivity('choose')}
                 />
               )}
 
-              {copyActivity === 'rhythm' && <RhythmEcho pattern={lesson.pattern} onComplete={enterMake} />}
+              {copyActivity === 'rhythm' && (
+                <RhythmEcho
+                  pattern={lesson.pattern}
+                  onComplete={enterMake}
+                  onChooseAnother={() => setCopyActivity('choose')}
+                />
+              )}
             </div>
           )}
 
@@ -373,7 +382,7 @@ export default function App() {
               <span className="success-flower" aria-hidden="true">✿</span>
               <div>
                 <p className="eyebrow">A lovely place to stop</p>
-                <h2>{lesson.successCue}</h2>
+                <h2>A flower grew for this musical turn!</h2>
                 <p>{rested ? 'All sound is off. The garden will be here another day.' : 'Pip saved only this lesson’s flower—not a score, time or number of tries.'}</p>
               </div>
               <div className="mission-actions">
