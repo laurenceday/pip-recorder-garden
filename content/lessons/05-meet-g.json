@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "meet-g",
+  "sourceIdeaId": "idea-005",
+  "order": 5,
+  "title": "Grow the G leaf",
+  "shortTitle": "Meet G",
+  "chapter": "Finger steps",
+  "kind": "hold",
+  "difficulty": 2,
+  "story": "A bright green leaf uncurls when it hears a gentle G.",
+  "childCue": "Cover thumb and holes 1, 2, 3. Play G.",
+  "adultCue": "Check the third left-hand finger reaches its hole without the upper fingers sliding away.",
+  "successCue": "The G leaf opened wide!",
+  "pattern": [{ "note": "G5", "beats": 4 }],
+  "stableMs": 650,
+  "toleranceCents": 100,
+  "tips": ["Three front fingers make G.", "If it squeaks, land the fingers again."],
+  "accent": "leaf"
+}

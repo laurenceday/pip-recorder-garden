@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "b-a-seesaw",
+  "sourceIdeaId": "idea-004",
+  "order": 4,
+  "title": "B and A seesaw",
+  "shortTitle": "B and A",
+  "chapter": "Finger steps",
+  "kind": "sequence",
+  "difficulty": 2,
+  "story": "B sits high, A sits low, and the garden seesaw rocks between them.",
+  "childCue": "Play B, A, B, A. Move only finger 2.",
+  "adultCue": "Keep the recorder still and watch the second finger move from its large knuckle rather than the whole hand.",
+  "successCue": "The seesaw made four gentle trips!",
+  "pattern": [{ "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }],
+  "stableMs": 450,
+  "toleranceCents": 100,
+  "tips": ["Thumb and finger 1 stay home.", "Slow changes are still good changes."],
+  "accent": "rose"
+}

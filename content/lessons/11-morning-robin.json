@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "morning-robin",
+  "sourceIdeaId": "idea-011",
+  "order": 11,
+  "title": "Morning robin",
+  "shortTitle": "Robin tune",
+  "chapter": "Little tunes",
+  "kind": "sequence",
+  "difficulty": 4,
+  "story": "A robin starts low, peeks over the hedge, and sings its way home.",
+  "childCue": "Play G, A, B, G, B, A, G.",
+  "adultCue": "This original tune changes direction twice. Break it after the first four notes if the full pattern feels crowded.",
+  "successCue": "The morning robin sang with you!",
+  "pattern": [{ "note": "G5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 2 }, { "note": "G5", "beats": 1 }, { "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "G5", "beats": 2 }],
+  "stableMs": 350,
+  "toleranceCents": 85,
+  "tips": ["Look ahead to the next note.", "Play slowly enough to keep fingers soft."],
+  "accent": "rose"
+}

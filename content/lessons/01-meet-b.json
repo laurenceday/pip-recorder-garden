@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "meet-b",
+  "sourceIdeaId": "idea-001",
+  "order": 1,
+  "title": "Wake up the B flower",
+  "shortTitle": "Meet B",
+  "chapter": "First sounds",
+  "kind": "hold",
+  "difficulty": 1,
+  "story": "A sleepy blue flower is waiting for one warm, steady B.",
+  "childCue": "Cover thumb and hole 1. Whisper doo, then let B float.",
+  "adultCue": "Check the left thumb and first finger are sealing their holes. Invite gentle air rather than a big blow.",
+  "successCue": "B heard you. The first flower is awake!",
+  "pattern": [{ "note": "B5", "beats": 4 }],
+  "stableMs": 650,
+  "toleranceCents": 110,
+  "tips": ["Left hand goes at the top.", "Soft air makes the kindest sound."],
+  "accent": "periwinkle"
+}

@@ -1,0 +1,90 @@
+name: Propose lesson ideas
+
+on:
+  schedule:
+    - cron: "37 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: Provider adapter
+        required: false
+        type: choice
+        options:
+          - openai-compatible
+          - anthropic
+      model:
+        description: Provider model identifier
+        required: false
+        type: string
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: lesson-agent
+  cancel-in-progress: false
+
+jobs:
+  propose:
+    runs-on: ${{ vars.LESSON_AGENT_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - name: Check out accepted main history without stored credentials
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Use Node 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.19.0
+          cache: npm
+      - name: Install the locked dependency graph
+        run: npm ci
+      - name: Interpret at most three pending ideas
+        env:
+          LESSON_AGENT_PROVIDER: ${{ inputs.provider || vars.LESSON_AGENT_PROVIDER || 'openai-compatible' }}
+          LESSON_AGENT_MODEL: ${{ inputs.model || vars.LESSON_AGENT_MODEL }}
+          LESSON_AGENT_BASE_URL: ${{ vars.LESSON_AGENT_BASE_URL }}
+          LESSON_AGENT_API_KEY: ${{ secrets.LESSON_AGENT_API_KEY }}
+        run: npm run agent:propose
+      - name: Refuse changes outside lesson proposals
+        run: npm run check-agent-diff
+      - name: Verify the resulting catalogue and site
+        run: npm run check
+      - name: Detect whether an idea was consumed
+        id: changes
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain=v1 --untracked-files=all)" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit and push one proposal branch
+        if: steps.changes.outputs.changed == 'true'
+        id: branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.LESSON_PR_TOKEN || github.token }}
+        run: |
+          branch="lesson-agent/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          gh auth setup-git
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add LESSON_IDEAS.md content/lessons
+          npm run check-agent-diff
+          git commit -m "chore: propose schema-validated recorder lessons"
+          git push origin "HEAD:$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+      - name: Open a human-review pull request
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.LESSON_PR_TOKEN || github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: >-
+          gh pr create
+          --base main
+          --head "$BRANCH"
+          --title "Lesson agent proposals (run $GITHUB_RUN_ID)"
+          --body "A bounded agent interpreted pending entries from LESSON_IDEAS.md. The job accepted only closed-schema lesson JSON and the matching checkbox changes, then ran the repository checks. Nothing is merged or published automatically; inspect the lesson copy, fingering, progression, and adult guidance before accepting this pull request."

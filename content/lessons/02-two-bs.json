@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "two-bs",
+  "sourceIdeaId": "idea-002",
+  "order": 2,
+  "title": "Two B bubbles",
+  "shortTitle": "B twice",
+  "chapter": "First sounds",
+  "kind": "sequence",
+  "difficulty": 1,
+  "story": "Make two round B bubbles with a tiny quiet gap between them.",
+  "childCue": "Play B, rest, then play B once more.",
+  "adultCue": "The detector waits for a release between repeated notes. A short, comfortable pause is enough.",
+  "successCue": "Pop, pop. Two B bubbles!",
+  "pattern": [{ "note": "B5", "beats": 2 }, { "note": "B5", "beats": 2 }],
+  "stableMs": 500,
+  "toleranceCents": 110,
+  "tips": ["Keep the same two holes covered.", "Say doo for each new bubble."],
+  "accent": "sky"
+}
