@@ -10,6 +10,8 @@ The microphone is a helper, not a judge. It estimates one note at a time, can be
 
 Use Node 22.19 or newer.
 
+### Development server
+
 ```sh
 npm ci
 npm run dev
@@ -17,7 +19,7 @@ npm run dev
 
 Open the exact localhost URL Vite prints. `localhost` is a secure browser context, so the microphone can work there. Opening `index.html` directly from disk is not supported.
 
-For a production-like build:
+### Production-like preview
 
 ```sh
 npm run verify:local
@@ -104,7 +106,7 @@ The adapter speaks two live provider protocols:
 
 GitHub Models is intentionally absent: GitHub retired its playground, catalogue and inference API on 30 July 2026.
 
-Local OpenAI-compatible example:
+### Local OpenAI-compatible service
 
 ```sh
 export LESSON_AGENT_PROVIDER=openai-compatible
@@ -115,7 +117,7 @@ npm run agent:propose -- --dry-run
 
 Remote endpoints must use HTTPS and need `LESSON_AGENT_API_KEY`. Loopback HTTP is allowed for a local or self-hosted runner and nowhere else.
 
-Anthropic example:
+### Anthropic
 
 ```sh
 export LESSON_AGENT_PROVIDER=anthropic
@@ -145,14 +147,16 @@ The workflow needs permission to create a proposal branch and pull request. `LES
 
 ## Publish with GitHub Pages
 
-`.github/workflows/pages.yml` verifies the accepted `main` tree, uploads only `dist/`, and gives deployment permissions only to the deploy job. To turn it on after the repository is ready:
+The live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). This public repository uses GitHub Actions as its Pages source and enforces HTTPS.
+
+`.github/workflows/pages.yml` verifies the accepted `main` tree, uploads only `dist/`, and gives deployment permissions only to the deploy job. To enable the same setup in a fork or replacement repository:
 
 1. Open **Settings → Pages**.
 2. Choose **GitHub Actions** as the source.
-3. Protect the `github-pages` environment so only `main` may deploy.
-4. Merge a reviewed pull request into `main` or run the workflow manually.
+3. If the repository policy requires it, protect the `github-pages` environment so only `main` may deploy.
+4. Merge a reviewed pull request into `main`, or run the workflow manually from the accepted `main` commit.
 
-The workflow files are present locally; this repository has not been pushed, enabled or deployed by the build process.
+The first live deployment built and checked main commit `9cf6f60a69aeebaafdf8191e7f04c902e7014e2d` before publishing its `dist/` artifact.
 
 ## Verification
 
