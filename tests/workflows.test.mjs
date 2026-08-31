@@ -33,7 +33,9 @@ test('Pages uploads only a verified dist artifact and isolates deployment permis
 
 test('the lesson agent proposes through a checked branch and has no merge path', async () => {
   const agent = await workflow('agent-lessons.yml');
+  const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   assert.match(agent, /npm run check-agent-diff/);
+  assert.equal(packageJson.scripts['check-agent-diff'], 'node scripts/check-agent-diff.mjs');
   assert.match(agent, /npm run check/);
   assert.match(agent, /git add LESSON_IDEAS\.md content\/lessons/);
   assert.match(agent, /gh pr create/);
