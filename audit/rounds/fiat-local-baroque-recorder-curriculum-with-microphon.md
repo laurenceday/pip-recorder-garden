@@ -34,3 +34,19 @@ Elenchus verdict: guarded
 | S1-R2-02 | high | `package.json` | The proposal workflow invoked `npm run check-agent-diff`, but the package declared no such script, so every lesson-writing run stopped before verification or pull-request creation. | fixed and guarded in this commit |
 
 Leads not pursued: Elenchus guards the missing package command; the obsolete exact-12 assertion is a test-only defect evidenced separately by an isolated run at `4357197` that wrote `idea-013`, accepted exactly two allowed paths, generated 13 lessons, then reproduced `13 !== 12`; the fixed-tree replay wrote the same proposal, kept both diff gates to two allowed paths, passed 43 tests, built 13 lessons and found no dependency advisory; real microphone hardware, hosted workflows, live Pages cache behaviour, and non-fixture provider responses remain outside this round.
+
+## Step 1, round 3 -- 2026-08-31T10:34:40Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: false-pitch-match=reviewed; child-frustration=reviewed; audio-privacy=reviewed; permission-denial=reviewed; feedback-loop=reviewed; fingering-drift=reviewed; progress-pressure=reviewed; pages-subpath=reviewed; model-output=reviewed; idea-injection=reviewed; workflow-authority=reviewed; schedule-drift=reviewed; dependency-advisories=reviewed
+
+Not checked: real microphone hardware and acoustic room behaviour; hosted GitHub Actions and Pages; live publication and cache behaviour; future agent-provider behaviour beyond fixture and protocol boundaries
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: no new finding remained after re-reading microphone ownership and teardown, storage, lesson validation, agent writes, workflow authority, relative Pages assets and emitted JavaScript; the base catalogue passes 43 tests and the isolated extension replay passes the same suite with 13 lessons and exactly two allowed changed paths; hardware acoustics, hosted runs, publication cache behaviour and future provider responses remain explicit manual or external evidence boundaries.
