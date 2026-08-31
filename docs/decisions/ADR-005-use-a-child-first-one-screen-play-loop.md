@@ -28,7 +28,7 @@ Keeping the old interface unchanged was rejected because it did not answer the f
 
 ## Consequences
 
-- Child copy additions require a reviewed lexicon and manifest change. The checker rejects unknown tokens, punctuation disguises, dynamic accessible names, open error text, opposite-role imports and undeclared states.
+- Child copy additions require a reviewed lexicon and manifest change. The checker follows the child component import closure, includes CSS in the commit-bound source digest and rejects unknown tokens, punctuation disguises, generated copy, uninspectable artwork, dynamic accessible names, open error text, opposite-role imports and undeclared states.
 - Grown-up prose remains unrestricted inside its separately mounted tree.
 - The existing twelve lessons, progress key, microphone boundary, guide-tone lifecycle and full mission remain available in grown-up mode.
 - The repository proves conformance to the declared list, not readability for one child. A real child read-through remains required.

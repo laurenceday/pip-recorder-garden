@@ -15,16 +15,16 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 67 of 67 tests with none skipped.
+- The Node test suite passed 79 of 79 tests with none skipped.
 - TypeScript and oxlint completed without findings.
-- The source and built-runtime boundary checks completed cleanly; the source check examined 20 files.
-- The production build emitted 232.82 kB of JavaScript (72.82 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232827 bytes, below the 300000-byte ceiling.
+- The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
+- The production build emitted 235.49 kB of JavaScript (73.58 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 235492 bytes, below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 67 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 79 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Guided mission evidence
 
@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The local development demo was also exercised at 390 by 844 CSS pixels without requesting microphone permission. The active lesson began at 91 CSS pixels and the lesson 8 garden path began below it at 1296 CSS pixels. No visible child lesson control measured below 44 by 44 CSS pixels. Lesson 8 visibly advanced through B, A, A and B before moving from **Hear it** to **Copy it**. Fingering and rhythm both returned to the route chooser; **Play to Pip** opened the ready card without requesting permission; and the empty maker offered **Finish without a tune**. Equal rhythm taps reached the maker; its add, undo and finish controls froze while B-A sounded; **Stop my tune** restored them. Route-agnostic completion used the participation-only heading **A flower grew for this musical turn!** Finishing left the same lesson selected and offered only **Stop here for today**, **Play this mission again** and **Back to the garden path**. Lesson 12’s fingering clue, puzzle and active note advanced together from low C to D, and its copy-mode note stones were not interactive. The application console had no warning or error.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. That grown-up-path evidence remains useful for the unchanged mission controls, but it is not a child-stage layout pass. In the Step 1 child tree at 391 by 844, the mounted child text was exactly **Pip**, **B**, **Play** and **Back**, with no grown-up tree mounted. Its document height was 876 pixels and both actions were 50 pixels high. Zero child scrolling and the 64-pixel action floor therefore remain pending Step 2 rather than passing here.
 
 ## Boundaries covered by checks
 
@@ -60,6 +60,6 @@ node scripts/check-child-copy.mjs \
   --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
 ```
 
-The report records the commit, source digests, four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `ChildStage` imports only its copy contract and copy-free garden mark. `App` returns the child tree before the grown-up tree can mount. Raw JSX text, raw or dynamic accessible names, open error text, lesson prose, opposite-role imports and an unlisted state fail the check.
+The report records a commit-bound digest for `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `App` must return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written.
 
 The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.

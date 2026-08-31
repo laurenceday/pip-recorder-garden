@@ -153,7 +153,7 @@ The workflow needs permission to create a proposal branch and pull request. `LES
 
 ## Publish with GitHub Pages
 
-The live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). This public repository uses GitHub Actions as its Pages source and enforces HTTPS.
+The intended live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). The repository contains a GitHub Actions Pages workflow, but the live Pages source was still the legacy branch publisher when this child-first run began. That publisher overwrote the built artifact with an entry that referenced `/src/main.tsx`. Do not treat the public URL as ready until the separately authorised Pages setting change and the built-asset check both pass.
 
 `.github/workflows/pages.yml` verifies the accepted `main` tree, uploads only `dist/`, and gives deployment permissions only to the deploy job. To enable the same setup in a fork or replacement repository:
 
@@ -175,7 +175,7 @@ node scripts/check-child-copy.mjs --candidate one-screen-play-loop --criterion r
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
 
-The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. Its hostile tests cover unknown words, punctuation and Unicode disguises, dynamic error or accessible text, opposite-role imports and undeclared states. This is a repository copy rule, not proof that one child can read every admitted word.
+The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds every inspected byte to the reported commit and refuses open visible or accessible attributes, dynamic error text, opposite-role imports and undeclared states. This is a repository copy rule, not proof that one child can read every admitted word.
 
 ## How the design was chosen
 
