@@ -6,6 +6,8 @@ Pip’s Recorder Garden is a static, interactive course for a young beginner pla
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
+The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens a child view whose entire first copy set is Pip, the note letters A to G, Play, Stop, Try, Done and Back. The child view receives no lesson prose or open error string. It currently models the chosen pattern, then returns to the grown-up view for the remaining mission controls.
+
 ## Run it locally
 
 Use Node 22.19 or newer.
@@ -30,7 +32,7 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 
 ## Play a lesson
 
-1. Choose any lesson on the garden path. Nothing is locked.
+1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start child play** for the closed-copy model card, or keep the detailed controls open for supported practice.
 2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
 3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
 4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
@@ -168,9 +170,12 @@ The first live deployment built and checked main commit `9cf6f60a69aeebaafdf8191
 npm run check          # catalogue, tests, TypeScript, lint, static boundaries
 npm run test:report    # receipted TAP result in .elenchus/node-test.json
 npm run verify:local   # check, production build and dependency audit
+node scripts/check-child-copy.mjs --candidate one-screen-play-loop --criterion rendered-child-copy-approved --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
 ```
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
+
+The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. Its hostile tests cover unknown words, punctuation and Unicode disguises, dynamic error or accessible text, opposite-role imports and undeclared states. This is a repository copy rule, not proof that one child can read every admitted word.
 
 ## How the design was chosen
 

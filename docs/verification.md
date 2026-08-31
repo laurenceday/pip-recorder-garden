@@ -48,3 +48,18 @@ The source check refuses audio recording and browser network channels in the chi
 Automated checks and the microphone-free browser demo cannot establish behaviour for a particular microphone, recorder, browser or room. Before giving the site to a child, an adult still needs to run the device checklist in the README. In particular, confirm that the browser permission indicator clears after every stop path, that guide volume is comfortable and that B is recognised at a comfortable playing distance without pressuring the child to satisfy the detector.
 
 This record does not claim that any branch has been pushed, that GitHub Pages is enabled, or that the site is deployed.
+
+## Child-copy role check
+
+Run the copy gate after `npm run verify:local`:
+
+```sh
+node scripts/check-child-copy.mjs \
+  --candidate one-screen-play-loop \
+  --criterion rendered-child-copy-approved \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
+```
+
+The report records the commit, source digests, four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `ChildStage` imports only its copy contract and copy-free garden mark. `App` returns the child tree before the grown-up tree can mount. Raw JSX text, raw or dynamic accessible names, open error text, lesson prose, opposite-role imports and an unlisted state fail the check.
+
+The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.
