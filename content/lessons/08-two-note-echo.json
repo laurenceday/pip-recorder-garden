@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "two-note-echo",
+  "sourceIdeaId": "idea-008",
+  "order": 8,
+  "title": "Echo over the hedge",
+  "shortTitle": "B–A echo",
+  "chapter": "Echoes",
+  "kind": "sequence",
+  "difficulty": 3,
+  "story": "A bird calls from the far hedge. Send its B and A pattern back.",
+  "childCue": "Listen, then play B, A, A, B.",
+  "adultCue": "Use the guide first, stop it, then begin listening so the device speaker cannot answer itself.",
+  "successCue": "The hedge sent your echo home!",
+  "pattern": [{ "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 1 }],
+  "stableMs": 400,
+  "toleranceCents": 90,
+  "tips": ["Only finger 2 moves.", "Listen once or many times."],
+  "accent": "periwinkle"
+}

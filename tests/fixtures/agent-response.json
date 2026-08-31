@@ -1,0 +1,24 @@
+{
+  "lessons": [
+    {
+      "schemaVersion": 1,
+      "id": "high-c-sunbeam",
+      "sourceIdeaId": "idea-013",
+      "order": 13,
+      "title": "Catch the high C sunbeam",
+      "shortTitle": "High C",
+      "chapter": "Explore",
+      "kind": "hold",
+      "difficulty": 5,
+      "story": "A high C sunbeam is shining through the top of the garden.",
+      "childCue": "Cover thumb and hole 2, then let high C shine.",
+      "adultCue": "Keep the guide tone off while listening and accept a comfortable, unforced attempt.",
+      "successCue": "The high C sunbeam found you!",
+      "pattern": [{ "note": "C6", "beats": 2 }],
+      "stableMs": 450,
+      "toleranceCents": 120,
+      "tips": ["Use gentle air.", "Thumb and finger 2 make high C."],
+      "accent": "marigold"
+    }
+  ]
+}

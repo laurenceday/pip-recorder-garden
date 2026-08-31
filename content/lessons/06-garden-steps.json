@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "garden-steps",
+  "sourceIdeaId": "idea-006",
+  "order": 6,
+  "title": "Down the garden steps",
+  "shortTitle": "B–A–G",
+  "chapter": "Finger steps",
+  "kind": "sequence",
+  "difficulty": 2,
+  "story": "Walk down three garden steps, turn around, and climb home.",
+  "childCue": "Play B, A, G, A, B.",
+  "adultCue": "Invite one finger at a time on the way down and one finger at a time off on the way up.",
+  "successCue": "Down and up without losing the path!",
+  "pattern": [{ "note": "B5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "G5", "beats": 1 }, { "note": "A5", "beats": 1 }, { "note": "B5", "beats": 2 }],
+  "stableMs": 425,
+  "toleranceCents": 95,
+  "tips": ["Keep every unused finger nearby.", "Pause anywhere you need."],
+  "accent": "leaf"
+}

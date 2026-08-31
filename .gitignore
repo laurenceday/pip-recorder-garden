@@ -10,6 +10,7 @@
 
 # testing
 /coverage
+/.elenchus/
 
 # next.js
 /.next/
@@ -33,6 +34,7 @@ yarn-error.log*
 .vercel
 next-env.d.ts
 /dist/
+src/generated/lessons.json
 /.wrangler/
 /outputs/
 /work/
