@@ -54,6 +54,9 @@ export function PatternMaker({ allowedNotes, playing, activeIndex, guideIssue, o
       </div>
       <div className="mission-actions">
         <button className="button button--soft" type="button" disabled={notes.length === 0 || playing} onClick={() => setNotes(removeMadePatternNote)}>Undo one</button>
+        {!ready && (
+          <button className="button button--soft" type="button" onClick={onComplete}>Finish without a tune</button>
+        )}
         {playing ? (
           <button className="button button--stop" type="button" onClick={onStop}>Stop my tune</button>
         ) : (

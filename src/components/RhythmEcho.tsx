@@ -5,9 +5,10 @@ import type { LessonPatternStep } from '../types.ts';
 interface RhythmEchoProps {
   pattern: readonly LessonPatternStep[];
   onComplete: () => void;
+  onChooseAnother: () => void;
 }
 
-export function RhythmEcho({ pattern, onComplete }: RhythmEchoProps) {
+export function RhythmEcho({ pattern, onComplete, onChooseAnother }: RhythmEchoProps) {
   const [tapTimes, setTapTimes] = useState<number[]>([]);
   const [result, setResult] = useState<RhythmResult>(() => compareRhythm(pattern, []));
 
@@ -27,7 +28,7 @@ export function RhythmEcho({ pattern, onComplete }: RhythmEchoProps) {
   const message = result.kind === 'matched'
     ? 'Those taps have the same big rhythm shape.'
     : result.kind === 'try-again'
-      ? 'That was a different shape. Listen again or clear the taps and try another way.'
+      ? 'That was a different shape. Clear the taps and try again, or choose another way.'
       : `Tap ${result.expectedTaps - result.receivedTaps} more ${result.expectedTaps - result.receivedTaps === 1 ? 'time' : 'times'}.`;
 
   return (
@@ -49,6 +50,7 @@ export function RhythmEcho({ pattern, onComplete }: RhythmEchoProps) {
       <div className="mission-actions">
         {result.kind === 'matched' && <button className="button button--primary" type="button" onClick={onComplete}>Rhythm echoed — make a tune</button>}
         {result.kind !== 'waiting' && <button className="button button--soft" type="button" onClick={reset}>Clear my taps</button>}
+        <button className="button button--soft" type="button" onClick={onChooseAnother}>Choose another way</button>
       </div>
     </section>
   );

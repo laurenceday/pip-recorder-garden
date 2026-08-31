@@ -5,11 +5,12 @@ interface FingeringMissionProps {
   note: NoteName;
   isLast: boolean;
   onComplete: () => void;
+  onChooseAnother: () => void;
 }
 
 const HOLES = [0, 1, 2, 3, 4, 5, 6, 7] as const;
 
-export function FingeringMission({ note, isLast, onComplete }: FingeringMissionProps) {
+export function FingeringMission({ note, isLast, onComplete, onChooseAnother }: FingeringMissionProps) {
   const [covered, setCovered] = useState<Set<number>>(new Set());
   const target = RECORDER_NOTES[note];
   const matches = (
@@ -48,11 +49,14 @@ export function FingeringMission({ note, isLast, onComplete }: FingeringMissionP
       <p className="mission-feedback" aria-live="polite">
         {matches ? 'Your screen picture matches Pip’s clue.' : 'Keep looking at the clue. You can change any hole.'}
       </p>
-      {matches && (
-        <button className="button button--primary" type="button" onClick={onComplete}>
-          {isLast ? 'Picture matched — make a tune' : 'Picture matched — next note'}
-        </button>
-      )}
+      <div className="mission-actions">
+        {matches && (
+          <button className="button button--primary" type="button" onClick={onComplete}>
+            {isLast ? 'Picture matched — make a tune' : 'Picture matched — next note'}
+          </button>
+        )}
+        <button className="button button--soft" type="button" onClick={onChooseAnother}>Choose another way</button>
+      </div>
     </section>
   );
 }
