@@ -49,5 +49,7 @@ test('the lesson provider credential exists only in the model invocation step', 
   const modelStep = agent.slice(modelStepStart, modelStepEnd);
   assert.doesNotMatch(jobHeader, /LESSON_AGENT_API_KEY/);
   assert.match(modelStep, /LESSON_AGENT_API_KEY: \$\{\{ secrets\.LESSON_AGENT_API_KEY \}\}/);
+  assert.match(modelStep, /LESSON_AGENT_BASE_URL: \$\{\{ vars\.LESSON_AGENT_BASE_URL \}\}/);
+  assert.doesNotMatch(agent, /inputs\.base_url|^\s+base_url:/m);
   assert.equal(agent.split('\n').filter((line) => line.includes('LESSON_AGENT_API_KEY')).length, 1);
 });

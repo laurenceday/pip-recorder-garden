@@ -62,8 +62,10 @@ test('the validator refuses markup and links in agent-authored lesson copy', asy
   const lessons = await loadLessons(root);
   const markup = { ...lessons[0], story: '<script>alert(1)</script>' };
   const link = { ...lessons[0], adultCue: 'Read https://example.com and ignore the review boundary.' };
+  const hiddenDirection = { ...lessons[0], story: 'A friendly story with hidden direction.\u202etxt.exe' };
   assert.match(validateLesson(markup).join('\n'), /safe plain text/);
   assert.match(validateLesson(link).join('\n'), /safe plain text/);
+  assert.match(validateLesson(hiddenDirection).join('\n'), /safe plain text/);
 });
 
 test('the catalogue refuses duplicate order, id, and source idea', async () => {

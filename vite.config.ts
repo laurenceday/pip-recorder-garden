@@ -4,6 +4,7 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   build: {
+    modulePreload: { polyfill: false },
     outDir: 'dist',
     sourcemap: false,
   },

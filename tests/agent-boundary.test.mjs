@@ -49,6 +49,20 @@ test('fixture proposal is valid only for its selected idea', async () => {
   assert.ok(validateProposalBatch(payload, [{ id: 'idea-014', text: 'Different', pending: true }], lessons).length > 0);
 });
 
+test('malformed or catalogue-exhausting proposals fail closed', async () => {
+  const fixture = await readFile(path.join(root, 'tests', 'fixtures', 'agent-response.json'), 'utf8');
+  const payload = extractProposalPayload(fixture);
+  const lessons = await loadLessons(root);
+  const ideas = parseIdeaInbox(await readFile(path.join(root, 'tests', 'fixtures', 'pending-ideas.md'), 'utf8'));
+  let malformedErrors;
+  assert.doesNotThrow(() => {
+    malformedErrors = validateProposalBatch({ lessons: [null] }, ideas, lessons);
+  });
+  assert.match(malformedErrors.join('\n'), /must be one object/);
+  const exhausting = { lessons: [{ ...payload.lessons[0], order: 999 }] };
+  assert.match(validateProposalBatch(exhausting, ideas, lessons).join('\n'), /next 1 consecutive/);
+});
+
 test('prompt isolates untrusted idea data from fixed policy', async () => {
   const schema = await readJsonFileBounded(path.join(root, 'schema', 'lesson.schema.json'));
   const prompt = buildAgentPrompt({

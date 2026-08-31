@@ -58,7 +58,7 @@ The sequence scorer checks pitch order and stable notes. It deliberately does no
 
 ## Microphone and saved-data boundary
 
-The child-facing runtime has no network request, audio recorder, analytics, account, camera, IndexedDB, socket, beacon or service worker. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
+Once its static files have loaded, the child-facing application has no network request, audio recorder, analytics, account, camera, IndexedDB, socket, beacon or service worker. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
 
 The only saved value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, detected frequency history, score, streak, timestamp or permission state. **Forget saved progress** clears it from that browser.
 
@@ -139,6 +139,8 @@ Set repository variables:
 
 Set `LESSON_AGENT_API_KEY` as an Actions secret for a remote provider. A GitHub-hosted runner cannot reach Ollama on a family computer; use a self-hosted runner for a loopback service.
 
+The provider endpoint comes only from the reviewed repository variable. Manual dispatch can choose a provider and model, but cannot redirect the API credential to another URL.
+
 The workflow needs permission to create a proposal branch and pull request. `LESSON_PR_TOKEN` is an optional secret for a dedicated fine-grained token with repository contents and pull-request write access. Without it, the workflow falls back to `GITHUB_TOKEN`, and the repository setting that permits Actions to create pull requests must be enabled. Events created by `GITHUB_TOKEN` do not recursively start other workflows, so the proposal job runs the full local check itself. A human still reviews and merges; there is no auto-merge path.
 
 ## Publish with GitHub Pages
@@ -160,7 +162,7 @@ npm run test:report    # receipted TAP result in .elenchus/node-test.json
 npm run verify:local   # check, production build and dependency audit
 ```
 
-The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output.
+The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
 
 ## How the design was chosen
 

@@ -1,0 +1,19 @@
+## Step 1, round 1 -- 2026-08-31T10:17:17Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: false-pitch-match=reviewed; child-frustration=reviewed; audio-privacy=reviewed; permission-denial=reviewed; feedback-loop=reviewed; fingering-drift=reviewed; progress-pressure=reviewed; pages-subpath=reviewed; model-output=reviewed; idea-injection=reviewed; workflow-authority=reviewed; schedule-drift=reviewed; dependency-advisories=reviewed
+
+Not checked: real microphone hardware and acoustic room behaviour; hosted GitHub Actions and Pages; live publication and cache behaviour; future agent-provider behaviour beyond fixture and protocol boundaries
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S1-R1-01 | medium | `src/hooks/useMicrophoneScoring.ts` | During suspended audio-context resume, Stop found no owned stream or context. Once resume returned, start proceeded to listening despite the intervening Stop. | fixed and guarded in this commit |
+| S1-R1-02 | high | `.github/workflows/agent-lessons.yml` | Manual dispatch accepted an arbitrary provider base URL in the same step as the provider credential, allowing a dispatcher to redirect the secret to another HTTPS endpoint. | fixed and guarded in this commit |
+| S1-R1-03 | medium | `scripts/lib/lesson-contract.mjs` | Agent-authored lesson text admitted invisible and bidirectional Unicode controls that could make reviewed copy display differently from its stored bytes. | fixed and guarded in this commit |
+| S1-R1-04 | medium | `scripts/lib/agent-boundary.mjs` | Malformed lesson entries reached catalogue sorting, and arbitrary large order values passed validation instead of using the next consecutive position. | fixed and guarded in this commit |
+| S1-R1-05 | medium | `vite.config.ts` | The default module-preload shim added `fetch` to the production bundle even though the source-only boundary check claimed the child-facing runtime had no outbound channel. | fixed and guarded in this commit |
+
+Leads not pursued: pitch accuracy and permission-indicator teardown still require real-device observation; schedule reliability and Pages cache behaviour require hosted runs; no microphone recording or outbound microphone-data path was found in source or emitted JavaScript; no mutable workflow action or dependency advisory was found; the reviewed lesson provider is intentionally allowed to receive idea and schema prompt data, but never microphone or child data.
