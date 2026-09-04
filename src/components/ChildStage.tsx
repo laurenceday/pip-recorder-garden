@@ -19,11 +19,17 @@ const MAX_CHILD_MADE_NOTES = 4;
 export function ChildStage({ state, notes, onAction, onBack }: ChildStageProps) {
   const copy = childCopyFor(state);
   const actionRef = useRef<HTMLButtonElement>(null);
+  const firstNoteRef = useRef<HTMLButtonElement>(null);
   const [madeNotes, setMadeNotes] = useState<ChildNoteLetter[]>([]);
 
   useEffect(() => {
-    actionRef.current?.focus();
-  }, []);
+    if (state === 'more') firstNoteRef.current?.focus();
+    else actionRef.current?.focus();
+  }, [state]);
+
+  useEffect(() => {
+    if (state === 'more' && madeNotes.length === MAX_CHILD_MADE_NOTES) actionRef.current?.focus();
+  }, [madeNotes.length, state]);
 
   const chooseNote = (choice: ChildNoteLetter) => {
     if (state !== 'more') return;
@@ -47,7 +53,7 @@ export function ChildStage({ state, notes, onAction, onBack }: ChildStageProps) 
         <h1 data-child-copy-id={`${state}.title`}>{copy.title}</h1>
         <div className="pattern-strip">
           {notes.map((note, index) => (
-            <button className="note-stone" data-child-copy-id={`all.note.${note.toLowerCase()}`} disabled={state !== 'more' || madeNotes.length >= MAX_CHILD_MADE_NOTES} key={`${note}-${index}`} onClick={() => chooseNote(note)} type="button">
+            <button ref={index === 0 ? firstNoteRef : undefined} className="note-stone" data-child-copy-id={`all.note.${note.toLowerCase()}`} disabled={state !== 'more' || madeNotes.length >= MAX_CHILD_MADE_NOTES} key={`${note}-${index}`} onClick={() => chooseNote(note)} type="button">
               {note}
             </button>
           ))}

@@ -68,7 +68,7 @@ export function validateLayoutContractSource(childSource, stylesSource) {
   const inspectableStyles = stylesSource.replace(/\/\*[\s\S]*?\*\//g, '');
   for (const [label, pattern] of [
     ['closed child state marker', /data-child-state=\{state\}/],
-    ['initial child focus', /actionRef\.current\?\.focus\(\)/],
+    ['initial child focus', /if \(state === 'more'\) firstNoteRef\.current\?\.focus\(\);\s*else actionRef\.current\?\.focus\(\);/],
     ['dynamic viewport height', /\.child-stage\s*\{[\s\S]*height:\s*100dvh/],
     ['safe-area top', /--child-safe-top:\s*env\(safe-area-inset-top\)/],
     ['safe-area right', /--child-safe-right:\s*env\(safe-area-inset-right\)/],
