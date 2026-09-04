@@ -47,7 +47,7 @@ The source check refuses audio recording and browser network channels in the chi
 
 Automated checks and the microphone-free browser demo cannot establish behaviour for a particular microphone, recorder, browser or room. Before giving the site to a child, an adult still needs to run the device checklist in the README. In particular, confirm that the browser permission indicator clears after every stop path, that guide volume is comfortable and that B is recognised at a comfortable playing distance without pressuring the child to satisfy the detector.
 
-This record does not claim that the current child-first branch has been released. The release record below is complete only after its live check passes against the accepted `main` build.
+Local evidence alone is not a release claim. Release acceptance requires the live check below to pass against the accepted `main` build.
 
 ## Release artifact checks
 
