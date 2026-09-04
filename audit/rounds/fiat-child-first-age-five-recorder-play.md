@@ -135,3 +135,19 @@ Elenchus verdict: null
 | -- | -- | -- | none | -- |
 
 Leads not pursued: The child card now has measured room for its largest current pattern, but the family device pass still owns comfort, comprehension and the effect of real browser chrome. No new dependencies, persistence, telemetry or child copy were introduced.
+
+## Step 3, round 1 -- 2026-09-04T10:31:29Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; public Pages boot assigned to Step 4. The sound and quiet state traces, six-state copy manifest, 42 browser measurements and exact audio-construction call sites were inspected. Elenchus produced a parent assertion failure and fixed-tree green result for the child-flow guard.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S3-R1-01 | high | src/App.tsx, scripts/check-child-quiet.mjs | A failed child guide left its internal error code visible when returning to grown-up mode, and the quiet report claimed no audio construction from a command trace without binding the only AudioContext, oscillator and media-permission construction sites. | fixed in this commit |
+
+Leads not pursued: The pure trace and closed call-site proof establish that quiet entry emits no audio-owning command, while the final browser acceptance step still owns the integrated public replay. No child learning, individual readability, physical playing technique or device comfort is inferred from the automated result.

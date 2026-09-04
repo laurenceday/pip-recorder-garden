@@ -18,7 +18,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 - The Node test suite passed 95 of 95 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
-- The production build emitted 235.62 kB of JavaScript (73.62 kB gzip) and 21.40 kB of CSS (5.55 kB gzip). The JavaScript total was 235618 bytes, below the 300000-byte ceiling.
+- The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The current browser replay covers ready, playing, tap, done, more and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern as its largest-content case. The resulting 42 measurements are synthetic Chrome evidence, not a real-device comfort claim.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The current browser replay covers ready, playing, tap, done, more and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern in ready and more states. The resulting 48 measurements are synthetic Chrome evidence, not a real-device comfort claim.
 
 ## Boundaries covered by checks
 

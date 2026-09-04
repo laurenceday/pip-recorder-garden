@@ -28,6 +28,7 @@ test('the child source keeps one-screen, safe-area, focus and target contracts',
   assert.match(layoutCheck.validateLayoutContractSource(childSource, stylesSource.replace('height: 100dvh;', '')).join('\n'), /dynamic viewport height/);
   assert.match(layoutCheck.validateLayoutContractSource(childSource.replace('actionRef.current?.focus();', ''), stylesSource).join('\n'), /initial child focus/);
   assert.match(layoutCheck.validateLayoutContractSource(childSource, stylesSource.replace('env(safe-area-inset-bottom)', '0px')).join('\n'), /safe-area bottom/);
+  assert.match(layoutCheck.validateLayoutContractSource(childSource, stylesSource.replace('.child-stage .note-stone {\n  min-width: 64px;', '.child-stage .note-stone {\n  min-width: 48px;')).join('\n'), /64 pixel child note action/);
   assert.match(layoutCheck.validateLayoutContractSource(`// actionRef.current?.focus()\n${childSource.replace('actionRef.current?.focus();', '')}`, stylesSource).join('\n'), /initial child focus/);
   assert.match(layoutCheck.validateLayoutContractSource(childSource, `/* height: 100dvh */\n${stylesSource.replace('height: 100dvh;', '')}`).join('\n'), /dynamic viewport height/);
 });
