@@ -1,14 +1,14 @@
 import { lstat, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindCommittedFiles, sha256, parseConformanceArguments, writeConformanceReport } from './child-conformance-common.mjs';
+import { bindCommittedFiles, sha256, parseConformanceArguments, trackedBuildFiles, writeConformanceReport } from './child-conformance-common.mjs';
 
 const CANDIDATE = 'one-screen-play-loop';
 const CRITERION = 'live-pages-boots-built-artifact';
 const LIVE_URL = 'https://laurenceday.github.io/pip-recorder-garden/';
 const MAX_HTML_BYTES = 65_536;
 const MAX_ASSET_BYTES = 1_048_576;
-const SOURCE_FILES = ['.github/workflows/pages.yml', 'package-lock.json', 'scripts/check-live-pages.mjs', 'scripts/child-conformance-common.mjs'];
+const CHECKER_FILES = ['.github/workflows/pages.yml', 'scripts/check-live-pages.mjs', 'scripts/child-conformance-common.mjs'];
 
 export function inspectPagesEntry(html, responseUrl = LIVE_URL) {
   if (typeof html !== 'string' || Buffer.byteLength(html) > MAX_HTML_BYTES) throw new Error('Pages entry is missing or too large');
@@ -44,7 +44,8 @@ async function localBuiltAsset(root) {
 
 export async function runLivePagesCheck(argv, root = process.cwd(), fetchImpl = fetch) {
   const options = parseConformanceArguments(argv, CANDIDATE, [CRITERION]);
-  const { commit, sourceSha256 } = await bindCommittedFiles(root, SOURCE_FILES);
+  const sourceFiles = [...new Set([...trackedBuildFiles(root), ...CHECKER_FILES])].sort();
+  const { commit, sourceSha256 } = await bindCommittedFiles(root, sourceFiles);
   const local = await localBuiltAsset(root);
   const requestUrl = `${LIVE_URL}?proof=${commit}`;
   const htmlResponse = await fetchImpl(requestUrl, { headers: { accept: 'text/html', 'cache-control': 'no-cache' }, redirect: 'follow' });
@@ -57,7 +58,7 @@ export async function runLivePagesCheck(argv, root = process.cwd(), fetchImpl = 
   const report = {
     schema: 'live-pages-conformance/v1', candidate: CANDIDATE, criterion: CRITERION, status: 'pass', commit,
     evidence: { requestedUrl: requestUrl, entryUrl: htmlResponse.url, assetUrl: live.assetUrl, entrySha256: sha256(liveHtml), assetSha256: sha256(liveAsset), localAssetSha256: sha256(local.assetBytes), bootRoot: 'root', sourceEntry: false },
-    sourceFiles: SOURCE_FILES, sourceSha256,
+    sourceFiles, sourceSha256,
   };
   await writeConformanceReport(root, CANDIDATE, CRITERION, options.report, report);
   console.log(`live Pages clean: ${live.assetName} matches the current build`);

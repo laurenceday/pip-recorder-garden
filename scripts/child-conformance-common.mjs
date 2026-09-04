@@ -7,6 +7,21 @@ const MAX_FILE_BYTES = 1_048_576;
 
 export const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
+export function trackedBuildFiles(root) {
+  const bytes = execFileSync('git', [
+    'ls-files', '-z', '--',
+    'index.html', 'package.json', 'package-lock.json', 'tsconfig.json', 'vite.config.ts', 'src', 'public',
+  ], { cwd: root, encoding: 'buffer', maxBuffer: MAX_FILE_BYTES + 1 });
+  const files = bytes.toString('utf8').split('\0').filter(Boolean).sort();
+  for (const file of files) {
+    if (path.isAbsolute(file) || file !== path.posix.normalize(file) || file.startsWith('../')) throw new Error('git returned an invalid build input path');
+  }
+  for (const required of ['index.html', 'package-lock.json', 'package.json', 'src/main.tsx', 'tsconfig.json', 'vite.config.ts']) {
+    if (!files.includes(required)) throw new Error(`tracked build input is missing: ${required}`);
+  }
+  return files;
+}
+
 export async function bindCommittedFiles(root, relativeFiles) {
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
   if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error('git did not return one commit id');

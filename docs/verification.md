@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 101 of 101 tests with none skipped.
+- The Node test suite passed 102 of 102 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
 - The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.

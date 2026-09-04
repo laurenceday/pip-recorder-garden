@@ -40,6 +40,14 @@ test('release checks reject the wrong candidate and criterion', () => {
   assert.throws(() => common.parseConformanceArguments(good.with(3, 'another-criterion'), 'one-screen-play-loop', ['production-javascript-bytes']), /unsupported/);
 });
 
+test('release reports bind the complete tracked build surface', () => {
+  const files = common.trackedBuildFiles(process.cwd());
+  for (const required of ['index.html', 'package-lock.json', 'public/social-card.png', 'src/App.tsx', 'src/main.tsx', 'src/styles.css', 'vite.config.ts']) {
+    assert.ok(files.includes(required), `${required} was not bound`);
+  }
+  assert.equal(files.some((file) => file.startsWith('dist/')), false);
+});
+
 test('commit-bound source input rejects tampering', async () => {
   const fixture = await mkdtemp(path.join(tmpdir(), 'pip-release-source-'));
   try {

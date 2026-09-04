@@ -1,12 +1,12 @@
 import { lstat, readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindCommittedFiles, sha256, parseConformanceArguments, writeConformanceReport } from './child-conformance-common.mjs';
+import { bindCommittedFiles, sha256, parseConformanceArguments, trackedBuildFiles, writeConformanceReport } from './child-conformance-common.mjs';
 
 const CANDIDATE = 'one-screen-play-loop';
 const CRITERION = 'production-javascript-bytes';
 export const JAVASCRIPT_CEILING_BYTES = 300_000;
-const SOURCE_FILES = ['package-lock.json', 'package.json', 'scripts/check-bundle-budget.mjs', 'scripts/child-conformance-common.mjs', 'vite.config.ts'];
+const CHECKER_FILES = ['scripts/check-bundle-budget.mjs', 'scripts/child-conformance-common.mjs'];
 
 export function measureJavaScriptAssets(assets, ceiling = JAVASCRIPT_CEILING_BYTES) {
   if (!Number.isInteger(ceiling) || ceiling < 1) throw new Error('bundle ceiling must be a positive integer');
@@ -36,10 +36,11 @@ async function collectJavaScript(root) {
 
 export async function runBundleBudgetCheck(argv, root = process.cwd()) {
   const options = parseConformanceArguments(argv, CANDIDATE, [CRITERION]);
-  const { commit, sourceSha256 } = await bindCommittedFiles(root, SOURCE_FILES);
+  const sourceFiles = [...new Set([...trackedBuildFiles(root), ...CHECKER_FILES])].sort();
+  const { commit, sourceSha256 } = await bindCommittedFiles(root, sourceFiles);
   const evidence = await collectJavaScript(root);
   if (!evidence.withinBudget) throw new Error(`production JavaScript is ${evidence.totalBytes} bytes, above ${evidence.ceilingBytes}`);
-  const report = { schema: 'bundle-budget-conformance/v1', candidate: CANDIDATE, criterion: CRITERION, status: 'pass', commit, evidence, sourceFiles: SOURCE_FILES, sourceSha256 };
+  const report = { schema: 'bundle-budget-conformance/v1', candidate: CANDIDATE, criterion: CRITERION, status: 'pass', commit, evidence, sourceFiles, sourceSha256 };
   await writeConformanceReport(root, CANDIDATE, CRITERION, options.report, report);
   console.log(`bundle budget clean: ${evidence.totalBytes} of ${evidence.ceilingBytes} bytes`);
   return report;
