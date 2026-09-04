@@ -73,6 +73,8 @@ The live check accepts only the expected HTTPS site path, one relative hashed Ja
 
 Each conformance command writes the closed seven-field report consumed by the design gate and a neighbouring `.evidence.json` record with the check-specific digests and measurements. Keeping those two records separate prevents detailed evidence from changing the controller contract.
 
+The Pages build has a twenty-minute job limit. The previous ten-minute limit was too short when a cold dependency install consumed almost five minutes and the complete verification gate then reached the job deadline. The deploy job keeps its separate ten-minute limit.
+
 ## Child-layout check
 
 Run the layout gate after `npm run verify:local` has built `dist/`:

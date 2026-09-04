@@ -236,3 +236,5 @@ Leads not pursued: The authenticated Pages publisher change and accepted-tree li
 ## Integration guard repair -- 2026-09-04T12:15:00Z
 
 The first Step 4 merge receipt stopped because the conformance commands had written their detailed evidence objects into paths reserved for the closed `protasis-design-report/v1` contract. The commands now write the seven-field controller report at the reserved path and retain full digests and measurements in a neighbouring `.evidence.json` record. A new contract test raises the suite to 104 tests. The rejected receipt changed no controller state; the live deployment gate remains pending.
+
+The first authorised Actions deployment then reproduced the earlier workflow cancellation pattern: a cold dependency install used almost five minutes of the ten-minute build allowance, leaving the complete verification gate at the deadline. The Pages build allowance is now twenty minutes; no verification command was removed. The deploy job retains its separate ten-minute bound.
