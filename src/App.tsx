@@ -3,6 +3,8 @@ import catalogueJson from './generated/lessons.json';
 import { FingeringDiagram } from './components/FingeringDiagram.tsx';
 import { FingeringMission } from './components/FingeringMission.tsx';
 import { GardenMark } from './components/GardenMark.tsx';
+import { ChildStage } from './components/ChildStage.tsx';
+import { GrownUpSetup } from './components/GrownUpSetup.tsx';
 import { LessonTrail } from './components/LessonTrail.tsx';
 import { PatternMaker } from './components/PatternMaker.tsx';
 import { PatternStrip } from './components/PatternStrip.tsx';
@@ -11,7 +13,18 @@ import { useGuideTone } from './hooks/useGuideTone.ts';
 import { useMicrophoneScoring } from './hooks/useMicrophoneScoring.ts';
 import { useProgress } from './hooks/useProgress.ts';
 import { advanceSequence, createSequenceState, sequenceProgress, type SequenceObservation } from './lib/lesson-state.ts';
-import { lessonPatternNotes, missionScrollBehavior, notesToPattern } from './lib/mission-loop.ts';
+import {
+  actOnChildTurn,
+  exitChildTurn,
+  failChildModel,
+  finishChildModel,
+  lessonPatternNotes,
+  missionScrollBehavior,
+  notesToPattern,
+  startChildTurn,
+  type ChildPlayMode,
+} from './lib/mission-loop.ts';
+import { childNoteLetters, type ChildCopyState } from './lib/child-copy.ts';
 import type { PitchAssessment } from './lib/pitch.ts';
 import { NOTE_NAMES, RECORDER_NOTES, type NoteName } from './lib/recorder.ts';
 import type { Lesson } from './types.ts';
@@ -83,6 +96,8 @@ function MissionMap({ phase }: { phase: MissionPhase }) {
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(initialLessonId);
+  const [childMode, setChildMode] = useState<ChildPlayMode | null>(null);
+  const [childTurn, setChildTurn] = useState(() => startChildTurn('sound'));
   const lesson = useMemo(() => LESSONS.find((item) => item.id === selectedId) ?? LESSONS[0], [selectedId]);
   const [missionPhase, setMissionPhase] = useState<MissionPhase>('model');
   const [copyActivity, setCopyActivity] = useState<CopyActivity>('choose');
@@ -252,8 +267,64 @@ export default function App() {
     document.querySelector<HTMLElement>('#garden-path')?.focus({ preventScroll: true });
   };
 
+  const childState: ChildCopyState = childTurn.phase;
+  const allChildNotes = childNoteLetters(lesson.pattern.map((step) => step.note));
+  const childNotes = childState === 'tap'
+    ? allChildNotes.slice(childTurn.tapIndex)
+    : childState === 'more'
+      ? [...new Set(allChildNotes)]
+      : allChildNotes;
+  const enterChildMode = (mode: ChildPlayMode) => {
+    microphone.stop();
+    tone.stop('stopped');
+    resetMission();
+    setChildTurn(startChildTurn(mode));
+    setChildMode(mode);
+  };
+  const leaveChildMode = () => {
+    microphone.stop();
+    tone.stop('stopped');
+    setGuideIssue(null);
+    setChildMode(null);
+  };
+  const playChildModel = async () => {
+    microphone.stop();
+    setGuideIssue(null);
+    try {
+      const finished = await tone.playPattern(lesson.pattern);
+      if (finished) setChildTurn((current) => finishChildModel(current, lesson.pattern.length));
+    } catch {
+      setGuideIssue('child-model-unavailable');
+      setChildTurn((current) => failChildModel(current, lesson.pattern.length));
+    }
+  };
+  const runChildAction = () => {
+    const transition = actOnChildTurn(childTurn, lesson.pattern.length);
+    setChildTurn(transition.state);
+    if (transition.command === 'play-model') void playChildModel();
+    if (transition.command === 'stop-model') tone.stop('stopped');
+    if (transition.command === 'leave') leaveChildMode();
+  };
+  const runChildBack = () => {
+    const transition = exitChildTurn(childTurn, lesson.pattern.length);
+    setChildTurn(transition.state);
+    if (transition.command === 'leave') leaveChildMode();
+  };
+
+  if (childMode) {
+    return (
+      <ChildStage
+        state={childState}
+        notes={childNotes}
+        onAction={runChildAction}
+        onBack={runChildBack}
+      />
+    );
+  }
+
   return (
-    <>
+    <GrownUpSetup onStart={() => enterChildMode('sound')} onStartQuiet={() => enterChildMode('quiet')}>
+      <>
       <a className="skip-link" href="#lesson">Skip to this lesson</a>
       <header className="site-header">
         <a className="brand" href="#meet-b" onClick={(event) => { event.preventDefault(); chooseLesson('meet-b'); }}>
@@ -429,6 +500,7 @@ export default function App() {
           <button type="button" className="text-button" onClick={resetProgress}>Forget saved progress on this device</button>
         </details>
       </footer>
-    </>
+      </>
+    </GrownUpSetup>
   );
 }

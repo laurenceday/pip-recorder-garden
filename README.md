@@ -6,6 +6,8 @@ Pip’s Recorder Garden is a static, interactive course for a young beginner pla
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
+The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens one full-screen sound turn: Pip models the chosen pattern, the child taps once for each note, then stops or chooses one small making activity. **Start quiet child play** begins at the tap response and creates no sound or microphone request. Child actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short sideways view or with text enlarged to 200%. The child view receives no lesson prose or open error string.
+
 ## Run it locally
 
 Use Node 22.19 or newer.
@@ -30,13 +32,13 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 
 ## Play a lesson
 
-1. Choose any lesson on the garden path. Nothing is locked.
+1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start child play** for the large one-screen model card, or keep the detailed controls open for supported practice.
 2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
 3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
 4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
 5. Finish the turn. Choose **Stop here for today**, **Play this mission again** or **Back to the garden path**. The site never moves to the next lesson by itself.
 
-Guide playback and the microphone cannot run together. Starting either one stops the other first. Guide playback also stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.
+Guide playback and the microphone cannot run together. Starting either one stops the other first. Opening or leaving child play also stops both owners before changing views. Guide playback stops after the pattern, on lesson change, when the tab is hidden and when the lesson is completed.
 
 ## The twelve lessons
 
@@ -69,7 +71,7 @@ GitHub Pages serves over HTTPS, which allows browsers to offer microphone permis
 
 The synthetic tests establish detector behaviour, not hardware behaviour. Her father should make this short acceptance pass on each intended browser:
 
-- at a phone-sized viewport, confirm the active lesson appears before the twelve-choice garden path and the child controls are comfortable to tap;
+- on the intended phone and tablet, open child play upright and sideways, enlarge text if the device offers that setting, and confirm the card stays still while both actions remain comfortable to tap;
 - open lesson 8, press **Hear the whole pattern**, and confirm B, A, A, B sounds once with the matching note stones pulsing;
 - stop the lesson pattern part-way through and confirm sound stops at once;
 - make a two-to-four-note tune, confirm note choices freeze while it sounds, then use **Stop my tune**;
@@ -151,7 +153,7 @@ The workflow needs permission to create a proposal branch and pull request. `LES
 
 ## Publish with GitHub Pages
 
-The live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). This public repository uses GitHub Actions as its Pages source and enforces HTTPS.
+The intended live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). The repository contains a GitHub Actions Pages workflow. At release, the Pages setting must name GitHub Actions as its build type, and the public hashed JavaScript asset must match the accepted production build.
 
 `.github/workflows/pages.yml` verifies the accepted `main` tree, uploads only `dist/`, and gives deployment permissions only to the deploy job. To enable the same setup in a fork or replacement repository:
 
@@ -160,7 +162,7 @@ The live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday
 3. If the repository policy requires it, protect the `github-pages` environment so only `main` may deploy.
 4. Merge a reviewed pull request into `main`, or run the workflow manually from the accepted `main` commit.
 
-The first live deployment built and checked main commit `9cf6f60a69aeebaafdf8191e7f04c902e7014e2d` before publishing its `dist/` artifact.
+The original live deployment built and checked main commit `9cf6f60a69aeebaafdf8191e7f04c902e7014e2d` before publishing its `dist/` artifact. Later release evidence belongs in [the verification record](docs/verification.md), not in this setup guide.
 
 ## Verification
 
@@ -168,9 +170,20 @@ The first live deployment built and checked main commit `9cf6f60a69aeebaafdf8191
 npm run check          # catalogue, tests, TypeScript, lint, static boundaries
 npm run test:report    # receipted TAP result in .elenchus/node-test.json
 npm run verify:local   # check, production build and dependency audit
+node scripts/check-child-copy.mjs --candidate one-screen-play-loop --criterion rendered-child-copy-approved --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
+node scripts/check-child-layout.mjs --candidate one-screen-play-loop --criterion small-phone-no-scroll --report .hexaemeron/reports/conformance/one-screen-play-loop--small-phone-no-scroll.json
+node scripts/check-child-flow.mjs --candidate one-screen-play-loop --criterion first-response-in-one-action --report .hexaemeron/reports/conformance/one-screen-play-loop--first-response-in-one-action.json
+node scripts/check-child-flow.mjs --candidate one-screen-play-loop --criterion every-child-state-one-action-exit --report .hexaemeron/reports/conformance/one-screen-play-loop--every-child-state-one-action-exit.json
+node scripts/check-child-quiet.mjs --candidate one-screen-play-loop --criterion quiet-mode-opens-no-audio --report .hexaemeron/reports/conformance/one-screen-play-loop--quiet-mode-opens-no-audio.json
+node scripts/check-bundle-budget.mjs --candidate one-screen-play-loop --criterion production-javascript-bytes --report .hexaemeron/reports/conformance/one-screen-play-loop--production-javascript-bytes.json
+node scripts/check-live-pages.mjs --candidate one-screen-play-loop --criterion live-pages-boots-built-artifact --report .hexaemeron/reports/conformance/one-screen-play-loop--live-pages-boots-built-artifact.json
 ```
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
+
+The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 15-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds its own checker, dependency lock and every inspected render byte to the reported commit, and refuses open visible or accessible expressions, dynamic error text, opposite-role imports and undeclared states. It records the Node and TypeScript versions and writes only through checked, non-symlink report paths. This is a repository copy rule, not proof that one child can read every admitted word.
+
+The child-layout check launches the built app in a bounded local Chrome process. It replays ready, playing, tap, done, more and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels, plus a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario also opens the eight-note octave lesson as the largest child pattern. The check rejects document or horizontal overflow, text below 20 CSS pixels, actions below 64 by 64 CSS pixels, clipped essential content, a missing exit or focus left outside child play.
 
 ## How the design was chosen
 

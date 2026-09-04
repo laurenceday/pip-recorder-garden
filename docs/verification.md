@@ -4,7 +4,7 @@ Verified on 31 August 2026 on macOS arm64.
 
 ## Supported runtime proof
 
-The test run used the official Node.js 22.19.0 macOS arm64 archive. Its SHA-256 digest was checked against the release `SHASUMS256.txt` before extraction:
+The test run uses the official Node.js 22.19.0 macOS arm64 archive. Its SHA-256 digest was checked against the release `SHASUMS256.txt` before extraction:
 
 ```text
 c59006db713c770d6ec63ae16cb3edc11f49ee093b5c415d667bb4f436c6526d  node-v22.19.0-darwin-arm64.tar.gz
@@ -15,16 +15,16 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 67 of 67 tests with none skipped.
+- The Node test suite passed 103 of 103 tests with none skipped.
 - TypeScript and oxlint completed without findings.
-- The source and built-runtime boundary checks completed cleanly; the source check examined 20 files.
-- The production build emitted 232.82 kB of JavaScript (72.82 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 232827 bytes, below the 300000-byte ceiling.
+- The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
+- The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 67 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest accepted run records the executed tests, assertion failures, runner errors and skipped tests.
 
 ## Guided mission evidence
 
@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The local development demo was also exercised at 390 by 844 CSS pixels without requesting microphone permission. The active lesson began at 91 CSS pixels and the lesson 8 garden path began below it at 1296 CSS pixels. No visible child lesson control measured below 44 by 44 CSS pixels. Lesson 8 visibly advanced through B, A, A and B before moving from **Hear it** to **Copy it**. Fingering and rhythm both returned to the route chooser; **Play to Pip** opened the ready card without requesting permission; and the empty maker offered **Finish without a tune**. Equal rhythm taps reached the maker; its add, undo and finish controls froze while B-A sounded; **Stop my tune** restored them. Route-agnostic completion used the participation-only heading **A flower grew for this musical turn!** Finishing left the same lesson selected and offered only **Stop here for today**, **Play this mission again** and **Back to the garden path**. Lesson 12’s fingering clue, puzzle and active note advanced together from low C to D, and its copy-mode note stones were not interactive. The application console had no warning or error.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The current browser replay covers ready, playing, tap, done, more and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern in ready and more states. The resulting 48 measurements are synthetic Chrome evidence, not a real-device comfort claim.
 
 ## Boundaries covered by checks
 
@@ -47,4 +47,54 @@ The source check refuses audio recording and browser network channels in the chi
 
 Automated checks and the microphone-free browser demo cannot establish behaviour for a particular microphone, recorder, browser or room. Before giving the site to a child, an adult still needs to run the device checklist in the README. In particular, confirm that the browser permission indicator clears after every stop path, that guide volume is comfortable and that B is recognised at a comfortable playing distance without pressuring the child to satisfy the detector.
 
-This record does not claim that any branch has been pushed, that GitHub Pages is enabled, or that the site is deployed.
+This record does not claim that the current child-first branch has been released. The release record below is complete only after its live check passes against the accepted `main` build.
+
+## Release artifact checks
+
+Run the JavaScript budget gate after `npm run verify:local` has built `dist/`:
+
+```sh
+node scripts/check-bundle-budget.mjs \
+  --candidate one-screen-play-loop \
+  --criterion production-javascript-bytes \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--production-javascript-bytes.json
+```
+
+After the accepted commit is deployed, run the live gate against the same checked-out tree:
+
+```sh
+node scripts/check-live-pages.mjs \
+  --candidate one-screen-play-loop \
+  --criterion live-pages-boots-built-artifact \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--live-pages-boots-built-artifact.json
+```
+
+The live check accepts only the expected HTTPS site path, one relative hashed JavaScript entry and an application root. It rejects a development source entry, redirects outside the site, missing or oversized responses, an asset name from another build and live bytes that differ from the local accepted build. [ADR-006](decisions/ADR-006-publish-pages-from-the-checked-workflow.md) records why the checked Actions workflow is the only publishing authority.
+
+## Child-layout check
+
+Run the layout gate after `npm run verify:local` has built `dist/`:
+
+```sh
+node scripts/check-child-layout.mjs \
+  --candidate one-screen-play-loop \
+  --criterion small-phone-no-scroll \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--small-phone-no-scroll.json
+```
+
+The report binds the layout checker, package contract, `App`, child component and CSS to one commit. It retains the viewport, scroll size, smallest text, smallest action, exit count, clipping result and focus result for every state and scenario. The checker serves only bounded files from `dist/` over loopback, launches a fresh local Chrome profile without shell evaluation, and removes that profile when it stops.
+
+## Child-copy role check
+
+Run the copy gate after `npm run verify:local`:
+
+```sh
+node scripts/check-child-copy.mjs \
+  --candidate one-screen-play-loop \
+  --criterion rendered-child-copy-approved \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
+```
+
+The report records a commit-bound digest for its checker, `package.json`, `package-lock.json`, `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus the Node and TypeScript versions, six declared child states, 25 visible-and-accessible manifest entries and the exact 15-token lexicon. `App` must import the two role roots under their exact names and return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open or composite child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written. Existing output files and every report-path directory are checked as regular, non-symlink filesystem entries before an atomic replacement.
+
+The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Tap, More, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.

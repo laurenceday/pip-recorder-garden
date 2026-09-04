@@ -7,6 +7,67 @@ export const GUIDE_START_DELAY_MS = 40;
 export const MIN_MADE_PATTERN_NOTES = 2;
 export const MAX_MADE_PATTERN_NOTES = 4;
 
+export type ChildPlayMode = 'sound' | 'quiet';
+export type ChildTurnPhase = 'ready' | 'playing' | 'tap' | 'done' | 'more' | 'error';
+export type ChildTurnCommand = 'none' | 'play-model' | 'stop-model' | 'leave';
+
+export interface ChildTurnState {
+  mode: ChildPlayMode;
+  phase: ChildTurnPhase;
+  tapIndex: number;
+}
+
+export interface ChildTurnTransition {
+  state: ChildTurnState;
+  command: ChildTurnCommand;
+}
+
+function assertChildTurn(state: ChildTurnState, noteCount: number): void {
+  if (!['sound', 'quiet'].includes(state.mode)) throw new Error('unknown child play mode');
+  if (!['ready', 'playing', 'tap', 'done', 'more', 'error'].includes(state.phase)) throw new Error('unknown child turn phase');
+  if (!Number.isInteger(noteCount) || noteCount < 1 || noteCount > 32) throw new Error('child turn note count must be between 1 and 32');
+  if (!Number.isInteger(state.tapIndex) || state.tapIndex < 0 || state.tapIndex > noteCount) throw new Error('child tap index is outside the turn');
+}
+
+export function startChildTurn(mode: ChildPlayMode): ChildTurnState {
+  if (!['sound', 'quiet'].includes(mode)) throw new Error('unknown child play mode');
+  return { mode, phase: mode === 'quiet' ? 'tap' : 'ready', tapIndex: 0 };
+}
+
+export function actOnChildTurn(state: ChildTurnState, noteCount: number): ChildTurnTransition {
+  assertChildTurn(state, noteCount);
+  if (state.phase === 'ready' || state.phase === 'error') {
+    return { state: { ...state, phase: 'playing' }, command: 'play-model' };
+  }
+  if (state.phase === 'playing') {
+    return { state: { ...state, phase: 'ready' }, command: 'stop-model' };
+  }
+  if (state.phase === 'tap') {
+    const tapIndex = Math.min(noteCount, state.tapIndex + 1);
+    return { state: { ...state, phase: tapIndex === noteCount ? 'done' : 'tap', tapIndex }, command: 'none' };
+  }
+  if (state.phase === 'done') return { state: { ...state, phase: 'more' }, command: 'none' };
+  return { state, command: 'leave' };
+}
+
+export function finishChildModel(state: ChildTurnState, noteCount: number): ChildTurnState {
+  assertChildTurn(state, noteCount);
+  if (state.phase !== 'playing' || state.mode !== 'sound') throw new Error('only a playing sound turn can finish its model');
+  return { ...state, phase: 'tap', tapIndex: 0 };
+}
+
+export function failChildModel(state: ChildTurnState, noteCount: number): ChildTurnState {
+  assertChildTurn(state, noteCount);
+  if (state.phase !== 'playing' || state.mode !== 'sound') throw new Error('only a playing sound turn can fail its model');
+  return { ...state, phase: 'error', tapIndex: 0 };
+}
+
+export function exitChildTurn(state: ChildTurnState, noteCount: number): ChildTurnTransition {
+  assertChildTurn(state, noteCount);
+  if (state.phase === 'more') return { state: { ...state, phase: 'done' }, command: 'none' };
+  return { state, command: 'leave' };
+}
+
 export interface GuideEvent {
   index: number;
   note: NoteName;
