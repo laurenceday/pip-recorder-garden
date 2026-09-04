@@ -636,7 +636,7 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     sourceSha256: Object.fromEntries(sourceFiles.map((file) => [file, digest(boundSources.get(file))])),
   };
   await writeReportSafely(root, reportPath, `${JSON.stringify(report, null, 2)}\n`);
-  console.log(`child copy clean: ${CHILD_COPY_MANIFEST.length} manifest entries, ${CHILD_LEXICON.length} lexicon tokens, 4 declared states`);
+  console.log(`child copy clean: ${CHILD_COPY_MANIFEST.length} manifest entries, ${CHILD_LEXICON.length} lexicon tokens, ${CHILD_COPY_STATE_IDS.length} declared states`);
   return report;
 }
 

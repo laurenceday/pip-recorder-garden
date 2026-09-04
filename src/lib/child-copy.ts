@@ -1,4 +1,4 @@
-export const CHILD_COPY_STATE_IDS = ['ready', 'playing', 'done', 'error'] as const;
+export const CHILD_COPY_STATE_IDS = ['ready', 'playing', 'tap', 'done', 'more', 'error'] as const;
 
 export type ChildCopyState = (typeof CHILD_COPY_STATE_IDS)[number];
 
@@ -16,17 +16,21 @@ export const CHILD_LEXICON = [
   'e',
   'f',
   'g',
+  'more',
   'pip',
   'play',
   'stop',
+  'tap',
   'try',
 ] as const;
 
 const COPY_BY_STATE = Object.freeze({
   ready: Object.freeze({ title: 'Pip', action: 'Play', exit: 'Back' }),
   playing: Object.freeze({ title: 'Pip', action: 'Stop', exit: 'Back' }),
-  done: Object.freeze({ title: 'Pip', action: 'Done', exit: 'Back' }),
-  error: Object.freeze({ title: 'Pip', action: 'Try', exit: 'Back' }),
+  tap: Object.freeze({ title: 'Tap', action: 'Tap', exit: 'Done' }),
+  done: Object.freeze({ title: 'Done', action: 'More', exit: 'Done' }),
+  more: Object.freeze({ title: 'More', action: 'Done', exit: 'Back' }),
+  error: Object.freeze({ title: 'Try', action: 'Play', exit: 'Back' }),
 }) satisfies Readonly<Record<ChildCopyState, Readonly<{ title: string; action: string; exit: string }>>>;
 
 export interface ChildCopyManifestEntry {
@@ -103,7 +107,7 @@ export function validateChildCopyManifest(entries: unknown): readonly string[] {
     if (JSON.stringify(keys) !== JSON.stringify(['id', 'state', 'surface', 'text'])) {
       findings.push(`entry ${index} has unsupported fields`);
     }
-    if (typeof entry.id !== 'string' || !/^(?:all\.note\.[a-g]|(?:ready|playing|done|error)\.(?:title|action|exit))$/.test(entry.id)) {
+    if (typeof entry.id !== 'string' || !/^(?:all\.note\.[a-g]|(?:ready|playing|tap|done|more|error)\.(?:title|action|exit))$/.test(entry.id)) {
       findings.push(`entry ${index} has an invalid id`);
     } else if (seen.has(entry.id)) {
       findings.push(`entry ${index} duplicates ${entry.id}`);

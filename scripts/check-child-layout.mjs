@@ -10,7 +10,7 @@ const EXPECTED_CANDIDATE = 'one-screen-play-loop';
 const EXPECTED_CRITERION = 'small-phone-no-scroll';
 const MAX_SOURCE_BYTES = 1_048_576;
 const MAX_REPORT_BYTES = 1_048_576;
-const STATES = ['ready', 'playing', 'done', 'error'];
+const STATES = ['ready', 'playing', 'tap', 'done', 'more', 'error'];
 export const CHILD_LAYOUT_LESSONS = Object.freeze(['meet-b', 'octave-garden']);
 export const CHILD_LAYOUT_SCENARIOS = Object.freeze([
   { id: 'phone-320', width: 320, height: 568, textScale: 1, reducedMotion: false },
@@ -68,7 +68,7 @@ export function validateLayoutContractSource(childSource, stylesSource) {
   const inspectableStyles = stylesSource.replace(/\/\*[\s\S]*?\*\//g, '');
   for (const [label, pattern] of [
     ['closed child state marker', /data-child-state=\{state\}/],
-    ['initial child focus', /actionRef\.current\?\.focus\(\)/],
+    ['initial child focus', /if \(state === 'more'\) firstNoteRef\.current\?\.focus\(\);\s*else actionRef\.current\?\.focus\(\);/],
     ['dynamic viewport height', /\.child-stage\s*\{[\s\S]*height:\s*100dvh/],
     ['safe-area top', /--child-safe-top:\s*env\(safe-area-inset-top\)/],
     ['safe-area right', /--child-safe-right:\s*env\(safe-area-inset-right\)/],
@@ -76,6 +76,7 @@ export function validateLayoutContractSource(childSource, stylesSource) {
     ['safe-area left', /--child-safe-left:\s*env\(safe-area-inset-left\)/],
     ['child overflow closure', /\.child-stage\s*\{[\s\S]*overflow:\s*hidden/],
     ['64 pixel child action', /\.child-stage \.button\s*\{[\s\S]*min-width:\s*64px;[\s\S]*min-height:\s*64px/],
+    ['64 pixel child note action', /\.child-stage \.note-stone\s*\{[^}]*min-width:\s*64px;[^}]*min-height:\s*64px/],
     ['landscape child layout', /@media \(max-height: 400px\) and \(orientation: landscape\)/],
     ['reduced motion', /@media \(prefers-reduced-motion: reduce\)/],
   ]) {
@@ -292,7 +293,7 @@ const clickButtonExpression = (label) => `(() => {
   return true;
 })()`;
 
-async function enterChild(client, url, scenario, lesson, forceError = false) {
+async function enterChild(client, url, scenario, lesson, forceError = false, quiet = false) {
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: scenario.width,
     height: scenario.height,
@@ -304,7 +305,7 @@ async function enterChild(client, url, scenario, lesson, forceError = false) {
   await client.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: scenario.reducedMotion ? 'reduce' : 'no-preference' }],
   });
-  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}#${lesson}`);
+  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}&mode=${quiet ? 'quiet' : 'sound'}#${lesson}`);
   if (forceError) {
     await evaluate(client, `(() => {
       const Audio = window.AudioContext || window.webkitAudioContext;
@@ -312,8 +313,10 @@ async function enterChild(client, url, scenario, lesson, forceError = false) {
       return true;
     })()`);
   }
-  if (!await evaluate(client, clickButtonExpression('Start child play'))) throw new Error('grown-up start action was not found');
-  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'ready'");
+  const startLabel = quiet ? 'Start quiet child play' : 'Start child play';
+  if (!await evaluate(client, clickButtonExpression(startLabel))) throw new Error('grown-up start action was not found');
+  const startState = quiet ? 'tap' : 'ready';
+  await waitForExpression(client, `document.querySelector('.child-stage')?.dataset.childState === '${startState}'`);
   if (scenario.textScale !== 1) {
     await evaluate(client, `document.documentElement.style.fontSize = ${JSON.stringify(`${scenario.textScale * 100}%`)}`);
     await delay(50);
@@ -335,7 +338,7 @@ async function measure(client, scenario, lesson, state) {
     const stage = document.querySelector('.child-stage');
     const card = stage.querySelector('.model-card');
     const textNodes = [...stage.querySelectorAll('h1, .note-stone, .mission-actions button')];
-    const actions = [...stage.querySelectorAll('.mission-actions button')];
+    const actions = [...stage.querySelectorAll('button:not(:disabled)')];
     const rects = actions.map((item) => item.getBoundingClientRect());
     const essentialRects = [...stage.querySelectorAll('.garden-mark, h1, .note-stone, .mission-actions button')].map((item) => item.getBoundingClientRect());
     const cardRect = card.getBoundingClientRect();
@@ -365,8 +368,14 @@ async function replayScenario(client, url, scenario) {
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child play action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'playing'");
   measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'playing'));
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'tap'");
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'tap'));
+  if (!await evaluate(client, clickButtonExpression('Tap'))) throw new Error('child tap action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'done'");
   measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'done'));
+  if (!await evaluate(client, clickButtonExpression('More'))) throw new Error('child more action was not found');
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'more'");
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'more'));
 
   await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[0], true);
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child error probe action was not found');
@@ -375,6 +384,14 @@ async function replayScenario(client, url, scenario) {
 
   await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[1]);
   measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[1], 'ready'));
+  await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[1], false, true);
+  for (let index = 0; index < 8; index += 1) {
+    if (!await evaluate(client, clickButtonExpression('Tap'))) throw new Error('largest lesson tap action was not found');
+  }
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'done'");
+  if (!await evaluate(client, clickButtonExpression('More'))) throw new Error('largest lesson more action was not found');
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'more'");
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[1], 'more'));
   return measurements;
 }
 
