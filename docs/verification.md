@@ -15,16 +15,16 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 82 of 82 tests with none skipped.
+- The Node test suite passed 89 of 89 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
-- The production build emitted 235.52 kB of JavaScript (73.59 kB gzip) and 19.27 kB of CSS (5.07 kB gzip). The JavaScript total was 235525 bytes, below the 300000-byte ceiling.
+- The production build emitted 235.62 kB of JavaScript (73.62 kB gzip) and 21.40 kB of CSS (5.55 kB gzip). The JavaScript total was 235618 bytes, below the 300000-byte ceiling.
 - The dependency audit reported no known vulnerabilities at moderate severity or above.
 - Ruby parsed all three workflow files as YAML.
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 82 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 89 executed tests, no assertion failures, no runner errors and no skipped tests.
 
 ## Guided mission evidence
 
@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. That grown-up-path evidence remains useful for the unchanged mission controls, but it is not a child-stage layout pass. In the Step 1 child tree at 391 by 844, the mounted child text was exactly **Pip**, **B**, **Play** and **Back**, with no grown-up tree mounted. Its document height was 876 pixels and both actions were 50 pixels high. Zero child scrolling and the 64-pixel action floor therefore remain pending Step 2 rather than passing here.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The Step 2 browser replay now covers every child state at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern as its largest-content case. All 30 measurements had zero horizontal or document overflow, one reachable exit and child focus inside the card. The smallest child text was 20 CSS pixels; the smallest action was 131 by 64 CSS pixels. This is synthetic Chrome evidence, not a real-device comfort claim.
 
 ## Boundaries covered by checks
 
@@ -48,6 +48,19 @@ The source check refuses audio recording and browser network channels in the chi
 Automated checks and the microphone-free browser demo cannot establish behaviour for a particular microphone, recorder, browser or room. Before giving the site to a child, an adult still needs to run the device checklist in the README. In particular, confirm that the browser permission indicator clears after every stop path, that guide volume is comfortable and that B is recognised at a comfortable playing distance without pressuring the child to satisfy the detector.
 
 This record does not claim that any branch has been pushed, that GitHub Pages is enabled, or that the site is deployed.
+
+## Child-layout check
+
+Run the layout gate after `npm run verify:local` has built `dist/`:
+
+```sh
+node scripts/check-child-layout.mjs \
+  --candidate one-screen-play-loop \
+  --criterion small-phone-no-scroll \
+  --report .hexaemeron/reports/conformance/one-screen-play-loop--small-phone-no-scroll.json
+```
+
+The report binds the layout checker, package contract, `App`, child component and CSS to one commit. It retains the viewport, scroll size, smallest text, smallest action, exit count, clipping result and focus result for every state and scenario. The checker serves only bounded files from `dist/` over loopback, launches a fresh local Chrome profile without shell evaluation, and removes that profile when it stops.
 
 ## Child-copy role check
 

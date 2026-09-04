@@ -67,3 +67,71 @@ Elenchus verdict: null
 | -- | -- | -- | none | -- |
 
 Leads not pursued: Child geometry, quiet play, instructional sequencing and public deployment remain explicitly assigned to Steps 2 through 4. The user has now authorised repair of the Pages publishing setting if the live-site check shows it is still unusable; no deployment setting was changed in this Step 1 audit.
+
+## Step 2, round 1 -- 2026-09-04T10:10:03Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; quiet play and progressive child flow assigned to Step 3; public Pages boot assigned to Step 4. The local browser report uses a fresh muted Chrome profile and retains geometry only, not child action data.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S2-R1-01 | high | scripts/check-child-layout.mjs | The report named a source commit but did not digest the built HTML, CSS or JavaScript it measured, and the local server did not reject a symlinked directory inside dist. A stale or substituted artifact could therefore earn current-source geometry evidence. | fixed in this commit |
+| S2-R1-02 | high | scripts/check-child-layout.mjs | Comment text could satisfy the static one-screen, focus, target and safe-area patterns, allowing a removed layout rule to pass its source contract. | fixed in this commit |
+| S2-R1-03 | medium | scripts/check-child-layout.mjs | Safe-area handling was checked only as CSS text and never exercised against reduced usable space, so clipping behind a notch or home indicator was not measured. | fixed in this commit |
+
+Leads not pursued: Chrome text enlargement is simulated by setting the root text size to 200%, which exercises the rem-based child copy but is not a claim about every platform accessibility setting. The browser executable and Git object store remain the local trust base. Step 3 still owns the child learning sequence and quiet path; this round does not infer pedagogy from geometry.
+
+## Step 2, round 2 -- 2026-09-04T10:12:08Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; native device text settings; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; Step 3 quiet and progressive flow; Step 4 public Pages boot. The inspected child essentials were Pip, every note stone and both actions in each state.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S2-R2-01 | high | scripts/check-child-layout.mjs | The report digested built assets before the browser run, but the server reopened them from disk for each request. A changed file between those operations could still make the measured bytes differ from the report digest. | fixed in this commit |
+| S2-R2-02 | high | scripts/check-child-layout.mjs | Overflow hidden could conceal clipped Pip, note stones or other essential content because only the two action rectangles were checked against the viewport. | fixed in this commit |
+| S2-R2-03 | medium | scripts/check-child-layout.mjs | The safe-area scenario changed CSS variables but judged content only against the full viewport, so an element inside the screen but under the declared inset could pass. | fixed in this commit |
+
+Leads not pursued: The local HTTP server now serves the captured HTML, CSS and JavaScript buffers that the report digests. Browser geometry remains synthetic and does not establish tap comfort, legibility or attention on the intended devices; those remain family acceptance checks.
+
+## Step 2, round 3 -- 2026-09-04T10:13:53Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; native device text settings; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; Step 3 quiet and progressive flow; Step 4 public Pages boot.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S2-R3-01 | high | scripts/check-child-layout.mjs | Every browser state and viewport replay used the one-note first lesson. The checked card could still clip when a grown-up chose the eight-note octave lesson, so the report did not cover the largest child pattern available in the catalogue. | fixed in this commit |
+
+Leads not pursued: The octave lesson is the catalogue maximum at eight displayed notes and is now opened in every scenario alongside the full four-state first-lesson flow. Future lesson-schema changes still need to keep the proposal and catalogue checks from exceeding that reviewed child-pattern bound.
+
+## Step 2, round 4 -- 2026-09-04T10:16:20Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; native device text settings; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; Step 3 quiet and progressive flow; Step 4 public Pages boot. The clean round checked 30 browser measurements, including the eight-note lesson, and the 89-test suite, type check, lint, static and built boundaries, production build and cached dependency audit all completed cleanly.
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: The child card now has measured room for its largest current pattern, but the family device pass still owns comfort, comprehension and the effect of real browser chrome. No new dependencies, persistence, telemetry or child copy were introduced.

@@ -284,7 +284,7 @@ export function validateChildStageSource(source) {
   }
 
   const imports = importsFrom(sourceFile);
-  const allowedImports = new Set(['./GardenMark.tsx', '../lib/child-copy.ts']);
+  const allowedImports = new Set(['react', './GardenMark.tsx', '../lib/child-copy.ts']);
   for (const imported of imports) {
     if (!allowedImports.has(imported)) findings.push(`child stage imports an undeclared render path: ${imported}`);
   }

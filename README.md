@@ -6,7 +6,7 @@ Pip’s Recorder Garden is a static, interactive course for a young beginner pla
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
-The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens a child view whose entire first copy set is Pip, the note letters A to G, Play, Stop, Try, Done and Back. The child view receives no lesson prose or open error string. It currently models the chosen pattern, then returns to the grown-up view for the remaining mission controls.
+The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens one full-screen task with Pip, the note letters A to G, Play, Stop, Try, Done and Back. Its actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short sideways view or with text enlarged to 200%. The child view receives no lesson prose or open error string. It currently models the chosen pattern, then returns to the grown-up view for the remaining mission controls.
 
 ## Run it locally
 
@@ -32,7 +32,7 @@ The build goes to `dist/` and uses relative asset paths, so it works under a Git
 
 ## Play a lesson
 
-1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start child play** for the closed-copy model card, or keep the detailed controls open for supported practice.
+1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start child play** for the large one-screen model card, or keep the detailed controls open for supported practice.
 2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
 3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
 4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
@@ -71,7 +71,7 @@ GitHub Pages serves over HTTPS, which allows browsers to offer microphone permis
 
 The synthetic tests establish detector behaviour, not hardware behaviour. Her father should make this short acceptance pass on each intended browser:
 
-- at a phone-sized viewport, confirm the active lesson appears before the twelve-choice garden path and the child controls are comfortable to tap;
+- on the intended phone and tablet, open child play upright and sideways, enlarge text if the device offers that setting, and confirm the card stays still while both actions remain comfortable to tap;
 - open lesson 8, press **Hear the whole pattern**, and confirm B, A, A, B sounds once with the matching note stones pulsing;
 - stop the lesson pattern part-way through and confirm sound stops at once;
 - make a two-to-four-note tune, confirm note choices freeze while it sounds, then use **Stop my tune**;
@@ -171,11 +171,14 @@ npm run check          # catalogue, tests, TypeScript, lint, static boundaries
 npm run test:report    # receipted TAP result in .elenchus/node-test.json
 npm run verify:local   # check, production build and dependency audit
 node scripts/check-child-copy.mjs --candidate one-screen-play-loop --criterion rendered-child-copy-approved --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
+node scripts/check-child-layout.mjs --candidate one-screen-play-loop --criterion small-phone-no-scroll --report .hexaemeron/reports/conformance/one-screen-play-loop--small-phone-no-scroll.json
 ```
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
 
 The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds its own checker, dependency lock and every inspected render byte to the reported commit, and refuses open visible or accessible expressions, dynamic error text, opposite-role imports and undeclared states. It records the Node and TypeScript versions and writes only through checked, non-symlink report paths. This is a repository copy rule, not proof that one child can read every admitted word.
+
+The child-layout check launches the built app in a bounded local Chrome process. It replays ready, playing, done and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels, plus a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario also opens the eight-note octave lesson as the largest child pattern. The check rejects document or horizontal overflow, text below 20 CSS pixels, actions below 64 by 64 CSS pixels, clipped essential content, a missing exit or focus left outside child play.
 
 ## How the design was chosen
 
