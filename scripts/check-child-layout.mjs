@@ -1,6 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
-import { createReadStream } from 'node:fs';
 import { lstat, mkdir, mkdtemp, readFile, rename, rm, unlink, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -97,6 +96,8 @@ export function validateLayoutMeasurement(measurement) {
   }
   if (measurement.exitActionCount !== 1) findings.push(`${prefix} does not have one reachable exit action`);
   if (!measurement.actionsInsideViewport) findings.push(`${prefix} has a clipped child action`);
+  if (!measurement.essentialsInsideCard) findings.push(`${prefix} clips essential child content inside the card`);
+  if (!measurement.essentialsInsideSafeArea) findings.push(`${prefix} places essential child content outside the safe area`);
   if (!measurement.focusInsideChild) findings.push(`${prefix} does not move focus into child play`);
   return findings;
 }
@@ -110,22 +111,20 @@ function mimeType(filePath) {
   return 'application/octet-stream';
 }
 
-async function startDistServer(root) {
-  const dist = path.join(root, 'dist');
-  const distStat = await lstat(dist);
-  if (!distStat.isDirectory() || distStat.isSymbolicLink()) throw new Error('dist must be a regular directory');
+async function startDistServer(artifacts) {
   const server = createServer(async (request, response) => {
     try {
       const parsed = new URL(request.url ?? '/', 'http://127.0.0.1');
       const relative = decodeURIComponent(parsed.pathname === '/' ? 'index.html' : parsed.pathname.slice(1));
       if (!relative || path.isAbsolute(relative) || relative.split('/').includes('..')) throw new Error('invalid path');
-      const { candidate, stat } = await boundedDistFile(dist, relative);
+      const bytes = artifacts.get(relative);
+      if (!bytes) throw new Error('asset is outside the measured artifact set');
       response.writeHead(200, {
         'Cache-Control': 'no-store',
-        'Content-Length': stat.size,
-        'Content-Type': mimeType(candidate),
+        'Content-Length': bytes.length,
+        'Content-Type': mimeType(relative),
       });
-      createReadStream(candidate).pipe(response);
+      response.end(bytes);
     } catch {
       response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       response.end('not found');
@@ -330,11 +329,16 @@ async function enterChild(client, url, scenario, forceError = false) {
 }
 
 async function measure(client, scenario, state) {
+  const safeInsets = scenario.safeInsets ?? { top: 0, right: 0, bottom: 0, left: 0 };
   const value = await evaluate(client, `(() => {
     const stage = document.querySelector('.child-stage');
+    const card = stage.querySelector('.model-card');
     const textNodes = [...stage.querySelectorAll('h1, .note-stone, .mission-actions button')];
     const actions = [...stage.querySelectorAll('.mission-actions button')];
     const rects = actions.map((item) => item.getBoundingClientRect());
+    const essentialRects = [...stage.querySelectorAll('.garden-mark, h1, .note-stone, .mission-actions button')].map((item) => item.getBoundingClientRect());
+    const cardRect = card.getBoundingClientRect();
+    const safe = ${JSON.stringify(safeInsets)};
     return {
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
@@ -345,6 +349,8 @@ async function measure(client, scenario, state) {
       smallestTargetHeight: Math.min(...rects.map((rect) => rect.height)),
       exitActionCount: stage.querySelectorAll('.mission-actions .button--soft').length,
       actionsInsideViewport: rects.every((rect) => rect.left >= -0.5 && rect.top >= -0.5 && rect.right <= innerWidth + 0.5 && rect.bottom <= innerHeight + 0.5),
+      essentialsInsideCard: essentialRects.every((rect) => rect.width > 0 && rect.height > 0 && rect.left >= cardRect.left - 0.5 && rect.top >= cardRect.top - 0.5 && rect.right <= cardRect.right + 0.5 && rect.bottom <= cardRect.bottom + 0.5),
+      essentialsInsideSafeArea: essentialRects.every((rect) => rect.left >= safe.left - 0.5 && rect.top >= safe.top - 0.5 && rect.right <= innerWidth - safe.right + 0.5 && rect.bottom <= innerHeight - safe.bottom + 0.5),
       focusInsideChild: stage.contains(document.activeElement),
     };
   })()`);
@@ -433,7 +439,7 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
 
   const chrome = await findChrome();
   const profile = await mkdtemp(path.join(tmpdir(), 'pip-child-layout-'));
-  const { server, url } = await startDistServer(root);
+  const { server, url } = await startDistServer(artifacts);
   const chromeProcess = spawn(chrome, [
     '--headless=new',
     '--remote-debugging-port=0',

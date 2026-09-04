@@ -85,3 +85,21 @@ Elenchus verdict: guarded
 | S2-R1-03 | medium | scripts/check-child-layout.mjs | Safe-area handling was checked only as CSS text and never exercised against reduced usable space, so clipping behind a notch or home indicator was not measured. | fixed in this commit |
 
 Leads not pursued: Chrome text enlargement is simulated by setting the root text size to 200%, which exercises the rem-based child copy but is not a claim about every platform accessibility setting. The browser executable and Git object store remain the local trust base. Step 3 still owns the child learning sequence and quiet path; this round does not infer pedagogy from geometry.
+
+## Step 2, round 2 -- 2026-09-04T10:12:08Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; native device text settings; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; Step 3 quiet and progressive flow; Step 4 public Pages boot. The inspected child essentials were Pip, every note stone and both actions in each state.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S2-R2-01 | high | scripts/check-child-layout.mjs | The report digested built assets before the browser run, but the server reopened them from disk for each request. A changed file between those operations could still make the measured bytes differ from the report digest. | fixed in this commit |
+| S2-R2-02 | high | scripts/check-child-layout.mjs | Overflow hidden could conceal clipped Pip, note stones or other essential content because only the two action rectangles were checked against the viewport. | fixed in this commit |
+| S2-R2-03 | medium | scripts/check-child-layout.mjs | The safe-area scenario changed CSS variables but judged content only against the full viewport, so an element inside the screen but under the declared inset could pass. | fixed in this commit |
+
+Leads not pursued: The local HTTP server now serves the captured HTML, CSS and JavaScript buffers that the report digests. Browser geometry remains synthetic and does not establish tap comfort, legibility or attention on the intended devices; those remain family acceptance checks.

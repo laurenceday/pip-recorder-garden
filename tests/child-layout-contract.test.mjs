@@ -45,6 +45,8 @@ test('measurement acceptance rejects scroll, small text, small or clipped action
     smallestTargetHeight: 64,
     exitActionCount: 1,
     actionsInsideViewport: true,
+    essentialsInsideCard: true,
+    essentialsInsideSafeArea: true,
     focusInsideChild: true,
   };
   assert.deepEqual(layoutCheck.validateLayoutMeasurement(clean), []);
@@ -56,6 +58,8 @@ test('measurement acceptance rejects scroll, small text, small or clipped action
     ['smallestTargetHeight', 63.9, 'below 64 by 64'],
     ['exitActionCount', 0, 'one reachable exit'],
     ['actionsInsideViewport', false, 'clipped'],
+    ['essentialsInsideCard', false, 'clips essential'],
+    ['essentialsInsideSafeArea', false, 'outside the safe area'],
     ['focusInsideChild', false, 'move focus'],
   ]) {
     assert.match(layoutCheck.validateLayoutMeasurement({ ...clean, [field]: value }).join('\n'), new RegExp(finding));
