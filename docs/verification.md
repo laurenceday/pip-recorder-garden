@@ -4,7 +4,7 @@ Verified on 31 August 2026 on macOS arm64.
 
 ## Supported runtime proof
 
-The test run used the official Node.js 22.19.0 macOS arm64 archive. Its SHA-256 digest was checked against the release `SHASUMS256.txt` before extraction:
+The test run uses the official Node.js 22.19.0 macOS arm64 archive. Its SHA-256 digest was checked against the release `SHASUMS256.txt` before extraction:
 
 ```text
 c59006db713c770d6ec63ae16cb3edc11f49ee093b5c415d667bb4f436c6526d  node-v22.19.0-darwin-arm64.tar.gz
@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 89 of 89 tests with none skipped.
+- The Node test suite passed 95 of 95 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
 - The production build emitted 235.62 kB of JavaScript (73.62 kB gzip) and 21.40 kB of CSS (5.55 kB gzip). The JavaScript total was 235618 bytes, below the 300000-byte ceiling.
@@ -24,7 +24,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 - A local Vite production preview returned HTTP 200.
 - `git diff --check` reported no whitespace errors.
 
-The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest run records 89 executed tests, no assertion failures, no runner errors and no skipped tests.
+The machine-readable Node test receipt is generated at `.elenchus/node-test.json`. Its latest accepted run records the executed tests, assertion failures, runner errors and skipped tests.
 
 ## Guided mission evidence
 
@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The Step 2 browser replay now covers every child state at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern as its largest-content case. All 30 measurements had zero horizontal or document overflow, one reachable exit and child focus inside the card. The smallest child text was 20 CSS pixels; the smallest action was 131 by 64 CSS pixels. This is synthetic Chrome evidence, not a real-device comfort claim.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The current browser replay covers ready, playing, tap, done, more and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern as its largest-content case. The resulting 42 measurements are synthetic Chrome evidence, not a real-device comfort claim.
 
 ## Boundaries covered by checks
 
@@ -73,6 +73,6 @@ node scripts/check-child-copy.mjs \
   --report .hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json
 ```
 
-The report records a commit-bound digest for its checker, `package.json`, `package-lock.json`, `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus the Node and TypeScript versions, four declared child states, 19 visible-and-accessible manifest entries and the exact 13-token lexicon. `App` must import the two role roots under their exact names and return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open or composite child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written. Existing output files and every report-path directory are checked as regular, non-symlink filesystem entries before an atomic replacement.
+The report records a commit-bound digest for its checker, `package.json`, `package-lock.json`, `App`, the grown-up wrapper, the copy contract, global CSS and every transitive child TSX render source, plus the Node and TypeScript versions, six declared child states, 25 visible-and-accessible manifest entries and the exact 15-token lexicon. `App` must import the two role roots under their exact names and return only the child tree from its child-mode branch and only the grown-up tree afterwards. Raw JSX text, visible or accessible string attributes, open or composite child expressions, generated CSS copy, uninspectable artwork paths, open error text, opposite-role imports and an unlisted state fail the check. Source bytes that differ from the report’s named commit fail before a report is written. Existing output files and every report-path directory are checked as regular, non-symlink filesystem entries before an atomic replacement.
 
-The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.
+The check establishes conformance to the reviewed list. It does not establish that the intended child has been taught every admitted word. Before family use, ask her to read or act on Pip, Play, Stop, Tap, More, Try, Done and Back on both the intended phone and tablet. Record any word that needs a picture, spoken model or replacement. Keep recorder, room, comfortable volume, microphone behaviour and learning response in the real-device checklist above.

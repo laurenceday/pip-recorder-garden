@@ -10,7 +10,7 @@ const EXPECTED_CANDIDATE = 'one-screen-play-loop';
 const EXPECTED_CRITERION = 'small-phone-no-scroll';
 const MAX_SOURCE_BYTES = 1_048_576;
 const MAX_REPORT_BYTES = 1_048_576;
-const STATES = ['ready', 'playing', 'done', 'error'];
+const STATES = ['ready', 'playing', 'tap', 'done', 'more', 'error'];
 export const CHILD_LAYOUT_LESSONS = Object.freeze(['meet-b', 'octave-garden']);
 export const CHILD_LAYOUT_SCENARIOS = Object.freeze([
   { id: 'phone-320', width: 320, height: 568, textScale: 1, reducedMotion: false },
@@ -365,8 +365,14 @@ async function replayScenario(client, url, scenario) {
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child play action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'playing'");
   measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'playing'));
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'tap'");
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'tap'));
+  if (!await evaluate(client, clickButtonExpression('Tap'))) throw new Error('child tap action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'done'");
   measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'done'));
+  if (!await evaluate(client, clickButtonExpression('More'))) throw new Error('child more action was not found');
+  await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'more'");
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'more'));
 
   await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[0], true);
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child error probe action was not found');

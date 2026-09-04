@@ -14,9 +14,9 @@ A repository rule cannot prove which words one child can read. Early reading dep
 
 Use `one-screen-play-loop`. `App` conditionally mounts one of two React trees. `GrownUpSetup` owns lesson selection, teaching notes, privacy, progress and the existing detailed mission. `ChildStage` receives only a closed state, validated note letters and actions. The grown-up tree is not hidden with CSS; it is absent from the child tree.
 
-The first child-copy contract admits exactly `a`, `b`, `back`, `c`, `d`, `done`, `e`, `f`, `g`, `pip`, `play`, `stop` and `try`. Case does not widen the list. Visible copy and accessible names share one deterministic 19-entry manifest over four states: `ready`, `playing`, `done` and `error`. Lesson note names become the letters A to G before they cross into the child tree. No lesson title, story, cue, error message or other open string may cross that interface.
+The child-copy contract admits exactly `a`, `b`, `back`, `c`, `d`, `done`, `e`, `f`, `g`, `more`, `pip`, `play`, `stop`, `tap` and `try`. Case does not widen the list. Visible copy and accessible names share one deterministic 25-entry manifest over six states: `ready`, `playing`, `tap`, `done`, `more` and `error`. Lesson note names become the letters A to G before they cross into the child tree. No lesson title, story, cue, error message or other open string may cross that interface.
 
-The child entry models the chosen note pattern with **Play**, gives **Stop** while sound runs, gives **Try** after a guide failure and uses **Done** or **Back** to return to grown-up mode. Entering and leaving the child tree first stops both microphone and guide-tone owners. This step establishes the copy boundary without changing the lesson schema, saved progress or audio ownership.
+The sound entry models the chosen note pattern with **Play**, gives **Stop** while sound runs, then gives one **Tap** for each note before reaching **Done**. The quiet entry starts at the same tap response without constructing audio or asking for microphone access. **Done** leaves the turn. **More** alone opens a two-to-four-note, current-lesson making card; it is optional and returns to **Done**. **Try** handles guide failure. Entering and leaving the child tree first stops both microphone and guide-tone owners. The change does not alter the lesson schema, saved progress or audio ownership.
 
 ## Alternatives
 
@@ -32,7 +32,8 @@ Keeping the old interface unchanged was rejected because it did not answer the f
 - Grown-up prose remains unrestricted inside its separately mounted tree.
 - The existing twelve lessons, progress key, microphone boundary, guide-tone lifecycle and full mission remain available in grown-up mode.
 - The repository proves conformance to the declared list, not readability for one child. A real child read-through remains required.
-- The selected one-screen presentation and complete model-response-stop turn are governed by the accepted runbook’s later steps.
+- Sound and quiet use the same response and stopping states. The quiet route cannot emit a play or stop command, and neither route advances to another lesson.
+- The optional making card holds at most four note choices in component memory and saves nothing.
 
 ## Evidence
 
