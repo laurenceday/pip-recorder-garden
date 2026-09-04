@@ -3,9 +3,25 @@ import { execFileSync } from 'node:child_process';
 import { lstat, mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const MAX_FILE_BYTES = 1_048_576;
+const MAX_INPUT_FILE_BYTES = 2_000_000;
+const MAX_REPORT_BYTES = 1_048_576;
 
 export const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
+
+export function trackedBuildFiles(root) {
+  const bytes = execFileSync('git', [
+    'ls-files', '-z', '--',
+    'index.html', 'package.json', 'package-lock.json', 'tsconfig.json', 'vite.config.ts', 'src', 'public',
+  ], { cwd: root, encoding: 'buffer', maxBuffer: MAX_REPORT_BYTES + 1 });
+  const files = bytes.toString('utf8').split('\0').filter(Boolean).sort();
+  for (const file of files) {
+    if (path.isAbsolute(file) || file !== path.posix.normalize(file) || file.startsWith('../')) throw new Error('git returned an invalid build input path');
+  }
+  for (const required of ['index.html', 'package-lock.json', 'package.json', 'src/main.tsx', 'tsconfig.json', 'vite.config.ts']) {
+    if (!files.includes(required)) throw new Error(`tracked build input is missing: ${required}`);
+  }
+  return files;
+}
 
 export async function bindCommittedFiles(root, relativeFiles) {
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
@@ -14,9 +30,9 @@ export async function bindCommittedFiles(root, relativeFiles) {
   for (const relative of relativeFiles) {
     const target = path.join(root, relative);
     const stat = await lstat(target);
-    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > MAX_FILE_BYTES) throw new Error(`conformance input must be one bounded regular file: ${relative}`);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size > MAX_INPUT_FILE_BYTES) throw new Error(`conformance input must be one bounded regular file: ${relative}`);
     const bytes = await readFile(target);
-    const committed = execFileSync('git', ['show', `${commit}:${relative}`], { cwd: root, encoding: 'buffer', maxBuffer: MAX_FILE_BYTES + 1 });
+    const committed = execFileSync('git', ['show', `${commit}:${relative}`], { cwd: root, encoding: 'buffer', maxBuffer: MAX_INPUT_FILE_BYTES + 1 });
     if (!bytes.equals(committed)) throw new Error(`conformance input does not match commit ${commit}: ${relative}`);
     files.set(relative, bytes);
   }
@@ -55,7 +71,7 @@ export async function writeConformanceReport(root, candidate, criterion, request
     if (!error || typeof error !== 'object' || error.code !== 'ENOENT') throw error;
   }
   const bytes = `${JSON.stringify(report, null, 2)}\n`;
-  if (Buffer.byteLength(bytes) > MAX_FILE_BYTES) throw new Error('report exceeds its size limit');
+  if (Buffer.byteLength(bytes) > MAX_REPORT_BYTES) throw new Error('report exceeds its size limit');
   const temporary = path.join(directory, `.${path.basename(expected)}.${randomUUID()}.tmp`);
   let failure;
   try {
