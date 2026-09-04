@@ -216,3 +216,19 @@ Elenchus verdict: guarded
 | S4-R2-01 | medium | scripts/check-live-pages.mjs | Both public fetches had size limits after a response arrived but no deadline for connection or body delivery, so a stalled Pages endpoint could hang release verification indefinitely. | fixed in this commit |
 
 Leads not pursued: The fifteen-second deadline bounds each public request without retrying or switching origin. GitHub availability outside that bounded release observation is not claimed.
+
+## Step 4, round 3 -- 2026-09-04T11:57:00Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; live boot of the accepted `main` tree, which remains an integration gate. The clean round passed 103 tests, type and lint checks, static and built boundaries, copy and quiet checks, both flow checks, 48 browser measurements, the 238513-byte bundle limit and all three discipline lints. The public checker still rejects the preserved legacy `/src/main.tsx` entry as intended before integration.
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: The authenticated Pages publisher change and accepted-tree live proof are explicitly deferred to integration. Physical and pedagogical family observations remain unclaimed and are not release blockers for technical site availability.
