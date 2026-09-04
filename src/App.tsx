@@ -3,6 +3,8 @@ import catalogueJson from './generated/lessons.json';
 import { FingeringDiagram } from './components/FingeringDiagram.tsx';
 import { FingeringMission } from './components/FingeringMission.tsx';
 import { GardenMark } from './components/GardenMark.tsx';
+import { ChildStage } from './components/ChildStage.tsx';
+import { GrownUpSetup } from './components/GrownUpSetup.tsx';
 import { LessonTrail } from './components/LessonTrail.tsx';
 import { PatternMaker } from './components/PatternMaker.tsx';
 import { PatternStrip } from './components/PatternStrip.tsx';
@@ -12,6 +14,7 @@ import { useMicrophoneScoring } from './hooks/useMicrophoneScoring.ts';
 import { useProgress } from './hooks/useProgress.ts';
 import { advanceSequence, createSequenceState, sequenceProgress, type SequenceObservation } from './lib/lesson-state.ts';
 import { lessonPatternNotes, missionScrollBehavior, notesToPattern } from './lib/mission-loop.ts';
+import { childNoteLetters, type ChildCopyState } from './lib/child-copy.ts';
 import type { PitchAssessment } from './lib/pitch.ts';
 import { NOTE_NAMES, RECORDER_NOTES, type NoteName } from './lib/recorder.ts';
 import type { Lesson } from './types.ts';
@@ -83,6 +86,7 @@ function MissionMap({ phase }: { phase: MissionPhase }) {
 
 export default function App() {
   const [selectedId, setSelectedId] = useState(initialLessonId);
+  const [childMode, setChildMode] = useState(false);
   const lesson = useMemo(() => LESSONS.find((item) => item.id === selectedId) ?? LESSONS[0], [selectedId]);
   const [missionPhase, setMissionPhase] = useState<MissionPhase>('model');
   const [copyActivity, setCopyActivity] = useState<CopyActivity>('choose');
@@ -252,8 +256,51 @@ export default function App() {
     document.querySelector<HTMLElement>('#garden-path')?.focus({ preventScroll: true });
   };
 
+  const childState: ChildCopyState = guideIssue
+    ? 'error'
+    : tone.playing
+      ? 'playing'
+      : missionPhase === 'model'
+        ? 'ready'
+        : 'done';
+  const childNotes = childNoteLetters(lesson.pattern.map((step) => step.note));
+  const enterChildMode = () => {
+    microphone.stop();
+    tone.stop('stopped');
+    resetMission();
+    setChildMode(true);
+  };
+  const leaveChildMode = () => {
+    microphone.stop();
+    tone.stop('stopped');
+    setChildMode(false);
+  };
+  const runChildAction = () => {
+    if (childState === 'playing') {
+      tone.stop('stopped');
+      return;
+    }
+    if (childState === 'done') {
+      leaveChildMode();
+      return;
+    }
+    void playModel();
+  };
+
+  if (childMode) {
+    return (
+      <ChildStage
+        state={childState}
+        notes={childNotes}
+        onAction={runChildAction}
+        onBack={leaveChildMode}
+      />
+    );
+  }
+
   return (
-    <>
+    <GrownUpSetup onStart={enterChildMode}>
+      <>
       <a className="skip-link" href="#lesson">Skip to this lesson</a>
       <header className="site-header">
         <a className="brand" href="#meet-b" onClick={(event) => { event.preventDefault(); chooseLesson('meet-b'); }}>
@@ -429,6 +476,7 @@ export default function App() {
           <button type="button" className="text-button" onClick={resetProgress}>Forget saved progress on this device</button>
         </details>
       </footer>
-    </>
+      </>
+    </GrownUpSetup>
   );
 }
