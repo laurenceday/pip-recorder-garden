@@ -151,3 +151,35 @@ Elenchus verdict: guarded
 | S3-R1-01 | high | src/App.tsx, scripts/check-child-quiet.mjs | A failed child guide left its internal error code visible when returning to grown-up mode, and the quiet report claimed no audio construction from a command trace without binding the only AudioContext, oscillator and media-permission construction sites. | fixed in this commit |
 
 Leads not pursued: The pure trace and closed call-site proof establish that quiet entry emits no audio-owning command, while the final browser acceptance step still owns the integrated public replay. No child learning, individual readability, physical playing technique or device comfort is inferred from the automated result.
+
+## Step 3, round 2 -- 2026-09-04T10:35:40Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; public Pages boot assigned to Step 4. The largest eight-note lesson now reaches the optional making state through quiet play in every named viewport, avoiding model-play timing as a prerequisite for geometry evidence.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S3-R2-01 | high | scripts/check-child-layout.mjs, src/styles.css | The 64-pixel action check measured only the two footer buttons, while the new interactive note choices were 48 pixels and the largest eight-note making state was never replayed. The first added quiet replay also reused the previous URL and could wait forever for a load event. | fixed in this commit |
+
+Leads not pursued: The 48-measurement replay now includes every child state plus the largest ready and making surfaces, but remains synthetic. Physical tap comfort, comprehension, attention and native browser settings remain family checks.
+
+## Step 3, round 3 -- 2026-09-04T10:36:10Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; public Pages boot assigned to Step 4. The clean round checked the complete 95-test suite, type and lint checks, static and built boundaries, cached dependency audit, 238.51 kB production JavaScript, copy conformance, sound and quiet flow conformance, and 48 browser measurements.
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: The accepted prototype provides model, response, natural stop and optional bounded making without automatic progression. Public artifact identity remains Step 4 work. Individual reading, learning and physical recorder use remain intentionally unclaimed pending family observation.
