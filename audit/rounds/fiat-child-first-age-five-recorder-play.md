@@ -51,3 +51,19 @@ Elenchus verdict: guarded
 | S1-R3-03 | medium | scripts/check-child-copy.mjs | Raw-source keyword matching treated harmless comments containing words such as error as child-copy violations. | fixed in this commit |
 
 Leads not pursued: The gate rejects image and vector render paths on the child import surface but does not OCR arbitrary pixels or path geometry. The social metadata remains grown-up-facing and outside the rendered child root. Later steps own measured child geometry, quiet play, pedagogical sequencing and the live Pages build; those claims are not advanced by this copy-boundary round.
+
+## Step 1, round 4 -- 2026-09-04T09:55:12Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=not-applicable; mobile-scroll=not-applicable; text-scale-crop=not-applicable; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=not-applicable; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical recorder, microphone, room, volume, comfort or learning outcome; OCR of vector paths or pixels; Step 2 no-scroll, text-scale, orientation, safe-area and 64-pixel target criteria; Step 3 quiet route and progressive play flow; Step 4 public built-artifact boot. The clean round re-ran the 86-test suite, type and lint checks, static and built boundaries, the 235520-byte production build, child-copy conformance and the three discipline lints. The package audit had already completed with zero vulnerabilities on the same signed commit; a redundant second network audit was stopped after it produced no result for 90 seconds.
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: Child geometry, quiet play, instructional sequencing and public deployment remain explicitly assigned to Steps 2 through 4. The user has now authorised repair of the Pages publishing setting if the live-site check shows it is still unusable; no deployment setting was changed in this Step 1 audit.
