@@ -284,6 +284,7 @@ export default function App() {
   const leaveChildMode = () => {
     microphone.stop();
     tone.stop('stopped');
+    setGuideIssue(null);
     setChildMode(null);
   };
   const playChildModel = async () => {

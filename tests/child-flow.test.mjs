@@ -78,4 +78,5 @@ test('the UI dispatches audio only for the sound-model command', async () => {
   assert.match(app, /if \(transition\.command === 'stop-model'\) tone\.stop\('stopped'\);/);
   assert.match(app, /onStartQuiet=\{\(\) => enterChildMode\('quiet'\)\}/);
   assert.equal((app.match(/tone\.playPattern\(/g) ?? []).length, 3);
+  assert.match(app, /const leaveChildMode = \(\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*setGuideIssue\(null\);\s*setChildMode\(null\);/);
 });
