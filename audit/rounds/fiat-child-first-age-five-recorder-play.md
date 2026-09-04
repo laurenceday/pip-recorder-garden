@@ -67,3 +67,21 @@ Elenchus verdict: null
 | -- | -- | -- | none | -- |
 
 Leads not pursued: Child geometry, quiet play, instructional sequencing and public deployment remain explicitly assigned to Steps 2 through 4. The user has now authorised repair of the Pages publishing setting if the live-site check shows it is still unusable; no deployment setting was changed in this Step 1 audit.
+
+## Step 2, round 1 -- 2026-09-04T10:10:03Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; quiet play and progressive child flow assigned to Step 3; public Pages boot assigned to Step 4. The local browser report uses a fresh muted Chrome profile and retains geometry only, not child action data.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S2-R1-01 | high | scripts/check-child-layout.mjs | The report named a source commit but did not digest the built HTML, CSS or JavaScript it measured, and the local server did not reject a symlinked directory inside dist. A stale or substituted artifact could therefore earn current-source geometry evidence. | fixed in this commit |
+| S2-R1-02 | high | scripts/check-child-layout.mjs | Comment text could satisfy the static one-screen, focus, target and safe-area patterns, allowing a removed layout rule to pass its source contract. | fixed in this commit |
+| S2-R1-03 | medium | scripts/check-child-layout.mjs | Safe-area handling was checked only as CSS text and never exercised against reduced usable space, so clipping behind a notch or home indicator was not measured. | fixed in this commit |
+
+Leads not pursued: Chrome text enlargement is simulated by setting the root text size to 200%, which exercises the rem-based child copy but is not a claim about every platform accessibility setting. The browser executable and Git object store remain the local trust base. Step 3 still owns the child learning sequence and quiet path; this round does not infer pedagogy from geometry.

@@ -13,6 +13,7 @@ test('the child layout matrix closes phone, tablet, landscape and enlarged text'
     { id: 'tablet-768', width: 768, height: 1024, textScale: 1, reducedMotion: false },
     { id: 'landscape-568', width: 568, height: 320, textScale: 1, reducedMotion: false },
     { id: 'phone-320-text-200', width: 320, height: 568, textScale: 2, reducedMotion: true },
+    { id: 'phone-320-safe-area', width: 320, height: 568, textScale: 1, reducedMotion: false, safeInsets: { top: 44, right: 0, bottom: 34, left: 0 } },
   ]);
 });
 
@@ -26,6 +27,8 @@ test('the child source keeps one-screen, safe-area, focus and target contracts',
   assert.match(layoutCheck.validateLayoutContractSource(childSource, stylesSource.replace('height: 100dvh;', '')).join('\n'), /dynamic viewport height/);
   assert.match(layoutCheck.validateLayoutContractSource(childSource.replace('actionRef.current?.focus();', ''), stylesSource).join('\n'), /initial child focus/);
   assert.match(layoutCheck.validateLayoutContractSource(childSource, stylesSource.replace('env(safe-area-inset-bottom)', '0px')).join('\n'), /safe-area bottom/);
+  assert.match(layoutCheck.validateLayoutContractSource(`// actionRef.current?.focus()\n${childSource.replace('actionRef.current?.focus();', '')}`, stylesSource).join('\n'), /initial child focus/);
+  assert.match(layoutCheck.validateLayoutContractSource(childSource, `/* height: 100dvh */\n${stylesSource.replace('height: 100dvh;', '')}`).join('\n'), /dynamic viewport height/);
 });
 
 test('measurement acceptance rejects scroll, small text, small or clipped actions and lost focus', () => {

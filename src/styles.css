@@ -222,6 +222,10 @@ button.note-stone { min-height: 64px; cursor: pointer; }
 /* Child play is one calm viewport. The grown-up tree keeps the document layout above. */
 .child-stage {
   --child-edge: clamp(10px, 3vmin, 24px);
+  --child-safe-top: env(safe-area-inset-top);
+  --child-safe-right: env(safe-area-inset-right);
+  --child-safe-bottom: env(safe-area-inset-bottom);
+  --child-safe-left: env(safe-area-inset-left);
   width: 100%;
   height: 100vh;
   height: 100dvh;
@@ -229,10 +233,10 @@ button.note-stone { min-height: 64px; cursor: pointer; }
   display: grid;
   place-items: center;
   padding:
-    max(var(--child-edge), env(safe-area-inset-top))
-    max(var(--child-edge), env(safe-area-inset-right))
-    max(var(--child-edge), env(safe-area-inset-bottom))
-    max(var(--child-edge), env(safe-area-inset-left));
+    max(var(--child-edge), var(--child-safe-top))
+    max(var(--child-edge), var(--child-safe-right))
+    max(var(--child-edge), var(--child-safe-bottom))
+    max(var(--child-edge), var(--child-safe-left));
 }
 .child-stage .model-card {
   width: min(100%, 720px);

@@ -18,6 +18,7 @@ export const CHILD_LAYOUT_SCENARIOS = Object.freeze([
   { id: 'tablet-768', width: 768, height: 1024, textScale: 1, reducedMotion: false },
   { id: 'landscape-568', width: 568, height: 320, textScale: 1, reducedMotion: false },
   { id: 'phone-320-text-200', width: 320, height: 568, textScale: 2, reducedMotion: true },
+  { id: 'phone-320-safe-area', width: 320, height: 568, textScale: 1, reducedMotion: false, safeInsets: { top: 44, right: 0, bottom: 34, left: 0 } },
 ]);
 const SOURCE_FILES = [
   'package-lock.json',
@@ -63,20 +64,22 @@ function assertSourcesMatchCommit(root, commit, sources) {
 
 export function validateLayoutContractSource(childSource, stylesSource) {
   const findings = [];
+  const inspectableChild = childSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n\r]*/g, '');
+  const inspectableStyles = stylesSource.replace(/\/\*[\s\S]*?\*\//g, '');
   for (const [label, pattern] of [
     ['closed child state marker', /data-child-state=\{state\}/],
     ['initial child focus', /actionRef\.current\?\.focus\(\)/],
     ['dynamic viewport height', /\.child-stage\s*\{[\s\S]*height:\s*100dvh/],
-    ['safe-area top', /env\(safe-area-inset-top\)/],
-    ['safe-area right', /env\(safe-area-inset-right\)/],
-    ['safe-area bottom', /env\(safe-area-inset-bottom\)/],
-    ['safe-area left', /env\(safe-area-inset-left\)/],
+    ['safe-area top', /--child-safe-top:\s*env\(safe-area-inset-top\)/],
+    ['safe-area right', /--child-safe-right:\s*env\(safe-area-inset-right\)/],
+    ['safe-area bottom', /--child-safe-bottom:\s*env\(safe-area-inset-bottom\)/],
+    ['safe-area left', /--child-safe-left:\s*env\(safe-area-inset-left\)/],
     ['child overflow closure', /\.child-stage\s*\{[\s\S]*overflow:\s*hidden/],
     ['64 pixel child action', /\.child-stage \.button\s*\{[\s\S]*min-width:\s*64px;[\s\S]*min-height:\s*64px/],
     ['landscape child layout', /@media \(max-height: 400px\) and \(orientation: landscape\)/],
     ['reduced motion', /@media \(prefers-reduced-motion: reduce\)/],
   ]) {
-    const source = label === 'closed child state marker' || label === 'initial child focus' ? childSource : stylesSource;
+    const source = label === 'closed child state marker' || label === 'initial child focus' ? inspectableChild : inspectableStyles;
     if (!pattern.test(source)) findings.push(`layout contract is missing ${label}`);
   }
   return findings;
@@ -116,10 +119,7 @@ async function startDistServer(root) {
       const parsed = new URL(request.url ?? '/', 'http://127.0.0.1');
       const relative = decodeURIComponent(parsed.pathname === '/' ? 'index.html' : parsed.pathname.slice(1));
       if (!relative || path.isAbsolute(relative) || relative.split('/').includes('..')) throw new Error('invalid path');
-      const candidate = path.resolve(dist, relative);
-      if (!candidate.startsWith(`${path.resolve(dist)}${path.sep}`)) throw new Error('path escaped dist');
-      const stat = await lstat(candidate);
-      if (!stat.isFile() || stat.isSymbolicLink() || stat.size > MAX_REPORT_BYTES) throw new Error('invalid asset');
+      const { candidate, stat } = await boundedDistFile(dist, relative);
       response.writeHead(200, {
         'Cache-Control': 'no-store',
         'Content-Length': stat.size,
@@ -138,6 +138,39 @@ async function startDistServer(root) {
   const address = server.address();
   if (!address || typeof address === 'string') throw new Error('layout server did not bind TCP');
   return { server, url: `http://127.0.0.1:${address.port}/` };
+}
+
+async function boundedDistFile(dist, relative) {
+  if (!relative || path.isAbsolute(relative) || relative.split('/').includes('..')) throw new Error('invalid dist path');
+  let candidate = dist;
+  const parts = relative.split('/');
+  for (const part of parts.slice(0, -1)) {
+    candidate = path.join(candidate, part);
+    const directory = await lstat(candidate);
+    if (!directory.isDirectory() || directory.isSymbolicLink()) throw new Error(`dist path contains an invalid directory: ${relative}`);
+  }
+  candidate = path.join(candidate, parts.at(-1));
+  const stat = await lstat(candidate);
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > MAX_REPORT_BYTES) throw new Error(`dist path contains an invalid asset: ${relative}`);
+  return { candidate, stat };
+}
+
+async function collectBuiltArtifacts(root) {
+  const dist = path.join(root, 'dist');
+  const { candidate: indexPath } = await boundedDistFile(dist, 'index.html');
+  const index = await readFile(indexPath);
+  const html = index.toString('utf8');
+  const references = [...html.matchAll(/(?:src|href)="\.\/([^"]+)"/g)].map((match) => match[1]);
+  const critical = references.filter((reference) => reference.startsWith('assets/') && /\.(?:css|js)$/.test(reference));
+  if (critical.length !== 2 || !critical.some((file) => file.endsWith('.css')) || !critical.some((file) => file.endsWith('.js'))) {
+    throw new Error('built index must reference one CSS and one JavaScript asset');
+  }
+  const artifacts = new Map([['index.html', index]]);
+  for (const relative of critical.sort()) {
+    const { candidate } = await boundedDistFile(dist, relative);
+    artifacts.set(relative, await readFile(candidate));
+  }
+  return artifacts;
 }
 
 async function findChrome() {
@@ -285,6 +318,15 @@ async function enterChild(client, url, scenario, forceError = false) {
     await evaluate(client, `document.documentElement.style.fontSize = ${JSON.stringify(`${scenario.textScale * 100}%`)}`);
     await delay(50);
   }
+  if (scenario.safeInsets) {
+    await evaluate(client, `(() => {
+      const stage = document.querySelector('.child-stage');
+      const values = ${JSON.stringify(scenario.safeInsets)};
+      for (const side of ['top', 'right', 'bottom', 'left']) stage.style.setProperty('--child-safe-' + side, values[side] + 'px');
+      return true;
+    })()`);
+    await delay(50);
+  }
 }
 
 async function measure(client, scenario, state) {
@@ -387,6 +429,7 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
   const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
   if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error('git did not return one commit id');
   assertSourcesMatchCommit(root, commit, sources);
+  const artifacts = await collectBuiltArtifacts(root);
 
   const chrome = await findChrome();
   const profile = await mkdtemp(path.join(tmpdir(), 'pip-child-layout-'));
@@ -410,6 +453,7 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
     client = await connectCdp(port);
     await client.send('Page.enable');
     await client.send('Runtime.enable');
+    const browserVersion = await client.send('Browser.getVersion');
     const measurements = [];
     for (const scenario of CHILD_LAYOUT_SCENARIOS) measurements.push(...await replayScenario(client, url, scenario));
     const findings = measurements.flatMap(validateLayoutMeasurement);
@@ -420,12 +464,14 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
       criterion: EXPECTED_CRITERION,
       status: 'pass',
       commit,
-      chrome: path.basename(chrome),
+      chrome: { executable: path.basename(chrome), product: browserVersion.product, protocolVersion: browserVersion.protocolVersion },
       states: STATES,
       scenarios: CHILD_LAYOUT_SCENARIOS,
       measurements,
       sourceFiles: SOURCE_FILES,
       sourceSha256: Object.fromEntries(SOURCE_FILES.map((file) => [file, digest(sources.get(file))])),
+      artifactFiles: [...artifacts.keys()],
+      artifactSha256: Object.fromEntries([...artifacts].map(([file, bytes]) => [file, digest(bytes)])),
     };
     const bytes = `${JSON.stringify(report, null, 2)}\n`;
     if (Buffer.byteLength(bytes) > MAX_REPORT_BYTES) throw new Error('layout report exceeds its size limit');
