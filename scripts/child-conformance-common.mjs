@@ -51,6 +51,58 @@ export function parseConformanceArguments(argv, candidate, criteria) {
   return { criterion: values.get('--criterion'), report: values.get('--report') };
 }
 
+const DESIGN_REPORT_CONTRACTS = Object.freeze({
+  'rendered-child-copy-approved': { unit: 'boolean', script: 'check-child-copy.mjs', value: () => true },
+  'small-phone-no-scroll': { unit: 'boolean', script: 'check-child-layout.mjs', value: () => true },
+  'first-response-in-one-action': { unit: 'count', script: 'check-child-flow.mjs', value: (report) => report.evidence.userActionsToModel },
+  'production-javascript-bytes': { unit: 'bytes', script: 'check-bundle-budget.mjs', value: (report) => report.evidence.totalBytes },
+  'quiet-mode-opens-no-audio': { unit: 'boolean', script: 'check-child-quiet.mjs', value: () => true },
+  'every-child-state-one-action-exit': { unit: 'count', script: 'check-child-flow.mjs', value: (report) => Math.max(...report.evidence.screens.map((screen) => screen.exitCount)) },
+  'live-pages-boots-built-artifact': { unit: 'boolean', script: 'check-live-pages.mjs', value: () => true },
+});
+
+export function buildProtasisDesignReport(root, candidate, criterion, requested, evidenceReport) {
+  const contract = DESIGN_REPORT_CONTRACTS[criterion];
+  if (!contract || evidenceReport?.status !== 'pass') throw new Error('cannot write a passing design report without passing evidence');
+  const expected = path.join(root, '.hexaemeron', 'reports', 'conformance', `${candidate}--${criterion}.json`);
+  if (path.resolve(root, requested) !== expected) throw new Error('report path is outside the declared conformance slot');
+  const reportPath = path.relative(root, expected).split(path.sep).join('/');
+  return {
+    schema: 'protasis-design-report/v1',
+    candidate,
+    criterion,
+    value: contract.value(evidenceReport),
+    unit: contract.unit,
+    command: `node scripts/${contract.script} --candidate ${candidate} --criterion ${criterion} --report ${reportPath}`,
+    exit: 0,
+  };
+}
+
+async function assertReportTarget(target) {
+  try {
+    const stat = await lstat(target);
+    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('report output must be a regular file and not a symlink');
+  } catch (error) {
+    if (!error || typeof error !== 'object' || error.code !== 'ENOENT') throw error;
+  }
+}
+
+async function writeAtomicReport(directory, target, bytes) {
+  const temporary = path.join(directory, `.${path.basename(target)}.${randomUUID()}.tmp`);
+  let failure;
+  try {
+    await writeFile(temporary, bytes, { flag: 'wx', mode: 0o600 });
+    await rename(temporary, target);
+  } catch (error) {
+    failure = error;
+  } finally {
+    try { await unlink(temporary); } catch (error) {
+      if ((!error || typeof error !== 'object' || error.code !== 'ENOENT') && !failure) failure = error;
+    }
+  }
+  if (failure) throw failure;
+}
+
 export async function writeConformanceReport(root, candidate, criterion, requested, report) {
   const directory = path.join(root, '.hexaemeron', 'reports', 'conformance');
   const expected = path.join(directory, `${candidate}--${criterion}.json`);
@@ -64,25 +116,12 @@ export async function writeConformanceReport(root, candidate, criterion, request
     const stat = await lstat(current);
     if (!stat.isDirectory() || stat.isSymbolicLink()) throw new Error(`report directory must not be a symlink: ${current}`);
   }
-  try {
-    const stat = await lstat(expected);
-    if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('report output must be a regular file and not a symlink');
-  } catch (error) {
-    if (!error || typeof error !== 'object' || error.code !== 'ENOENT') throw error;
-  }
-  const bytes = `${JSON.stringify(report, null, 2)}\n`;
-  if (Buffer.byteLength(bytes) > MAX_REPORT_BYTES) throw new Error('report exceeds its size limit');
-  const temporary = path.join(directory, `.${path.basename(expected)}.${randomUUID()}.tmp`);
-  let failure;
-  try {
-    await writeFile(temporary, bytes, { flag: 'wx', mode: 0o600 });
-    await rename(temporary, expected);
-  } catch (error) {
-    failure = error;
-  } finally {
-    try { await unlink(temporary); } catch (error) {
-      if ((!error || typeof error !== 'object' || error.code !== 'ENOENT') && !failure) failure = error;
-    }
-  }
-  if (failure) throw failure;
+  const evidenceTarget = expected.replace(/\.json$/, '.evidence.json');
+  await assertReportTarget(expected);
+  await assertReportTarget(evidenceTarget);
+  const evidenceBytes = `${JSON.stringify(report, null, 2)}\n`;
+  const designBytes = `${JSON.stringify(buildProtasisDesignReport(root, candidate, criterion, requested, report), null, 2)}\n`;
+  if (Buffer.byteLength(evidenceBytes) > MAX_REPORT_BYTES || Buffer.byteLength(designBytes) > 65_536) throw new Error('report exceeds its size limit');
+  await writeAtomicReport(directory, evidenceTarget, evidenceBytes);
+  await writeAtomicReport(directory, expected, designBytes);
 }

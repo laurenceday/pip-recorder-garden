@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 103 of 103 tests with none skipped.
+- The Node test suite passed 105 of 105 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
 - The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.
@@ -47,7 +47,7 @@ The source check refuses audio recording and browser network channels in the chi
 
 Automated checks and the microphone-free browser demo cannot establish behaviour for a particular microphone, recorder, browser or room. Before giving the site to a child, an adult still needs to run the device checklist in the README. In particular, confirm that the browser permission indicator clears after every stop path, that guide volume is comfortable and that B is recognised at a comfortable playing distance without pressuring the child to satisfy the detector.
 
-This record does not claim that the current child-first branch has been released. The release record below is complete only after its live check passes against the accepted `main` build.
+Local evidence alone is not a release claim. Release acceptance requires the live check below to pass against the accepted `main` build.
 
 ## Release artifact checks
 
@@ -70,6 +70,10 @@ node scripts/check-live-pages.mjs \
 ```
 
 The live check accepts only the expected HTTPS site path, one relative hashed JavaScript entry and an application root. It rejects a development source entry, redirects outside the site, missing or oversized responses, an asset name from another build and live bytes that differ from the local accepted build. [ADR-006](decisions/ADR-006-publish-pages-from-the-checked-workflow.md) records why the checked Actions workflow is the only publishing authority.
+
+Each conformance command writes the closed seven-field report consumed by the design gate and a neighbouring `.evidence.json` record with the check-specific digests and measurements. Keeping those two records separate prevents detailed evidence from changing the controller contract.
+
+The Pages build has a twenty-minute job limit. It installs the locked graph without npm's implicit advisory request, then runs the deterministic test, type, lint, boundary and production-build gate. The network-dependent dependency audit remains fail-closed in `verify:local` and the ordinary CI workflow; it is not duplicated in the availability-critical Pages job. This separation prevents an npm advisory-service outage from publishing unchecked code or indefinitely withholding an already audited static artifact. The deploy job keeps its separate ten-minute limit.
 
 ## Child-layout check
 

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - name: Check out accepted main history
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -25,9 +25,9 @@ jobs:
           node-version: 22.19.0
           cache: npm
       - name: Install the locked dependency graph
-        run: npm ci
+        run: npm ci --no-audit
       - name: Verify and build the static site
-        run: npm run verify:local
+        run: npm run verify:artifact
       - name: Configure Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - name: Upload only the checked site artifact

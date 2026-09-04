@@ -21,7 +21,8 @@
     "check:boundaries": "node scripts/check-static-boundaries.mjs",
     "check": "npm run generate && npm run generate:check && npm run test && npm run typecheck && npm run lint && npm run check:boundaries",
     "audit": "npm --userconfig /dev/null audit --audit-level=moderate",
-    "verify:local": "npm run check && npm run build && npm run audit",
+    "verify:artifact": "npm run check && npm run build",
+    "verify:local": "npm run verify:artifact && npm run audit",
     "agent:propose": "node scripts/propose-lessons.mjs",
     "check-agent-diff": "node scripts/check-agent-diff.mjs"
   },

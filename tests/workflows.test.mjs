@@ -23,12 +23,23 @@ test('workflow actions are immutable SHA pins with visible release comments', as
 
 test('Pages uploads only a verified dist artifact and isolates deployment permission', async () => {
   const pages = await workflow('pages.yml');
-  assert.match(pages, /run: npm run verify:local/);
+  assert.match(pages, /run: npm run verify:artifact/);
   assert.match(pages, /path: dist/);
   assert.match(pages, /needs: build/);
   assert.match(pages, /pages: write/);
   assert.match(pages, /id-token: write/);
   assert.doesNotMatch(pages, /pull_request_target/);
+});
+
+test('Pages keeps the network advisory gate in ordinary CI', async () => {
+  const pages = await workflow('pages.yml');
+  const ci = await workflow('ci.yml');
+  const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
+  assert.match(pages, /run: npm ci --no-audit/);
+  assert.doesNotMatch(pages, /run: npm run verify:local/);
+  assert.equal(packageJson.scripts['verify:artifact'], 'npm run check && npm run build');
+  assert.equal(packageJson.scripts['verify:local'], 'npm run verify:artifact && npm run audit');
+  assert.match(ci, /run: npm run verify:local/);
 });
 
 test('the lesson agent proposes through a checked branch and has no merge path', async () => {

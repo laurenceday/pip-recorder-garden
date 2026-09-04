@@ -40,6 +40,17 @@ test('release checks reject the wrong candidate and criterion', () => {
   assert.throws(() => common.parseConformanceArguments(good.with(3, 'another-criterion'), 'one-screen-play-loop', ['production-javascript-bytes']), /unsupported/);
 });
 
+test('integration reports use the closed Protasis contract and retain evidence separately', () => {
+  const report = common.buildProtasisDesignReport(process.cwd(), 'one-screen-play-loop', 'production-javascript-bytes', '.hexaemeron/reports/conformance/one-screen-play-loop--production-javascript-bytes.json', {
+    status: 'pass', evidence: { totalBytes: 238_513 },
+  });
+  assert.deepEqual(Object.keys(report).sort(), ['candidate', 'command', 'criterion', 'exit', 'schema', 'unit', 'value']);
+  assert.equal(report.schema, 'protasis-design-report/v1');
+  assert.equal(report.unit, 'bytes');
+  assert.equal(report.value, 238_513);
+  assert.equal(report.exit, 0);
+});
+
 test('release reports bind the complete tracked build surface', () => {
   const files = common.trackedBuildFiles(process.cwd());
   for (const required of ['index.html', 'package-lock.json', 'public/social-card.png', 'src/App.tsx', 'src/main.tsx', 'src/styles.css', 'vite.config.ts']) {
