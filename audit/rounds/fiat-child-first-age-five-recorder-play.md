@@ -119,3 +119,19 @@ Elenchus verdict: guarded
 | S2-R3-01 | high | scripts/check-child-layout.mjs | Every browser state and viewport replay used the one-note first lesson. The checked card could still clip when a grown-up chose the eight-note octave lesson, so the report did not cover the largest child pattern available in the catalogue. | fixed in this commit |
 
 Leads not pursued: The octave lesson is the catalogue maximum at eight displayed notes and is now opened in every scenario alongside the full four-state first-lesson flow. Future lesson-schema changes still need to keep the proposal and catalogue checks from exceeding that reviewed child-pattern bound.
+
+## Step 2, round 4 -- 2026-09-04T10:16:20Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; native device text settings; physical safe-area insets; physical recorder, microphone, room, volume, comfort or learning outcome; Step 3 quiet and progressive flow; Step 4 public Pages boot. The clean round checked 30 browser measurements, including the eight-note lesson, and the 89-test suite, type check, lint, static and built boundaries, production build and cached dependency audit all completed cleanly.
+
+Elenchus verdict: null
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| -- | -- | -- | none | -- |
+
+Leads not pursued: The child card now has measured room for its largest current pattern, but the family device pass still owns comfort, comprehension and the effect of real browser chrome. No new dependencies, persistence, telemetry or child copy were introduced.
