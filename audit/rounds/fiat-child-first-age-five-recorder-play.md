@@ -200,3 +200,19 @@ Elenchus verdict: guarded
 | S4-R1-02 | medium | scripts/child-conformance-common.mjs | The expanded build binding refused the existing 1494347-byte social card because its one-megabyte input limit was smaller than a tracked production input. The input limit is now a separate two-megabyte bound while report output remains capped at one mebibyte. | fixed in this commit |
 
 Leads not pursued: The release checks trust Git object integrity, the pinned package tree, Node 22.19.0 and GitHub Pages transport. They prove public artifact identity, not individual comprehension, musical learning or physical recorder use. The authenticated Pages setting change remains deferred until the reviewed stack reaches integration.
+
+## Step 4, round 2 -- 2026-09-04T11:54:00Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; live boot of the accepted `main` tree, which remains an integration gate. The checker paths, redirects, response-size limits, input bindings, report destination and fetch lifecycle were inspected.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S4-R2-01 | medium | scripts/check-live-pages.mjs | Both public fetches had size limits after a response arrived but no deadline for connection or body delivery, so a stalled Pages endpoint could hang release verification indefinitely. | fixed in this commit |
+
+Leads not pursued: The fifteen-second deadline bounds each public request without retrying or switching origin. GitHub availability outside that bounded release observation is not claimed.

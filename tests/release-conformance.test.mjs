@@ -67,3 +67,10 @@ test('HTTP failures and empty assets fail closed', async () => {
   await assert.rejects(pagesCheck.responseBytes(new Response('missing', { status: 404 }), 100, 'Pages asset'), /HTTP 404/);
   await assert.rejects(pagesCheck.responseBytes(new Response('', { status: 200 }), 100, 'Pages asset'), /missing or too large/);
 });
+
+test('public fetches carry a bounded abort signal and explicit redirect policy', () => {
+  const options = pagesCheck.fetchOptions('text/html', 'follow');
+  assert.deepEqual(options.headers, { accept: 'text/html', 'cache-control': 'no-cache' });
+  assert.equal(options.redirect, 'follow');
+  assert.equal(options.signal.aborted, false);
+});

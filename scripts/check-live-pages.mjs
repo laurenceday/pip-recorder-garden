@@ -8,7 +8,12 @@ const CRITERION = 'live-pages-boots-built-artifact';
 const LIVE_URL = 'https://laurenceday.github.io/pip-recorder-garden/';
 const MAX_HTML_BYTES = 65_536;
 const MAX_ASSET_BYTES = 1_048_576;
+const FETCH_TIMEOUT_MS = 15_000;
 const CHECKER_FILES = ['.github/workflows/pages.yml', 'scripts/check-live-pages.mjs', 'scripts/child-conformance-common.mjs'];
+
+export function fetchOptions(accept, redirect) {
+  return { headers: { accept, 'cache-control': 'no-cache' }, redirect, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) };
+}
 
 export function inspectPagesEntry(html, responseUrl = LIVE_URL) {
   if (typeof html !== 'string' || Buffer.byteLength(html) > MAX_HTML_BYTES) throw new Error('Pages entry is missing or too large');
@@ -48,11 +53,11 @@ export async function runLivePagesCheck(argv, root = process.cwd(), fetchImpl = 
   const { commit, sourceSha256 } = await bindCommittedFiles(root, sourceFiles);
   const local = await localBuiltAsset(root);
   const requestUrl = `${LIVE_URL}?proof=${commit}`;
-  const htmlResponse = await fetchImpl(requestUrl, { headers: { accept: 'text/html', 'cache-control': 'no-cache' }, redirect: 'follow' });
+  const htmlResponse = await fetchImpl(requestUrl, fetchOptions('text/html', 'follow'));
   const liveHtml = await responseBytes(htmlResponse, MAX_HTML_BYTES, 'Pages entry');
   const live = inspectPagesEntry(liveHtml.toString('utf8'), htmlResponse.url);
   if (live.assetName !== local.entry.assetName) throw new Error('live entry does not name the current built asset');
-  const assetResponse = await fetchImpl(live.assetUrl, { headers: { accept: 'text/javascript', 'cache-control': 'no-cache' }, redirect: 'error' });
+  const assetResponse = await fetchImpl(live.assetUrl, fetchOptions('text/javascript', 'error'));
   const liveAsset = await responseBytes(assetResponse, MAX_ASSET_BYTES, 'Pages asset');
   if (!liveAsset.equals(local.assetBytes)) throw new Error('live JavaScript bytes do not match the current build');
   const report = {
