@@ -305,7 +305,7 @@ async function enterChild(client, url, scenario, lesson, forceError = false, qui
   await client.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: scenario.reducedMotion ? 'reduce' : 'no-preference' }],
   });
-  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}#${lesson}`);
+  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}&mode=${quiet ? 'quiet' : 'sound'}#${lesson}`);
   if (forceError) {
     await evaluate(client, `(() => {
       const Audio = window.AudioContext || window.webkitAudioContext;
