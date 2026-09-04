@@ -153,7 +153,7 @@ The workflow needs permission to create a proposal branch and pull request. `LES
 
 ## Publish with GitHub Pages
 
-The intended live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). The repository contains a GitHub Actions Pages workflow, but the live Pages source was still the legacy branch publisher when this child-first run began. That publisher overwrote the built artifact with an entry that referenced `/src/main.tsx`. Do not treat the public URL as ready until the separately authorised Pages setting change and the built-asset check both pass.
+The intended live site is [laurenceday.github.io/pip-recorder-garden](https://laurenceday.github.io/pip-recorder-garden/). The repository contains a GitHub Actions Pages workflow. At release, the Pages setting must name GitHub Actions as its build type, and the public hashed JavaScript asset must match the accepted production build.
 
 `.github/workflows/pages.yml` verifies the accepted `main` tree, uploads only `dist/`, and gives deployment permissions only to the deploy job. To enable the same setup in a fork or replacement repository:
 
@@ -162,7 +162,7 @@ The intended live site is [laurenceday.github.io/pip-recorder-garden](https://la
 3. If the repository policy requires it, protect the `github-pages` environment so only `main` may deploy.
 4. Merge a reviewed pull request into `main`, or run the workflow manually from the accepted `main` commit.
 
-The first live deployment built and checked main commit `9cf6f60a69aeebaafdf8191e7f04c902e7014e2d` before publishing its `dist/` artifact.
+The original live deployment built and checked main commit `9cf6f60a69aeebaafdf8191e7f04c902e7014e2d` before publishing its `dist/` artifact. Later release evidence belongs in [the verification record](docs/verification.md), not in this setup guide.
 
 ## Verification
 
@@ -175,6 +175,8 @@ node scripts/check-child-layout.mjs --candidate one-screen-play-loop --criterion
 node scripts/check-child-flow.mjs --candidate one-screen-play-loop --criterion first-response-in-one-action --report .hexaemeron/reports/conformance/one-screen-play-loop--first-response-in-one-action.json
 node scripts/check-child-flow.mjs --candidate one-screen-play-loop --criterion every-child-state-one-action-exit --report .hexaemeron/reports/conformance/one-screen-play-loop--every-child-state-one-action-exit.json
 node scripts/check-child-quiet.mjs --candidate one-screen-play-loop --criterion quiet-mode-opens-no-audio --report .hexaemeron/reports/conformance/one-screen-play-loop--quiet-mode-opens-no-audio.json
+node scripts/check-bundle-budget.mjs --candidate one-screen-play-loop --criterion production-javascript-bytes --report .hexaemeron/reports/conformance/one-screen-play-loop--production-javascript-bytes.json
+node scripts/check-live-pages.mjs --candidate one-screen-play-loop --criterion live-pages-boots-built-artifact --report .hexaemeron/reports/conformance/one-screen-play-loop--live-pages-boots-built-artifact.json
 ```
 
 The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, repeated-note gaps, explicit stop states, broad rhythm matching and lesson-bounded two-to-four-note tunes. The pitch fixtures cover C5 through C6 with harmonics, silence, broadband noise, adjacent-note refusal, stable holds and repeated-note releases. The static boundary fails if child-facing source gains a recorder or outbound channel, if microphone access or local storage escapes its one named module, or if the microphone graph reaches audible output. A second check inspects the minified production JavaScript after Vite builds it and refuses recorder or outbound-network APIs there too.
