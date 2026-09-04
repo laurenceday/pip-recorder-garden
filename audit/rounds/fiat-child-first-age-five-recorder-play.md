@@ -190,12 +190,13 @@ Audit schema: fiat-audit-round/v2
 
 Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=reviewed; mobile-scroll=reviewed; text-scale-crop=reviewed; quiet-audio-leak=reviewed; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=reviewed; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=reviewed; bundle-growth=reviewed
 
-Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; live boot of the accepted `main` tree, which remains an integration gate. The public pre-release fetch reproduced the `/src/main.tsx` source-entry failure. Local evidence passed 101 tests, copy and quiet gates, both flow gates, 48 browser measurements, built boundaries and the 238513-byte bundle limit.
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical phone or tablet browser chrome; physical recorder, microphone, room, volume, comfort or learning outcome; live boot of the accepted `main` tree, which remains an integration gate. The public pre-release fetch reproduced the `/src/main.tsx` source-entry failure. Local evidence passed 102 tests, copy and quiet gates, both flow gates, 48 browser measurements, built boundaries and the 238513-byte bundle limit.
 
 Elenchus verdict: guarded
 
 | id | severity | file | finding | status |
 | --- | --- | --- | --- | --- |
 | S4-R1-01 | high | scripts/check-live-pages.mjs, scripts/check-bundle-budget.mjs | Both reports bound their checker and a few configuration files to the named commit, but not the full tracked `src`, `public` and HTML build surface. A live artifact made from dirty application bytes could therefore be reported against an unchanged commit. | fixed in this commit |
+| S4-R1-02 | medium | scripts/child-conformance-common.mjs | The expanded build binding refused the existing 1494347-byte social card because its one-megabyte input limit was smaller than a tracked production input. The input limit is now a separate two-megabyte bound while report output remains capped at one mebibyte. | fixed in this commit |
 
 Leads not pursued: The release checks trust Git object integrity, the pinned package tree, Node 22.19.0 and GitHub Pages transport. They prove public artifact identity, not individual comprehension, musical learning or physical recorder use. The authenticated Pages setting change remains deferred until the reviewed stack reaches integration.
