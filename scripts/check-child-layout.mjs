@@ -11,6 +11,7 @@ const EXPECTED_CRITERION = 'small-phone-no-scroll';
 const MAX_SOURCE_BYTES = 1_048_576;
 const MAX_REPORT_BYTES = 1_048_576;
 const STATES = ['ready', 'playing', 'done', 'error'];
+export const CHILD_LAYOUT_LESSONS = Object.freeze(['meet-b', 'octave-garden']);
 export const CHILD_LAYOUT_SCENARIOS = Object.freeze([
   { id: 'phone-320', width: 320, height: 568, textScale: 1, reducedMotion: false },
   { id: 'phone-391', width: 391, height: 844, textScale: 1, reducedMotion: false },
@@ -86,7 +87,7 @@ export function validateLayoutContractSource(childSource, stylesSource) {
 
 export function validateLayoutMeasurement(measurement) {
   const findings = [];
-  const prefix = `${measurement.scenario}/${measurement.state}`;
+  const prefix = `${measurement.scenario}/${measurement.lesson}/${measurement.state}`;
   if (!STATES.includes(measurement.state)) findings.push(`${prefix} is not a declared child state`);
   if (measurement.scrollWidth > measurement.viewportWidth + 1) findings.push(`${prefix} has horizontal overflow`);
   if (measurement.scrollHeight > measurement.viewportHeight + 1) findings.push(`${prefix} has document overflow`);
@@ -291,7 +292,7 @@ const clickButtonExpression = (label) => `(() => {
   return true;
 })()`;
 
-async function enterChild(client, url, scenario, forceError = false) {
+async function enterChild(client, url, scenario, lesson, forceError = false) {
   await client.send('Emulation.setDeviceMetricsOverride', {
     width: scenario.width,
     height: scenario.height,
@@ -303,7 +304,7 @@ async function enterChild(client, url, scenario, forceError = false) {
   await client.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: scenario.reducedMotion ? 'reduce' : 'no-preference' }],
   });
-  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}`);
+  await navigate(client, `${url}?layout=${scenario.id}&error=${forceError ? '1' : '0'}#${lesson}`);
   if (forceError) {
     await evaluate(client, `(() => {
       const Audio = window.AudioContext || window.webkitAudioContext;
@@ -328,7 +329,7 @@ async function enterChild(client, url, scenario, forceError = false) {
   }
 }
 
-async function measure(client, scenario, state) {
+async function measure(client, scenario, lesson, state) {
   const safeInsets = scenario.safeInsets ?? { top: 0, right: 0, bottom: 0, left: 0 };
   const value = await evaluate(client, `(() => {
     const stage = document.querySelector('.child-stage');
@@ -354,23 +355,26 @@ async function measure(client, scenario, state) {
       focusInsideChild: stage.contains(document.activeElement),
     };
   })()`);
-  return { scenario: scenario.id, state, ...value };
+  return { scenario: scenario.id, lesson, state, ...value };
 }
 
 async function replayScenario(client, url, scenario) {
   const measurements = [];
-  await enterChild(client, url, scenario);
-  measurements.push(await measure(client, scenario, 'ready'));
+  await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[0]);
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'ready'));
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child play action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'playing'");
-  measurements.push(await measure(client, scenario, 'playing'));
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'playing'));
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'done'");
-  measurements.push(await measure(client, scenario, 'done'));
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'done'));
 
-  await enterChild(client, url, scenario, true);
+  await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[0], true);
   if (!await evaluate(client, clickButtonExpression('Play'))) throw new Error('child error probe action was not found');
   await waitForExpression(client, "document.querySelector('.child-stage')?.dataset.childState === 'error'");
-  measurements.push(await measure(client, scenario, 'error'));
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[0], 'error'));
+
+  await enterChild(client, url, scenario, CHILD_LAYOUT_LESSONS[1]);
+  measurements.push(await measure(client, scenario, CHILD_LAYOUT_LESSONS[1], 'ready'));
   return measurements;
 }
 
@@ -472,6 +476,7 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
       commit,
       chrome: { executable: path.basename(chrome), product: browserVersion.product, protocolVersion: browserVersion.protocolVersion },
       states: STATES,
+      lessons: CHILD_LAYOUT_LESSONS,
       scenarios: CHILD_LAYOUT_SCENARIOS,
       measurements,
       sourceFiles: SOURCE_FILES,

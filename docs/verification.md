@@ -35,7 +35,7 @@ The machine-readable Node test receipt is generated at `.elenchus/node-test.json
 - Scripted lesson, retry and garden navigation selects immediate scrolling when the learner prefers reduced motion and smooth scrolling otherwise.
 - The one saved-progress key remains `pip-recorder-garden.completed.v1`; mission tunes, taps, timing, routes and attempts stay in memory only.
 
-The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The Step 2 browser replay now covers every child state at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks 568 by 320 landscape, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. All 24 measurements had zero horizontal or document overflow, one reachable exit and child focus inside the card. The smallest child text was 20 CSS pixels; the smallest action was 131 by 64 CSS pixels. This is synthetic Chrome evidence, not a real-device comfort claim.
+The earlier guided-mission demo was exercised at 390 by 844 CSS pixels without requesting microphone permission. The Step 2 browser replay now covers every child state at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels. It also checks 568 by 320 landscape, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario opens the eight-note octave pattern as its largest-content case. All 30 measurements had zero horizontal or document overflow, one reachable exit and child focus inside the card. The smallest child text was 20 CSS pixels; the smallest action was 131 by 64 CSS pixels. This is synthetic Chrome evidence, not a real-device comfort claim.
 
 ## Boundaries covered by checks
 

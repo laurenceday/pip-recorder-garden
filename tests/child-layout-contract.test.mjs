@@ -7,6 +7,7 @@ import * as layoutCheck from '../scripts/check-child-layout.mjs';
 const root = process.cwd();
 
 test('the child layout matrix closes phone, tablet, landscape and enlarged text', () => {
+  assert.deepEqual(layoutCheck.CHILD_LAYOUT_LESSONS, ['meet-b', 'octave-garden']);
   assert.deepEqual(layoutCheck.CHILD_LAYOUT_SCENARIOS, [
     { id: 'phone-320', width: 320, height: 568, textScale: 1, reducedMotion: false },
     { id: 'phone-391', width: 391, height: 844, textScale: 1, reducedMotion: false },
@@ -35,6 +36,7 @@ test('measurement acceptance rejects scroll, small text, small or clipped action
   assert.equal(typeof layoutCheck.validateLayoutMeasurement, 'function');
   const clean = {
     scenario: 'phone-320',
+    lesson: 'meet-b',
     state: 'ready',
     viewportWidth: 320,
     viewportHeight: 568,
