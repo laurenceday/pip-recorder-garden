@@ -232,3 +232,7 @@ Elenchus verdict: null
 | -- | -- | -- | none | -- |
 
 Leads not pursued: The authenticated Pages publisher change and accepted-tree live proof are explicitly deferred to integration. Physical and pedagogical family observations remain unclaimed and are not release blockers for technical site availability.
+
+## Integration guard repair -- 2026-09-04T12:15:00Z
+
+The first Step 4 merge receipt stopped because the conformance commands had written their detailed evidence objects into paths reserved for the closed `protasis-design-report/v1` contract. The commands now write the seven-field controller report at the reserved path and retain full digests and measurements in a neighbouring `.evidence.json` record. A new contract test raises the suite to 104 tests. The rejected receipt changed no controller state; the live deployment gate remains pending.

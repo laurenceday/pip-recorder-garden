@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 103 of 103 tests with none skipped.
+- The Node test suite passed 104 of 104 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
 - The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.
@@ -70,6 +70,8 @@ node scripts/check-live-pages.mjs \
 ```
 
 The live check accepts only the expected HTTPS site path, one relative hashed JavaScript entry and an application root. It rejects a development source entry, redirects outside the site, missing or oversized responses, an asset name from another build and live bytes that differ from the local accepted build. [ADR-006](decisions/ADR-006-publish-pages-from-the-checked-workflow.md) records why the checked Actions workflow is the only publishing authority.
+
+Each conformance command writes the closed seven-field report consumed by the design gate and a neighbouring `.evidence.json` record with the check-specific digests and measurements. Keeping those two records separate prevents detailed evidence from changing the controller contract.
 
 ## Child-layout check
 

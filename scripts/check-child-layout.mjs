@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildProtasisDesignReport } from './child-conformance-common.mjs';
 
 const EXPECTED_CANDIDATE = 'one-screen-play-loop';
 const EXPECTED_CRITERION = 'small-phone-no-scroll';
@@ -24,6 +25,7 @@ const SOURCE_FILES = [
   'package-lock.json',
   'package.json',
   'scripts/check-child-layout.mjs',
+  'scripts/child-conformance-common.mjs',
   'src/App.tsx',
   'src/components/ChildStage.tsx',
   'src/styles.css',
@@ -501,9 +503,11 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
       artifactFiles: [...artifacts.keys()],
       artifactSha256: Object.fromEntries([...artifacts].map(([file, bytes]) => [file, digest(bytes)])),
     };
-    const bytes = `${JSON.stringify(report, null, 2)}\n`;
-    if (Buffer.byteLength(bytes) > MAX_REPORT_BYTES) throw new Error('layout report exceeds its size limit');
-    await writeReportSafely(root, reportPath, bytes);
+    const evidenceBytes = `${JSON.stringify(report, null, 2)}\n`;
+    if (Buffer.byteLength(evidenceBytes) > MAX_REPORT_BYTES) throw new Error('layout report exceeds its size limit');
+    const designReport = buildProtasisDesignReport(root, EXPECTED_CANDIDATE, EXPECTED_CRITERION, options.report, report);
+    await writeReportSafely(root, reportPath.replace(/\.json$/, '.evidence.json'), evidenceBytes);
+    await writeReportSafely(root, reportPath, `${JSON.stringify(designReport, null, 2)}\n`);
     console.log(`child layout clean: ${measurements.length} state and viewport measurements`);
     return report;
   } finally {

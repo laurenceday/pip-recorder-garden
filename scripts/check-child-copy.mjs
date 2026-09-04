@@ -4,6 +4,7 @@ import { lstat, mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promi
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import { buildProtasisDesignReport } from './child-conformance-common.mjs';
 import {
   CHILD_COPY_MANIFEST,
   CHILD_COPY_STATE_IDS,
@@ -21,6 +22,7 @@ const CHILD_STYLES = 'src/styles.css';
 const RUNTIME_ENTRY = 'src/main.tsx';
 const HTML_SHELL = 'index.html';
 const CHECKER_SOURCE = 'scripts/check-child-copy.mjs';
+const CHECKER_COMMON = 'scripts/child-conformance-common.mjs';
 const PACKAGE_MANIFEST = 'package.json';
 const PACKAGE_LOCK = 'package-lock.json';
 const VISIBLE_STRING_ATTRIBUTES = new Set([
@@ -577,10 +579,11 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     contract: path.join(root, 'src', 'lib', 'child-copy.ts'),
     styles: path.join(root, 'src', 'styles.css'),
     checker: path.join(root, CHECKER_SOURCE),
+    checkerCommon: path.join(root, CHECKER_COMMON),
     packageManifest: path.join(root, PACKAGE_MANIFEST),
     packageLock: path.join(root, PACKAGE_LOCK),
   };
-  const [htmlShellSource, appSource, runtimeEntrySource, grownUpSource, contractSource, stylesSource, checkerSource, packageManifest, packageLock, childRender] = await Promise.all([
+  const [htmlShellSource, appSource, runtimeEntrySource, grownUpSource, contractSource, stylesSource, checkerSource, checkerCommon, packageManifest, packageLock, childRender] = await Promise.all([
     readBoundedRegularFile(paths.htmlShell),
     readBoundedRegularFile(paths.app),
     readBoundedRegularFile(paths.runtimeEntry),
@@ -588,6 +591,7 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     readBoundedRegularFile(paths.contract),
     readBoundedRegularFile(paths.styles),
     readBoundedRegularFile(paths.checker),
+    readBoundedRegularFile(paths.checkerCommon),
     readBoundedRegularFile(paths.packageManifest),
     readBoundedRegularFile(paths.packageLock),
     collectChildRenderSources(root),
@@ -614,6 +618,7 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     [CHILD_CONTRACT, contractSource],
     [CHILD_STYLES, stylesSource],
     [CHECKER_SOURCE, checkerSource],
+    [CHECKER_COMMON, checkerCommon],
     [PACKAGE_MANIFEST, packageManifest],
     [PACKAGE_LOCK, packageLock],
     ...childRender.sources,
@@ -635,7 +640,9 @@ export async function runChildCopyCheck(argv, root = process.cwd()) {
     sourceFiles,
     sourceSha256: Object.fromEntries(sourceFiles.map((file) => [file, digest(boundSources.get(file))])),
   };
-  await writeReportSafely(root, reportPath, `${JSON.stringify(report, null, 2)}\n`);
+  const designReport = buildProtasisDesignReport(root, EXPECTED_CANDIDATE, EXPECTED_CRITERION, options.report, report);
+  await writeReportSafely(root, reportPath.replace(/\.json$/, '.evidence.json'), `${JSON.stringify(report, null, 2)}\n`);
+  await writeReportSafely(root, reportPath, `${JSON.stringify(designReport, null, 2)}\n`);
   console.log(`child copy clean: ${CHILD_COPY_MANIFEST.length} manifest entries, ${CHILD_LEXICON.length} lexicon tokens, ${CHILD_COPY_STATE_IDS.length} declared states`);
   return report;
 }
