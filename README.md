@@ -6,7 +6,7 @@ Pip’s Recorder Garden is a static, interactive course for a young beginner pla
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
-The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens one full-screen task with Pip, the note letters A to G, Play, Stop, Try, Done and Back. Its actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short landscape view or with text enlarged to 200%. The child view receives no lesson prose or open error string. It currently models the chosen pattern, then returns to the grown-up view for the remaining mission controls.
+The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens one full-screen task with Pip, the note letters A to G, Play, Stop, Try, Done and Back. Its actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short sideways view or with text enlarged to 200%. The child view receives no lesson prose or open error string. It currently models the chosen pattern, then returns to the grown-up view for the remaining mission controls.
 
 ## Run it locally
 
@@ -71,7 +71,7 @@ GitHub Pages serves over HTTPS, which allows browsers to offer microphone permis
 
 The synthetic tests establish detector behaviour, not hardware behaviour. Her father should make this short acceptance pass on each intended browser:
 
-- on the intended phone and tablet, open child play in portrait and landscape, enlarge text if the device offers that setting, and confirm the card stays still while both actions remain comfortable to tap;
+- on the intended phone and tablet, open child play upright and sideways, enlarge text if the device offers that setting, and confirm the card stays still while both actions remain comfortable to tap;
 - open lesson 8, press **Hear the whole pattern**, and confirm B, A, A, B sounds once with the matching note stones pulsing;
 - stop the lesson pattern part-way through and confirm sound stops at once;
 - make a two-to-four-note tune, confirm note choices freeze while it sounds, then use **Stop my tune**;
@@ -178,7 +178,7 @@ The mission tests cover the complete lesson 8 B-A-A-B schedule, beat lengths, re
 
 The child-copy check binds every declared child state to a deterministic manifest, admits only the reviewed 13-token lexicon and checks that `App` mounts either the child tree or the grown-up tree. It follows imported child TSX, checks global CSS for generated copy, binds its own checker, dependency lock and every inspected render byte to the reported commit, and refuses open visible or accessible expressions, dynamic error text, opposite-role imports and undeclared states. It records the Node and TypeScript versions and writes only through checked, non-symlink report paths. This is a repository copy rule, not proof that one child can read every admitted word.
 
-The child-layout check launches the built app in a bounded local Chrome process. It replays ready, playing, done and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels, plus 568 by 320 landscape, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario also opens the eight-note octave lesson as the largest child pattern. The check rejects document or horizontal overflow, text below 20 CSS pixels, actions below 64 by 64 CSS pixels, clipped essential content, a missing exit or focus left outside child play.
+The child-layout check launches the built app in a bounded local Chrome process. It replays ready, playing, done and error at 320 by 568, 391 by 844 and 768 by 1024 CSS pixels, plus a 568 by 320 wide view, 320 by 568 with 200% text and reduced motion, and 320 by 568 with 44-pixel top and 34-pixel bottom safe areas. Each scenario also opens the eight-note octave lesson as the largest child pattern. The check rejects document or horizontal overflow, text below 20 CSS pixels, actions below 64 by 64 CSS pixels, clipped essential content, a missing exit or focus left outside child play.
 
 ## How the design was chosen
 
