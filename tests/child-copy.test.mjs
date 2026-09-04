@@ -13,7 +13,16 @@ import {
   rejectedChildCopyTokens,
   validateChildCopyManifest,
 } from '../src/lib/child-copy.ts';
-import { runChildCopyCheck, validateChildStageSource, validateRoleMountSource } from '../scripts/check-child-copy.mjs';
+import * as childCopyCheck from '../scripts/check-child-copy.mjs';
+
+const {
+  runChildCopyCheck,
+  validateChildStageSource,
+  validateChildStylesSource,
+  validateHtmlShellSource,
+  validateRoleMountSource,
+  validateRuntimeEntrySource,
+} = childCopyCheck;
 
 const root = process.cwd();
 const checkerArguments = [
@@ -22,6 +31,7 @@ const checkerArguments = [
   '--report', '.hexaemeron/reports/conformance/one-screen-play-loop--rendered-child-copy-approved.json',
 ];
 const fixtureFiles = [
+  'index.html',
   'package-lock.json',
   'package.json',
   'scripts/check-child-copy.mjs',
@@ -30,6 +40,7 @@ const fixtureFiles = [
   'src/components/GardenMark.tsx',
   'src/components/GrownUpSetup.tsx',
   'src/lib/child-copy.ts',
+  'src/main.tsx',
   'src/styles.css',
 ];
 
@@ -125,6 +136,26 @@ test('the child component refuses opposite-role copy and undeclared imports', as
   assert.match(validateChildStageSource(`${source}\nimport { LessonTrail } from './LessonTrail.tsx';`).join('\n'), /undeclared render path/);
 });
 
+test('the child component binds every rendered word to the manifest', async () => {
+  const source = await readFile(path.join(root, 'src', 'components', 'ChildStage.tsx'), 'utf8');
+  const shadowed = source.replace(
+    'const copy = childCopyFor(state);',
+    'const copy = { title: "Recorder", action: "Recorder", exit: "Recorder" };',
+  );
+  assert.match(validateChildStageSource(shadowed).join('\n'), /bind copy once/);
+  assert.match(validateChildStageSource(`${source}\n<div aria-roledescription="Recorder" />`).join('\n'), /raw child copy/);
+  assert.match(validateChildStageSource(`${source}\ndocument.body.append(document.createTextNode("Recorder"));`).join('\n'), /imperative render escape/);
+  assert.match(
+    validateChildStageSource(source.replace('data-child-copy-id={`${state}.title`}', 'data-child-copy-id={`${state}.action`}')).join('\n'),
+    /not joined once|not joined to its manifest id/,
+  );
+});
+
+test('comments do not create false child-copy findings', async () => {
+  const source = await readFile(path.join(root, 'src', 'components', 'ChildStage.tsx'), 'utf8');
+  assert.deepEqual(validateChildStageSource(`${source}\n// error feedback story tips`), []);
+});
+
 test('App conditionally mounts one child tree or one grown-up tree', async () => {
   const [app, grownUp] = await Promise.all([
     readFile(path.join(root, 'src', 'App.tsx'), 'utf8'),
@@ -149,6 +180,25 @@ test('App conditionally mounts one child tree or one grown-up tree', async () =>
     "import { GrownUpSetup as ChildStage } from './components/GrownUpSetup.tsx';",
   );
   assert.match(validateRoleMountSource(aliasedChild, grownUp).join('\n'), /exact name and path/);
+  const childSideEffect = app.replace(
+    'if (childMode) {',
+    'if (childMode) {\n    document.body.append("Recorder");',
+  );
+  assert.match(validateRoleMountSource(childSideEffect, grownUp).join('\n'), /return only the child tree|imperative role-mount escape/);
+});
+
+test('the HTML shell and runtime expose one child-safe root', async () => {
+  assert.equal(typeof validateHtmlShellSource, 'function');
+  assert.equal(typeof validateRuntimeEntrySource, 'function');
+  const [html, runtime] = await Promise.all([
+    readFile(path.join(root, 'index.html'), 'utf8'),
+    readFile(path.join(root, 'src', 'main.tsx'), 'utf8'),
+  ]);
+  assert.deepEqual(validateHtmlShellSource(html), []);
+  assert.deepEqual(validateRuntimeEntrySource(runtime), []);
+  assert.match(validateHtmlShellSource(html.replace('<title>Pip</title>', '<title>Recorder</title>')).join('\n'), /title/);
+  assert.match(validateHtmlShellSource(html.replace('<div id="root"></div>', '<div id="root"></div><p>Recorder</p>')).join('\n'), /empty runtime root/);
+  assert.match(validateRuntimeEntrySource(`${runtime}\ndocument.body.append("Recorder");`).join('\n'), /one App root/);
 });
 
 test('entering child mode stops microphone and guide ownership first', async () => {
@@ -175,6 +225,11 @@ test('the copy gate refuses generated CSS copy', async () => {
   }, null, async (fixture) => {
     await assert.rejects(runChildCopyCheck(checkerArguments, fixture), /stylesheet contains generated copy/);
   });
+});
+
+test('the stylesheet gate refuses custom word markers', async () => {
+  const styles = await readFile(path.join(root, 'src', 'styles.css'), 'utf8');
+  assert.match(validateChildStylesSource(`${styles}\n@counter-style pip { symbols: Recorder; }`).join('\n'), /generated marker copy/);
 });
 
 test('the conformance report refuses source bytes outside its named commit', async () => {
@@ -214,6 +269,7 @@ test('a clean report digests the complete child render surface', async () => {
   await withCommittedFixture(null, null, async (fixture) => {
     const report = await runChildCopyCheck(checkerArguments, fixture);
     assert.deepEqual(report.sourceFiles, [
+      'index.html',
       'package-lock.json',
       'package.json',
       'scripts/check-child-copy.mjs',
@@ -222,6 +278,7 @@ test('a clean report digests the complete child render surface', async () => {
       'src/components/GardenMark.tsx',
       'src/components/GrownUpSetup.tsx',
       'src/lib/child-copy.ts',
+      'src/main.tsx',
       'src/styles.css',
     ]);
     assert.deepEqual(Object.keys(report.sourceSha256), report.sourceFiles);

@@ -33,3 +33,21 @@ Elenchus verdict: guarded
 | S1-R2-03 | medium | scripts/check-child-copy.mjs | The report did not bind its checker or dependency lock and could follow an existing report-output symlink, leaving both the checking program and destination outside the receipt. | fixed in this commit |
 
 Leads not pursued: The checker admits only its named JSX expression grammar and rejects dynamic imports, imperative render paths, generated CSS text and uninspectable artwork, but it does not OCR inline paths, canvas pixels or image bytes; later artwork therefore still needs human review. Git object integrity, the local executable and the installed Node toolchain remain the local verification trust base. No real child, assistive technology, recorder, microphone, room or public deployment was available. Layout, quiet-flow and live Pages behaviour remain owned by their source-bound later steps, and the legacy Pages setting still requires separate user authority.
+
+## Step 1, round 3 -- 2026-09-04T09:50:32Z
+
+Audit schema: fiat-audit-round/v2
+
+Covered: child-copy-leak=reviewed; phonics-overclaim=reviewed; parent-mode-leak=reviewed; child-overload=not-applicable; mobile-scroll=not-applicable; text-scale-crop=not-applicable; quiet-audio-leak=not-applicable; pattern-model-drift=reviewed; audio-overlap=reviewed; screen-fingering-transfer=not-applicable; false-learning-signal=reviewed; attention-capture=reviewed; progress-pressure=reviewed; privacy-expansion=reviewed; agent-copy-bypass=reviewed; deployment-overwrite=not-applicable; bundle-growth=reviewed
+
+Not checked: intended-child read-through; screen-reader and other assistive-technology runs; physical recorder, microphone, room, volume, comfort or learning outcome; words drawn as vector paths or pixels; Step 2 no-scroll, text-scale, orientation, safe-area and 64-pixel target criteria; Step 3 quiet route and progressive play flow; Step 4 public built-artifact boot. This round bound the HTML shell and runtime root as well as the previously checked React, CSS, checker and dependency surfaces. Git object integrity, the local executable and Node 22.19.0 remain the local verification trust base.
+
+Elenchus verdict: guarded
+
+| id | severity | file | finding | status |
+| --- | --- | --- | --- | --- |
+| S1-R3-01 | high | scripts/check-child-copy.mjs | The output proof could be bypassed by shadowing the closed copy binding, accessible aria-roledescription text, imperative text nodes or CSS counter-style word markers. | fixed in this commit |
+| S1-R3-02 | high | scripts/check-child-copy.mjs | The role proof omitted the HTML shell and runtime root and allowed side effects before the child return, so a grown-up document title or appended word could survive beside the child tree. | fixed in this commit |
+| S1-R3-03 | medium | scripts/check-child-copy.mjs | Raw-source keyword matching treated harmless comments containing words such as error as child-copy violations. | fixed in this commit |
+
+Leads not pursued: The gate rejects image and vector render paths on the child import surface but does not OCR arbitrary pixels or path geometry. The social metadata remains grown-up-facing and outside the rendered child root. Later steps own measured child geometry, quiet play, pedagogical sequencing and the live Pages build; those claims are not advanced by this copy-boundary round.
