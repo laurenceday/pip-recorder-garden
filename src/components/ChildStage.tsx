@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { GardenMark } from './GardenMark.tsx';
 import {
   childCopyFor,
@@ -14,9 +15,14 @@ interface ChildStageProps {
 
 export function ChildStage({ state, notes, onAction, onBack }: ChildStageProps) {
   const copy = childCopyFor(state);
+  const actionRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    actionRef.current?.focus();
+  }, []);
 
   return (
-    <main className="child-stage" data-copy-role="child">
+    <main className="child-stage" data-child-state={state} data-copy-role="child">
       <section className="model-card" aria-live="polite">
         <GardenMark />
         <h1 data-child-copy-id={`${state}.title`}>{copy.title}</h1>
@@ -28,7 +34,7 @@ export function ChildStage({ state, notes, onAction, onBack }: ChildStageProps) 
           ))}
         </div>
         <div className="mission-actions">
-          <button className={state === 'playing' ? 'button button--stop' : 'button button--primary'} data-child-copy-id={`${state}.action`} type="button" onClick={onAction}>
+          <button ref={actionRef} className={state === 'playing' ? 'button button--stop' : 'button button--primary'} data-child-copy-id={`${state}.action`} type="button" onClick={onAction}>
             {copy.action}
           </button>
           <button className="button button--soft" data-child-copy-id={`${state}.exit`} type="button" onClick={onBack}>
