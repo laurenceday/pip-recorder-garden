@@ -15,7 +15,7 @@ With that binary first on `PATH`, a clean `npm ci` installed 28 packages and rep
 ## Automated evidence
 
 - Catalogue generation and the stale-output check both reported 12 lessons.
-- The Node test suite passed 104 of 104 tests with none skipped.
+- The Node test suite passed 105 of 105 tests with none skipped.
 - TypeScript and oxlint completed without findings.
 - The source and built-runtime boundary checks completed cleanly; the source check examined 23 files.
 - The production build emitted 238.51 kB of JavaScript and 21.98 kB of CSS. The JavaScript total remains below the 300000-byte ceiling.
@@ -73,7 +73,7 @@ The live check accepts only the expected HTTPS site path, one relative hashed Ja
 
 Each conformance command writes the closed seven-field report consumed by the design gate and a neighbouring `.evidence.json` record with the check-specific digests and measurements. Keeping those two records separate prevents detailed evidence from changing the controller contract.
 
-The Pages build has a twenty-minute job limit. The previous ten-minute limit was too short when a cold dependency install consumed almost five minutes and the complete verification gate then reached the job deadline. The deploy job keeps its separate ten-minute limit.
+The Pages build has a twenty-minute job limit. It installs the locked graph without npm's implicit advisory request, then runs the deterministic test, type, lint, boundary and production-build gate. The network-dependent dependency audit remains fail-closed in `verify:local` and the ordinary CI workflow; it is not duplicated in the availability-critical Pages job. This separation prevents an npm advisory-service outage from publishing unchecked code or indefinitely withholding an already audited static artifact. The deploy job keeps its separate ten-minute limit.
 
 ## Child-layout check
 
