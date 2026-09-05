@@ -38,7 +38,7 @@ const VISIBLE_STRING_ATTRIBUTES = new Set([
   'title',
   'value',
 ]);
-const ALLOWED_CHILD_EXPRESSIONS = new Set(['copy.action', 'copy.exit', 'copy.title', 'note']);
+const ALLOWED_CHILD_EXPRESSIONS = new Set(['copy.action', 'copy.exit', 'copy.help', 'copy.title', 'note']);
 
 function digest(text) {
   return createHash('sha256').update(text).digest('hex');
@@ -233,6 +233,7 @@ export function validateChildStageSource(source) {
       for (const output of outputs) {
         outputCounts.set(output, (outputCounts.get(output) ?? 0) + 1);
         const expectedId = {
+          'copy.help': '`${state}.help`',
           'copy.title': '`${state}.title`',
           'copy.action': '`${state}.action`',
           'copy.exit': '`${state}.exit`',
@@ -255,7 +256,7 @@ export function validateChildStageSource(source) {
     ? stageParameter.name.elements.flatMap((element) => bindingIdentifiers(element.name)) : [];
   if (!stageParameter || !ts.isObjectBindingPattern(stageParameter.name)
     || stageParameter.type?.getText(sourceFile) !== 'ChildStageProps'
-    || JSON.stringify(stageParameterNames) !== JSON.stringify(['state', 'notes', 'onAction', 'onBack'])) {
+    || JSON.stringify(stageParameterNames) !== JSON.stringify(['state', 'notes', 'coveredHoles', 'movingHoles', 'gardenGrowth', 'canSpeak', 'busy', 'onAction', 'onBack', 'onSpeak'])) {
     findings.push('ChildStage does not consume only the declared closed props');
   }
   const copyDeclaration = copyDeclarations.length === 1 ? copyDeclarations[0] : null;
@@ -263,7 +264,7 @@ export function validateChildStageSource(source) {
     || !(copyDeclaration.parent.flags & ts.NodeFlags.Const)) {
     findings.push('child stage does not bind copy once to childCopyFor(state)');
   }
-  for (const name of ['state', 'notes', 'onAction', 'onBack', 'copy']) {
+  for (const name of ['state', 'notes', 'coveredHoles', 'movingHoles', 'gardenGrowth', 'canSpeak', 'busy', 'onAction', 'onBack', 'onSpeak', 'copy']) {
     if (protectedBindings.get(name) !== 1) findings.push(`child stage shadows or omits its ${name} binding`);
   }
   const noteCallback = noteMapCallbacks.length === 1 ? noteMapCallbacks[0] : null;
@@ -274,6 +275,7 @@ export function validateChildStageSource(source) {
     findings.push('child note output is not bound to the one notes.map callback');
   }
   for (const [label, expression] of [
+    ['help', '`${state}.help`'],
     ['title', '`${state}.title`'],
     ['action', '`${state}.action`'],
     ['exit', '`${state}.exit`'],
@@ -281,7 +283,7 @@ export function validateChildStageSource(source) {
   ]) {
     if (copyIds.get(expression) !== 1) findings.push(`child ${label} is not joined once to its manifest id`);
   }
-  for (const output of ['copy.title', 'copy.action', 'copy.exit', 'note']) {
+  for (const output of ['copy.help', 'copy.title', 'copy.action', 'copy.exit', 'note']) {
     if (outputCounts.get(output) !== 1) findings.push(`child output ${output} is not rendered exactly once`);
   }
 
@@ -292,7 +294,7 @@ export function validateChildStageSource(source) {
   }
   const propsInterface = sourceFile.statements.find((statement) => ts.isInterfaceDeclaration(statement)
     && statement.name.text === 'ChildStageProps');
-  if (!propsInterface || !/interface ChildStageProps \{\s*state: ChildCopyState;\s*notes: readonly ChildNoteLetter\[\];\s*onAction: \(\) => void;\s*onBack: \(\) => void;\s*\}/.test(propsInterface.getText(sourceFile))) {
+  if (!propsInterface || !/interface ChildStageProps \{\s*state: ChildCopyState;\s*notes: readonly ChildNoteLetter\[\];\s*coveredHoles: readonly number\[\];\s*movingHoles: readonly number\[\];\s*gardenGrowth: number;\s*canSpeak: boolean;\s*busy: boolean;\s*onAction: \(choices: readonly number\[\]\) => void;\s*onBack: \(\) => void;\s*onSpeak: \(\) => void;\s*\}/.test(propsInterface.getText(sourceFile))) {
     findings.push('child stage props are outside the closed state, note and action interface');
   }
   return findings;
@@ -346,7 +348,7 @@ export function validateRoleMountSource(appSource, grownUpSource) {
     const attributes = childMounts[0].attributes.properties;
     const names = attributes.filter(ts.isJsxAttribute).map((attribute) => attribute.name.text).sort();
     if (attributes.some(ts.isJsxSpreadAttribute)
-      || JSON.stringify(names) !== JSON.stringify(['notes', 'onAction', 'onBack', 'state'])) {
+      || JSON.stringify(names) !== JSON.stringify(['busy', 'canSpeak', 'coveredHoles', 'gardenGrowth', 'movingHoles', 'notes', 'onAction', 'onBack', 'onSpeak', 'state'])) {
       findings.push('App passes props outside the closed child interface');
     }
   }
@@ -410,6 +412,7 @@ export function validateRuntimeEntrySource(source) {
     "import { createRoot } from 'react-dom/client';",
     "import App from './App.tsx';",
     "import './styles.css';",
+    "import './register-service-worker.ts';",
   ])) findings.push('runtime entry imports are outside the one-root contract');
   const executable = sourceFile.statements.filter((statement) => !ts.isImportDeclaration(statement));
   const statement = executable.length === 1 && ts.isExpressionStatement(executable[0]) ? executable[0] : null;

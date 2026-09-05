@@ -9,7 +9,7 @@ export const MAX_MADE_PATTERN_NOTES = 4;
 
 export type ChildPlayMode = 'sound' | 'quiet';
 export type ChildTurnPhase = 'ready' | 'playing' | 'tap' | 'done' | 'more' | 'error';
-export type ChildTurnCommand = 'none' | 'play-model' | 'stop-model' | 'leave';
+export type ChildTurnCommand = 'none' | 'play-model' | 'play-made' | 'stop-model' | 'leave';
 
 export interface ChildTurnState {
   mode: ChildPlayMode;
@@ -47,6 +47,9 @@ export function actOnChildTurn(state: ChildTurnState, noteCount: number): ChildT
     return { state: { ...state, phase: tapIndex === noteCount ? 'done' : 'tap', tapIndex }, command: 'none' };
   }
   if (state.phase === 'done') return { state: { ...state, phase: 'more' }, command: 'none' };
+  if (state.phase === 'more') {
+    return { state, command: state.mode === 'sound' ? 'play-made' : 'none' };
+  }
   return { state, command: 'leave' };
 }
 

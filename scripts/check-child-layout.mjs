@@ -315,7 +315,7 @@ async function enterChild(client, url, scenario, lesson, forceError = false, qui
       return true;
     })()`);
   }
-  const startLabel = quiet ? 'Start quiet child play' : 'Start child play';
+  const startLabel = quiet ? 'Start without sound' : 'Start with sound';
   if (!await evaluate(client, clickButtonExpression(startLabel))) throw new Error('grown-up start action was not found');
   const startState = quiet ? 'tap' : 'ready';
   await waitForExpression(client, `document.querySelector('.child-stage')?.dataset.childState === '${startState}'`);

@@ -72,7 +72,7 @@ async function withCommittedFixture(beforeCommit, afterCommit, callback) {
 test('the child lexicon is deliberately tiny and the checked manifest is exhaustive', () => {
   assert.deepEqual(CHILD_LEXICON, ['a', 'b', 'back', 'c', 'd', 'done', 'e', 'f', 'g', 'more', 'pip', 'play', 'stop', 'tap', 'try']);
   assert.deepEqual(CHILD_COPY_STATE_IDS, ['ready', 'playing', 'tap', 'done', 'more', 'error']);
-  assert.equal(CHILD_COPY_MANIFEST.length, 25);
+  assert.equal(CHILD_COPY_MANIFEST.length, 31);
   assert.deepEqual(validateChildCopyManifest(CHILD_COPY_MANIFEST), []);
   assert.equal(new Set(CHILD_COPY_MANIFEST.map((entry) => entry.id)).size, CHILD_COPY_MANIFEST.length);
 });
@@ -204,8 +204,8 @@ test('the HTML shell and runtime expose one child-safe root', async () => {
 
 test('entering child mode stops microphone and guide ownership first', async () => {
   const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
-  assert.match(app, /const enterChildMode = \(mode: ChildPlayMode\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*resetMission\(\);\s*setChildTurn\(startChildTurn\(mode\)\);\s*setChildMode\(mode\);\s*\};/);
-  assert.match(app, /<GrownUpSetup onStart=\{\(\) => enterChildMode\('sound'\)\} onStartQuiet=\{\(\) => enterChildMode\('quiet'\)\}>/);
+  assert.match(app, /const enterChildMode = \(mode: ChildPlayMode\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*childVoice\.cancel\(\);\s*resetMission\(\);[\s\S]*setChildMode\(mode\);\s*\};/);
+  assert.match(app, /<GrownUpSetup onStart=\{\(\) => enterChildMode\('sound'\)\} onStartQuiet=\{\(\) => enterChildMode\('quiet'\)\} summary=\{lastChildSession\}>/);
 });
 
 test('the copy gate follows imported child components', async () => {

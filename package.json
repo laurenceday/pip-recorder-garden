@@ -20,7 +20,7 @@
     "lint": "oxlint src scripts tests vite.config.ts",
     "check:boundaries": "node scripts/check-static-boundaries.mjs",
     "check": "npm run generate && npm run generate:check && npm run test && npm run typecheck && npm run lint && npm run check:boundaries",
-    "audit": "npm --userconfig /dev/null audit --audit-level=moderate",
+    "audit": "env -u npm_config_allow_scripts -u NPM_CONFIG_ALLOW_SCRIPTS npm --userconfig /dev/null audit --audit-level=moderate",
     "verify:artifact": "npm run check && npm run build",
     "verify:local": "npm run verify:artifact && npm run audit",
     "agent:propose": "node scripts/propose-lessons.mjs",

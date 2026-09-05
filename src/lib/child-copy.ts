@@ -25,13 +25,13 @@ export const CHILD_LEXICON = [
 ] as const;
 
 const COPY_BY_STATE = Object.freeze({
-  ready: Object.freeze({ title: 'Pip', action: 'Play', exit: 'Back' }),
-  playing: Object.freeze({ title: 'Pip', action: 'Stop', exit: 'Back' }),
-  tap: Object.freeze({ title: 'Tap', action: 'Tap', exit: 'Done' }),
-  done: Object.freeze({ title: 'Done', action: 'More', exit: 'Done' }),
-  more: Object.freeze({ title: 'More', action: 'Done', exit: 'Back' }),
-  error: Object.freeze({ title: 'Try', action: 'Play', exit: 'Back' }),
-}) satisfies Readonly<Record<ChildCopyState, Readonly<{ title: string; action: string; exit: string }>>>;
+  ready: Object.freeze({ help: 'Pip', title: 'Pip', action: 'Play', exit: 'Back' }),
+  playing: Object.freeze({ help: 'Pip', title: 'Pip', action: 'Stop', exit: 'Back' }),
+  tap: Object.freeze({ help: 'Pip', title: 'Tap', action: 'Tap', exit: 'Done' }),
+  done: Object.freeze({ help: 'Pip', title: 'Done', action: 'More', exit: 'Done' }),
+  more: Object.freeze({ help: 'Pip', title: 'More', action: 'Play', exit: 'Back' }),
+  error: Object.freeze({ help: 'Pip', title: 'Try', action: 'Play', exit: 'Back' }),
+}) satisfies Readonly<Record<ChildCopyState, Readonly<{ help: string; title: string; action: string; exit: string }>>>;
 
 export interface ChildCopyManifestEntry {
   id: string;
@@ -42,6 +42,7 @@ export interface ChildCopyManifestEntry {
 
 function expectedManifest(): ChildCopyManifestEntry[] {
   const stateEntries = CHILD_COPY_STATE_IDS.flatMap((state) => ([
+    { id: `${state}.help`, state, surface: 'visible-and-accessible' as const, text: COPY_BY_STATE[state].help },
     { id: `${state}.title`, state, surface: 'visible-and-accessible' as const, text: COPY_BY_STATE[state].title },
     { id: `${state}.action`, state, surface: 'visible-and-accessible' as const, text: COPY_BY_STATE[state].action },
     { id: `${state}.exit`, state, surface: 'visible-and-accessible' as const, text: COPY_BY_STATE[state].exit },
@@ -63,7 +64,7 @@ const CHILD_LEXICON_SET = new Set<string>(CHILD_LEXICON);
 const CHILD_COPY_STATE_SET = new Set<string>(CHILD_COPY_STATE_IDS);
 const CHILD_NOTE_LETTER_SET = new Set<string>(CHILD_NOTE_LETTERS);
 
-export function childCopyFor(state: ChildCopyState): Readonly<{ title: string; action: string; exit: string }> {
+export function childCopyFor(state: ChildCopyState): Readonly<{ help: string; title: string; action: string; exit: string }> {
   if (!CHILD_COPY_STATE_SET.has(state)) throw new Error(`unknown child state: ${String(state)}`);
   return COPY_BY_STATE[state];
 }
@@ -107,7 +108,7 @@ export function validateChildCopyManifest(entries: unknown): readonly string[] {
     if (JSON.stringify(keys) !== JSON.stringify(['id', 'state', 'surface', 'text'])) {
       findings.push(`entry ${index} has unsupported fields`);
     }
-    if (typeof entry.id !== 'string' || !/^(?:all\.note\.[a-g]|(?:ready|playing|tap|done|more|error)\.(?:title|action|exit))$/.test(entry.id)) {
+    if (typeof entry.id !== 'string' || !/^(?:all\.note\.[a-g]|(?:ready|playing|tap|done|more|error)\.(?:help|title|action|exit))$/.test(entry.id)) {
       findings.push(`entry ${index} has an invalid id`);
     } else if (seen.has(entry.id)) {
       findings.push(`entry ${index} duplicates ${entry.id}`);

@@ -6,7 +6,7 @@ Pip’s Recorder Garden is a static, interactive course for a young beginner pla
 
 The microphone is a helper, not a judge. It estimates one note at a time, can be confused by rooms and devices, and never grades tone quality or the child. Fingering puzzles, rhythm taps and grown-up co-play make every lesson usable without microphone permission.
 
-The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start child play** opens one full-screen sound turn: Pip models the chosen pattern, the child taps once for each note, then stops or chooses one small making activity. **Start quiet child play** begins at the tap response and creates no sound or microphone request. Child actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short sideways view or with text enlarged to 200%. The child view receives no lesson prose or open error string.
+The interface has two separately mounted views. The grown-up view owns lesson choice, teaching detail, privacy and the full guided mission. **Start with sound** opens one full-screen turn: Pip models the chosen pattern, shows the covered holes, glows the finger that moves, and grows a little garden after each tap. Tapping Pip reads the current two-word cue aloud. The child can then build and hear a two-to-four-note tune. **Start without sound** begins at the tap response and creates no sound or microphone request; its tune-making response stays visual. Child actions are at least 64 by 64 CSS pixels, and the task does not scroll at the checked phone and tablet sizes, in a short sideways view or with text enlarged to 200%. The child view receives no lesson prose or open error string.
 
 ## Run it locally
 
@@ -28,11 +28,11 @@ npm run verify:local
 npm run preview
 ```
 
-The build goes to `dist/` and uses relative asset paths, so it works under a GitHub Pages repository subpath.
+The build goes to `dist/` and uses relative asset paths, so it works under a GitHub Pages repository subpath. After one successful online load, its same-site service worker keeps the checked app shell available offline.
 
 ## Play a lesson
 
-1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start child play** for the large one-screen model card, or keep the detailed controls open for supported practice.
+1. In the grown-up view, choose any lesson on the garden path. Nothing is locked. Use **Start with sound** for the large one-screen child turn, **Start without sound** for a silent turn, or keep the detailed controls open for supported practice.
 2. Press **Hear the whole pattern**. The note stones move with every note and beat; sound never starts by itself.
 3. Copy in one of four ways: play to Pip, build the fingering picture, tap the rhythm, or echo with a grown-up. Only the first route asks for microphone permission.
 4. Make a two-to-four-note tune from the notes in that lesson, or choose **Finish without a tune**. Hear, stop and change a tune as often as you like; either route records participation, not mastery.
@@ -61,9 +61,11 @@ The optional sequence helper checks pitch order and stable notes. The rhythm act
 
 ## Microphone and saved-data boundary
 
-Once its static files have loaded, the child-facing application has no network request, audio recorder, analytics, account, camera, IndexedDB, socket, beacon or service worker. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
+The application has no analytics, account, audio recorder, camera, IndexedDB, socket or beacon. Its service worker fetches and caches only this app's own static files beneath the same site path, so a later child turn can work offline. It refuses cross-origin and out-of-scope requests. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
 
-The only saved value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, made tune, tap timing, chosen route, attempt count, detected frequency history, score, streak, timestamp or permission state. **Forget saved progress** clears it from that browser.
+Pip's optional spoken cue uses the browser's device voice and only the same closed child words already visible on screen. The application does not send a speech request, although downloading or providing voices remains a browser or operating-system feature. Spoken help is disabled in the no-sound route.
+
+The only saved learning value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, made tune, tap timing, chosen route, attempt count, detected frequency history, score, streak, timestamp or permission state. The grown-up recap of the last child turn exists only in page memory and disappears on reload. **Forget saved progress** clears the completed-lesson set from that browser. The browser separately owns its ordinary offline copy of the app files.
 
 GitHub Pages serves over HTTPS, which allows browsers to offer microphone permission. Permission remains a browser and device decision; the site still works with diagrams, guide tones and adult-assisted completion when access is denied.
 
@@ -72,6 +74,8 @@ GitHub Pages serves over HTTPS, which allows browsers to offer microphone permis
 The synthetic tests establish detector behaviour, not hardware behaviour. Her father should make this short acceptance pass on each intended browser:
 
 - on the intended phone and tablet, open child play upright and sideways, enlarge text if the device offers that setting, and confirm the card stays still while both actions remain comfortable to tap;
+- move through a B-to-A lesson and confirm the changed recorder hole glows while the garden grows with each response;
+- tap Pip in the sound route and confirm the short spoken cue is clear; confirm Pip is silent in the no-sound route;
 - open lesson 8, press **Hear the whole pattern**, and confirm B, A, A, B sounds once with the matching note stones pulsing;
 - stop the lesson pattern part-way through and confirm sound stops at once;
 - make a two-to-four-note tune, confirm note choices freeze while it sounds, then use **Stop my tune**;
@@ -82,6 +86,7 @@ The synthetic tests establish detector behaviour, not hardware behaviour. Her fa
 - deny permission once and complete a turn through rhythm, fingering or grown-up co-play;
 - play a guide pattern and confirm the site is not listening at the same time;
 - finish a turn and confirm the choices are stop, replay and garden, with no automatic progression;
+- reload once online, then use the device's offline mode and confirm the app still opens;
 - keep device volume conversational and take a break whenever the child wants one.
 
 ## Add an idea

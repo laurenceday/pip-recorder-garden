@@ -4,12 +4,13 @@ import { FingeringDiagram } from './components/FingeringDiagram.tsx';
 import { FingeringMission } from './components/FingeringMission.tsx';
 import { GardenMark } from './components/GardenMark.tsx';
 import { ChildStage } from './components/ChildStage.tsx';
-import { GrownUpSetup } from './components/GrownUpSetup.tsx';
+import { GrownUpSetup, type ChildSessionSummary } from './components/GrownUpSetup.tsx';
 import { LessonTrail } from './components/LessonTrail.tsx';
 import { PatternMaker } from './components/PatternMaker.tsx';
 import { PatternStrip } from './components/PatternStrip.tsx';
 import { RhythmEcho } from './components/RhythmEcho.tsx';
 import { useGuideTone } from './hooks/useGuideTone.ts';
+import { useChildVoice } from './hooks/useChildVoice.ts';
 import { useMicrophoneScoring } from './hooks/useMicrophoneScoring.ts';
 import { useProgress } from './hooks/useProgress.ts';
 import { advanceSequence, createSequenceState, sequenceProgress, type SequenceObservation } from './lib/lesson-state.ts';
@@ -98,6 +99,9 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(initialLessonId);
   const [childMode, setChildMode] = useState<ChildPlayMode | null>(null);
   const [childTurn, setChildTurn] = useState(() => startChildTurn('sound'));
+  const [childSession, setChildSession] = useState<ChildSessionSummary>({ mode: 'sound', taps: 0, madeTunes: 0, usedPipHelp: false });
+  const [lastChildSession, setLastChildSession] = useState<ChildSessionSummary | null>(null);
+  const [childMadePattern, setChildMadePattern] = useState<NoteName[]>([]);
   const lesson = useMemo(() => LESSONS.find((item) => item.id === selectedId) ?? LESSONS[0], [selectedId]);
   const [missionPhase, setMissionPhase] = useState<MissionPhase>('model');
   const [copyActivity, setCopyActivity] = useState<CopyActivity>('choose');
@@ -111,6 +115,7 @@ export default function App() {
   const exploredRef = useRef(explored);
   const { completed, markComplete, resetProgress } = useProgress(LESSON_IDS);
   const tone = useGuideTone();
+  const childVoice = useChildVoice();
   const isExplorer = lesson.kind === 'explore';
   const microphoneExpected = isExplorer ? explorerTarget : lesson.pattern[Math.min(sequence.index, lesson.pattern.length - 1)].note;
   const fingeringExpected = lesson.pattern[Math.min(fingeringIndex, lesson.pattern.length - 1)].note;
@@ -272,19 +277,39 @@ export default function App() {
   const childNotes = childState === 'tap'
     ? allChildNotes.slice(childTurn.tapIndex)
     : childState === 'more'
-      ? [...new Set(allChildNotes)]
+      ? childNoteLetters(allowedMakerNotes)
       : allChildNotes;
+  const childPatternIndex = Math.max(0, Math.min(lesson.pattern.length - 1, tone.currentStep ?? childTurn.tapIndex));
+  const childPlaybackIndex = tone.currentStep ?? 0;
+  const childMadePatternIsPlaying = childState === 'more' && childMadePattern.length > 0 && tone.currentStep !== null;
+  const childDisplayNote = childMadePatternIsPlaying
+    ? childMadePattern[Math.min(childPlaybackIndex, childMadePattern.length - 1)]
+    : lesson.pattern[childPatternIndex].note;
+  const childPreviousNote = childMadePatternIsPlaying
+    ? childMadePattern[Math.max(0, Math.min(childPlaybackIndex - 1, childMadePattern.length - 1))]
+    : lesson.pattern[Math.max(0, childPatternIndex - 1)].note;
+  const childCoveredHoles = RECORDER_NOTES[childDisplayNote].coveredHoles;
+  const childMovingHoles = (childMadePatternIsPlaying ? childPlaybackIndex === 0 : childPatternIndex === 0)
+    ? []
+    : [...new Set([...RECORDER_NOTES[childPreviousNote].coveredHoles, ...childCoveredHoles])]
+      .filter((hole) => RECORDER_NOTES[childPreviousNote].coveredHoles.includes(hole) !== childCoveredHoles.includes(hole));
+  const childGardenGrowth = Math.min(4, childTurn.tapIndex + (childState === 'done' || childState === 'more' ? 1 : 0));
   const enterChildMode = (mode: ChildPlayMode) => {
     microphone.stop();
     tone.stop('stopped');
+    childVoice.cancel();
     resetMission();
     setChildTurn(startChildTurn(mode));
+    setChildSession({ mode, taps: 0, madeTunes: 0, usedPipHelp: false });
+    setChildMadePattern([]);
     setChildMode(mode);
   };
   const leaveChildMode = () => {
     microphone.stop();
     tone.stop('stopped');
+    childVoice.cancel();
     setGuideIssue(null);
+    setLastChildSession(childSession);
     setChildMode(null);
   };
   const playChildModel = async () => {
@@ -298,14 +323,31 @@ export default function App() {
       setChildTurn((current) => failChildModel(current, lesson.pattern.length));
     }
   };
-  const runChildAction = () => {
+  const speakChildPrompt = () => {
+    if (childTurn.mode !== 'sound') return;
+    if (childVoice.speak(childState)) setChildSession((current) => ({ ...current, usedPipHelp: true }));
+  };
+  const runChildAction = (choices: readonly number[]) => {
     const transition = actOnChildTurn(childTurn, lesson.pattern.length);
     setChildTurn(transition.state);
+    if (childTurn.phase === 'tap') setChildSession((current) => ({ ...current, taps: current.taps + 1 }));
     if (transition.command === 'play-model') void playChildModel();
     if (transition.command === 'stop-model') tone.stop('stopped');
+    if (childTurn.phase === 'more') {
+      const madeNotes = choices.map((index) => allowedMakerNotes[index]).filter((note): note is NoteName => Boolean(note));
+      if (madeNotes.length >= 2) {
+        setChildMadePattern(madeNotes);
+        setChildSession((current) => ({ ...current, madeTunes: current.madeTunes + 1 }));
+        if (transition.command === 'play-made') {
+          void tone.playPattern(notesToPattern(madeNotes, allowedMakerNotes)).catch(() => setGuideIssue('child-model-unavailable'));
+        }
+      }
+    }
     if (transition.command === 'leave') leaveChildMode();
   };
   const runChildBack = () => {
+    tone.stop('stopped');
+    childVoice.cancel();
     const transition = exitChildTurn(childTurn, lesson.pattern.length);
     setChildTurn(transition.state);
     if (transition.command === 'leave') leaveChildMode();
@@ -316,14 +358,20 @@ export default function App() {
       <ChildStage
         state={childState}
         notes={childNotes}
+        coveredHoles={childCoveredHoles}
+        movingHoles={childMovingHoles}
+        gardenGrowth={childGardenGrowth}
+        canSpeak={childTurn.mode === 'sound'}
+        busy={tone.playing}
         onAction={runChildAction}
         onBack={runChildBack}
+        onSpeak={speakChildPrompt}
       />
     );
   }
 
   return (
-    <GrownUpSetup onStart={() => enterChildMode('sound')} onStartQuiet={() => enterChildMode('quiet')}>
+    <GrownUpSetup onStart={() => enterChildMode('sound')} onStartQuiet={() => enterChildMode('quiet')} summary={lastChildSession}>
       <>
       <a className="skip-link" href="#lesson">Skip to this lesson</a>
       <header className="site-header">
