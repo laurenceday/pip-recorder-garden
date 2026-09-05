@@ -342,7 +342,8 @@ async function measure(client, scenario, lesson, state) {
     const textNodes = [...stage.querySelectorAll('h1, .note-stone, .mission-actions button')];
     const actions = [...stage.querySelectorAll('button:not(:disabled)')];
     const rects = actions.map((item) => item.getBoundingClientRect());
-    const essentialRects = [...stage.querySelectorAll('.garden-mark, h1, .note-stone, .mission-actions button')].map((item) => item.getBoundingClientRect());
+    const essentialElements = [...stage.querySelectorAll('.garden-mark, h1, .note-stone, .mission-actions button')];
+    const essentialRects = essentialElements.map((item) => item.getBoundingClientRect());
     const cardRect = card.getBoundingClientRect();
     const safe = ${JSON.stringify(safeInsets)};
     return {
@@ -357,6 +358,14 @@ async function measure(client, scenario, lesson, state) {
       actionsInsideViewport: rects.every((rect) => rect.left >= -0.5 && rect.top >= -0.5 && rect.right <= innerWidth + 0.5 && rect.bottom <= innerHeight + 0.5),
       essentialsInsideCard: essentialRects.every((rect) => rect.width > 0 && rect.height > 0 && rect.left >= cardRect.left - 0.5 && rect.top >= cardRect.top - 0.5 && rect.right <= cardRect.right + 0.5 && rect.bottom <= cardRect.bottom + 0.5),
       essentialsInsideSafeArea: essentialRects.every((rect) => rect.left >= safe.left - 0.5 && rect.top >= safe.top - 0.5 && rect.right <= innerWidth - safe.right + 0.5 && rect.bottom <= innerHeight - safe.bottom + 0.5),
+      essentialGeometry: essentialElements.map((item, index) => ({
+        element: item.matches('.garden-mark') ? 'garden-mark' : item.matches('.note-stone') ? 'note-stone' : item.matches('.mission-actions button') ? 'action' : 'heading',
+        text: item.textContent.trim(),
+        left: essentialRects[index].left,
+        top: essentialRects[index].top,
+        right: essentialRects[index].right,
+        bottom: essentialRects[index].bottom,
+      })),
       focusInsideChild: stage.contains(document.activeElement),
     };
   })()`);
