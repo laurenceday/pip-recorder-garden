@@ -11,6 +11,7 @@ const SOURCE_FILES = [
   'scripts/child-conformance-common.mjs',
   'src/App.tsx',
   'src/components/GrownUpSetup.tsx',
+  'src/hooks/useChildVoice.ts',
   'src/hooks/useGuideTone.ts',
   'src/hooks/useMicrophoneScoring.ts',
   'src/lib/mission-loop.ts',
@@ -26,23 +27,31 @@ export async function runChildQuietCheck(argv, root = process.cwd()) {
     state = transition.state;
     trace.push({ phase: state.phase, command: transition.command });
   }
+  const moreTransition = actOnChildTurn(state, 4);
+  state = moreTransition.state;
+  trace.push({ phase: state.phase, command: moreTransition.command });
+  const madeTransition = actOnChildTurn(state, 4);
+  trace.push({ phase: madeTransition.state.phase, command: madeTransition.command });
   const app = files.get('src/App.tsx').toString('utf8');
   const setup = files.get('src/components/GrownUpSetup.tsx').toString('utf8');
+  const voice = files.get('src/hooks/useChildVoice.ts').toString('utf8');
   const guide = files.get('src/hooks/useGuideTone.ts').toString('utf8');
   const microphone = files.get('src/hooks/useMicrophoneScoring.ts').toString('utf8');
   const findings = [];
   if (trace.some((event) => event.command !== 'none')) findings.push('quiet trace emitted an audio-owning command');
-  if (state.phase !== 'done' || exitChildTurn(state, 4).command !== 'leave') findings.push('quiet trace did not end at a stopping point');
+  if (state.phase !== 'more' || exitChildTurn(state, 4).state.phase !== 'done') findings.push('quiet optional activity did not remain bounded and reversible');
   if (!/onStartQuiet=\{\(\) => enterChildMode\('quiet'\)\}/.test(app) || !/onClick=\{onStartQuiet\}/.test(setup)) findings.push('quiet entry is not wired to the closed quiet state');
+  if (!/canSpeak=\{childTurn\.mode === 'sound'\}/.test(app)) findings.push('spoken help is not gated out of quiet mode');
   if (!/if \(transition\.command === 'play-model'\) void playChildModel\(\);/.test(app)) findings.push('audio dispatch is not command-gated');
   if ((guide.match(/new AudioContext\(/g) ?? []).length !== 1 || !/const playPattern = useCallback\(async[\s\S]*new AudioContext\(/.test(guide)) findings.push('guide audio construction is not confined to playPattern');
   if ((guide.match(/createOscillator\(/g) ?? []).length !== 1 || !/const playPattern = useCallback\(async[\s\S]*createOscillator\(/.test(guide)) findings.push('oscillator construction is not confined to playPattern');
   if ((microphone.match(/new AudioContext\(/g) ?? []).length !== 1 || !/const start = useCallback\(async[\s\S]*new AudioContext\(/.test(microphone)) findings.push('microphone audio construction is not confined to start');
   if ((microphone.match(/getUserMedia\(/g) ?? []).length !== 1 || !/const start = useCallback\(async[\s\S]*getUserMedia\(/.test(microphone)) findings.push('media permission is not confined to microphone start');
+  if ((voice.match(/new Audio\(/g) ?? []).length !== 1 || !/const speak = useCallback\([\s\S]*new Audio\(/.test(voice)) findings.push('spoken audio construction is not confined to the sound-only help action');
   if (findings.length > 0) throw new Error(`quiet child flow failed:\n${findings.map((finding) => `- ${finding}`).join('\n')}`);
   const report = {
     schema: 'child-quiet-conformance/v1', candidate: CANDIDATE, criterion: CRITERION, status: 'pass', commit,
-    evidence: { startMode: 'quiet', trace, audioCommands: 0, audioContextConstructionSites: 0, oscillatorConstructionSites: 0, mediaPermissionCommands: 0, persistedFieldsAdded: 0 },
+    evidence: { startMode: 'quiet', trace, audioCommands: 0, audioContextConstructionSites: 0, htmlAudioConstructionSites: 0, oscillatorConstructionSites: 0, mediaPermissionCommands: 0, persistedFieldsAdded: 0 },
     sourceFiles: SOURCE_FILES, sourceSha256,
   };
   await writeConformanceReport(root, CANDIDATE, CRITERION, options.report, report);

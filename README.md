@@ -63,7 +63,7 @@ The optional sequence helper checks pitch order and stable notes. The rhythm act
 
 The application has no analytics, account, audio recorder, camera, IndexedDB, socket or beacon. Its service worker fetches and caches only this app's own static files beneath the same site path, so a later child turn can work offline. It refuses cross-origin and out-of-scope requests. Microphone samples pass from a `MediaStreamAudioSourceNode` to an `AnalyserNode`, then into the pitch detector in browser memory. The microphone graph is never connected to the speakers.
 
-Pip's optional spoken cue uses the browser's device voice and only the same closed child words already visible on screen. The application does not send a speech request, although downloading or providing voices remains a browser or operating-system feature. Spoken help is disabled in the no-sound route.
+Pip's optional spoken cue uses six bundled audio clips and only the same closed child words already visible on screen. It does not call a speech service. Spoken help is disabled in the no-sound route.
 
 The only saved learning value is a sorted set of completed lesson IDs in `localStorage`. There is no name, raw audio, made tune, tap timing, chosen route, attempt count, detected frequency history, score, streak, timestamp or permission state. The grown-up recap of the last child turn exists only in page memory and disappears on reload. **Forget saved progress** clears the completed-lesson set from that browser. The browser separately owns its ordinary offline copy of the app files.
 

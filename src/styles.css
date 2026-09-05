@@ -419,7 +419,8 @@ button.note-stone { min-height: 64px; cursor: pointer; }
   .child-stage[data-child-state="more"] .child-head { grid-column: 1; grid-row: 1; }
   .child-stage[data-child-state="more"] .child-fingering { display: none; }
   .child-stage[data-child-state="more"] .pattern-strip { grid-column: 1; grid-row: 2; }
-  .child-stage[data-child-state="more"] .make-dots { bottom: auto; top: 30px; left: 88px; }
+  .child-stage[data-child-state="more"] .make-dots { bottom: auto; top: 42px; left: 264px; grid-template-columns: repeat(4, 12px); gap: 5px; }
+  .child-stage[data-child-state="more"] .make-dot { width: 12px; height: 12px; }
   .child-stage[data-child-state="more"] .mission-actions { grid-column: 2; grid-row: 1 / 3; }
 }
 

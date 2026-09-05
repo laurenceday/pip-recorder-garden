@@ -38,6 +38,18 @@ if (manifest.name !== 'Pip' || manifest.start_url !== './' || manifest.scope !==
   throw new Error('built install manifest is outside the local Pip app boundary');
 }
 
+for (const name of ['ready', 'playing', 'tap', 'done', 'more', 'error']) {
+  const relative = `./voice/${name}.m4a`;
+  if (!index.includes(`href="${relative}"`)) throw new Error(`built index does not preload child voice clip: ${name}`);
+  const voicePath = path.join(distRoot, 'voice', `${name}.m4a`);
+  const voiceStat = await lstat(voicePath);
+  if (!voiceStat.isFile() || voiceStat.isSymbolicLink() || voiceStat.size < 1_024 || voiceStat.size > 65_536) {
+    throw new Error(`built child voice clip is outside its file boundary: ${name}`);
+  }
+  const header = (await readFile(voicePath)).subarray(0, 16).toString('latin1');
+  if (!header.includes('ftyp')) throw new Error(`built child voice clip is not an M4A file: ${name}`);
+}
+
 const assetRoot = path.join(distRoot, 'assets');
 const entries = await readdir(assetRoot, { withFileTypes: true });
 const javaScriptNames = entries.filter((entry) => entry.name.endsWith('.js')).map((entry) => entry.name);

@@ -71,6 +71,13 @@ for (const required of [
 }
 if (/https?:\/\//i.test(serviceWorker)) throw new Error('offline cache contains an absolute network destination');
 
+const childVoice = contents.get('src/hooks/useChildVoice.ts') ?? '';
+if ((childVoice.match(/\.\/voice\/(?:ready|playing|tap|done|more|error)\.m4a/g) ?? []).length !== 6
+  || !/new Audio\(CHILD_VOICE_CLIPS\[state\]\)/.test(childVoice)
+  || /speechSynthesis|SpeechSynthesisUtterance|https?:\/\//i.test(childVoice)) {
+  throw new Error('child spoken help is outside its six bundled local clips');
+}
+
 const microphone = contents.get('src/hooks/useMicrophoneScoring.ts') ?? '';
 for (const required of [
   'source.connect(analyser)',

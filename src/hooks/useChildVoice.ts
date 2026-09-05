@@ -1,23 +1,39 @@
-import { useCallback, useEffect } from 'react';
-import { childCopyFor, type ChildCopyState } from '../lib/child-copy.ts';
+import { useCallback, useEffect, useRef } from 'react';
+import type { ChildCopyState } from '../lib/child-copy.ts';
+
+const CHILD_VOICE_CLIPS: Readonly<Record<ChildCopyState, string>> = Object.freeze({
+  ready: './voice/ready.m4a',
+  playing: './voice/playing.m4a',
+  tap: './voice/tap.m4a',
+  done: './voice/done.m4a',
+  more: './voice/more.m4a',
+  error: './voice/error.m4a',
+});
 
 export function useChildVoice() {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const cancel = useCallback(() => {
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    const audio = audioRef.current;
+    audioRef.current = null;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
   }, []);
 
   const speak = useCallback((state: ChildCopyState): boolean => {
-    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return false;
-    const copy = childCopyFor(state);
-    const voice = new SpeechSynthesisUtterance(`${copy.title}. ${copy.action}.`);
-    voice.lang = 'en-GB';
-    voice.rate = 0.78;
-    voice.pitch = 1.08;
-    voice.volume = 0.82;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(voice);
+    cancel();
+    const audio = new Audio(CHILD_VOICE_CLIPS[state]);
+    audio.volume = 0.82;
+    audioRef.current = audio;
+    audio.addEventListener('ended', () => {
+      if (audioRef.current === audio) audioRef.current = null;
+    }, { once: true });
+    void audio.play().catch(() => {
+      if (audioRef.current === audio) audioRef.current = null;
+    });
     return true;
-  }, []);
+  }, [cancel]);
 
   useEffect(() => {
     const stopWhenHidden = () => {
