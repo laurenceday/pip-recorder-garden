@@ -61,13 +61,14 @@ test('Done stops and More is bounded, optional and reversible', () => {
     command: 'none',
   });
   assert.deepEqual(missionLoop.exitChildTurn(more.state, 4), { state: done, command: 'none' });
-  assert.equal(missionLoop.actOnChildTurn(more.state, 4).command, 'leave');
+  assert.equal(missionLoop.actOnChildTurn(more.state, 4).command, 'play-made');
+  assert.equal(missionLoop.actOnChildTurn({ ...more.state, mode: 'quiet' }, 4).command, 'none');
 });
 
 test('every child screen has one learning action and one exit in the closed lexicon', () => {
   for (const state of childCopy.CHILD_COPY_STATE_IDS) {
     const copy = childCopy.childCopyFor(state);
-    assert.deepEqual(Object.keys(copy), ['title', 'action', 'exit']);
+    assert.deepEqual(Object.keys(copy), ['help', 'title', 'action', 'exit']);
     for (const value of Object.values(copy)) assert.deepEqual(childCopy.rejectedChildCopyTokens(value), []);
   }
 });
@@ -76,7 +77,8 @@ test('the UI dispatches audio only for the sound-model command', async () => {
   const app = await readFile(path.join(root, 'src', 'App.tsx'), 'utf8');
   assert.match(app, /if \(transition\.command === 'play-model'\) void playChildModel\(\);/);
   assert.match(app, /if \(transition\.command === 'stop-model'\) tone\.stop\('stopped'\);/);
+  assert.match(app, /if \(transition\.command === 'play-made'\) \{[\s\S]*tone\.playPattern\(notesToPattern\(madeNotes, allowedMakerNotes\)\)/);
   assert.match(app, /onStartQuiet=\{\(\) => enterChildMode\('quiet'\)\}/);
-  assert.equal((app.match(/tone\.playPattern\(/g) ?? []).length, 3);
-  assert.match(app, /const leaveChildMode = \(\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*setGuideIssue\(null\);\s*setChildMode\(null\);/);
+  assert.equal((app.match(/tone\.playPattern\(/g) ?? []).length, 4);
+  assert.match(app, /const leaveChildMode = \(\) => \{\s*microphone\.stop\(\);\s*tone\.stop\('stopped'\);\s*childVoice\.cancel\(\);\s*setGuideIssue\(null\);\s*setLastChildSession\(childSession\);\s*setChildMode\(null\);/);
 });

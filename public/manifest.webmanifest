@@ -1,0 +1,17 @@
+{
+  "name": "Pip",
+  "short_name": "Pip",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5efdf",
+  "theme_color": "#f7f0df",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

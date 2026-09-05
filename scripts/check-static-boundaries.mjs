@@ -32,7 +32,6 @@ const forbiddenRuntimeAPIs = [
   ['event stream', /\bEventSource\b/],
   ['beacon', /\bsendBeacon\b/],
   ['indexed database', /\bindexedDB\b/],
-  ['service worker', /\bserviceWorker\b/],
 ];
 for (const [label, pattern] of forbiddenRuntimeAPIs) {
   if (pattern.test(joined)) throw new Error(`child-facing runtime unexpectedly contains ${label}`);
@@ -48,6 +47,35 @@ for (const [file, text] of contents) {
   if (text.includes('context.destination') && file !== 'src/hooks/useGuideTone.ts') {
     throw new Error(`audible output escaped the guide-tone boundary: ${file}`);
   }
+  if (text.includes('serviceWorker') && file !== 'src/register-service-worker.ts') {
+    throw new Error(`service worker registration escaped its boundary: ${file}`);
+  }
+}
+
+const serviceWorkerRegistration = contents.get('src/register-service-worker.ts') ?? '';
+if (!/import\.meta\.env\.PROD && 'serviceWorker' in navigator/.test(serviceWorkerRegistration)
+  || !/navigator\.serviceWorker\.register\('\.\/sw\.js', \{ scope: '\.\/' \}\)/.test(serviceWorkerRegistration)
+  || /\bfetch\s*\(/.test(serviceWorkerRegistration)) {
+  throw new Error('service worker registration is outside its production-only local boundary');
+}
+
+const serviceWorker = await readFile(path.join(root, 'public', 'sw.js'), 'utf8');
+for (const required of [
+  "const APP_ROOT = new URL('./', self.location.href)",
+  "url.origin !== APP_ROOT.origin",
+  "!url.pathname.startsWith(APP_ROOT.pathname)",
+  "request.method !== 'GET'",
+  "request.mode === 'navigate'",
+]) {
+  if (!serviceWorker.includes(required)) throw new Error(`offline cache boundary is missing: ${required}`);
+}
+if (/https?:\/\//i.test(serviceWorker)) throw new Error('offline cache contains an absolute network destination');
+
+const childVoice = contents.get('src/hooks/useChildVoice.ts') ?? '';
+if ((childVoice.match(/\.\/voice\/(?:ready|playing|tap|done|more|error)\.m4a/g) ?? []).length !== 6
+  || !/new Audio\(CHILD_VOICE_CLIPS\[state\]\)/.test(childVoice)
+  || /speechSynthesis|SpeechSynthesisUtterance|https?:\/\//i.test(childVoice)) {
+  throw new Error('child spoken help is outside its six bundled local clips');
 }
 
 const microphone = contents.get('src/hooks/useMicrophoneScoring.ts') ?? '';

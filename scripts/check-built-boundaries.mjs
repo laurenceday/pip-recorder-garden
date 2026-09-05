@@ -12,6 +12,43 @@ const index = await readFile(indexPath, 'utf8');
 if (/<(?:script|link)\b[^>]*(?:src|href)=["']\/(?!\/)/i.test(index)) {
   throw new Error('built scripts and styles must use repository-relative asset paths');
 }
+if (!/<link rel="manifest" href="\.\/manifest\.webmanifest" \/>/.test(index)) {
+  throw new Error('built index lost its local install manifest');
+}
+
+const serviceWorkerPath = path.join(distRoot, 'sw.js');
+const serviceWorkerStat = await lstat(serviceWorkerPath);
+if (!serviceWorkerStat.isFile() || serviceWorkerStat.isSymbolicLink() || serviceWorkerStat.size > 65_536) {
+  throw new Error('built service worker must be one bounded regular file');
+}
+const serviceWorker = await readFile(serviceWorkerPath, 'utf8');
+if (/https?:\/\//i.test(serviceWorker)
+  || !serviceWorker.includes("url.origin !== APP_ROOT.origin")
+  || !serviceWorker.includes("!url.pathname.startsWith(APP_ROOT.pathname)")) {
+  throw new Error('built offline cache escaped its same-site app scope');
+}
+
+const manifestPath = path.join(distRoot, 'manifest.webmanifest');
+const manifestStat = await lstat(manifestPath);
+if (!manifestStat.isFile() || manifestStat.isSymbolicLink() || manifestStat.size > 16_384) {
+  throw new Error('built install manifest must be one bounded regular file');
+}
+const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+if (manifest.name !== 'Pip' || manifest.start_url !== './' || manifest.scope !== './' || manifest.display !== 'standalone') {
+  throw new Error('built install manifest is outside the local Pip app boundary');
+}
+
+for (const name of ['ready', 'playing', 'tap', 'done', 'more', 'error']) {
+  const relative = `./voice/${name}.m4a`;
+  if (!index.includes(`href="${relative}"`)) throw new Error(`built index does not preload child voice clip: ${name}`);
+  const voicePath = path.join(distRoot, 'voice', `${name}.m4a`);
+  const voiceStat = await lstat(voicePath);
+  if (!voiceStat.isFile() || voiceStat.isSymbolicLink() || voiceStat.size < 1_024 || voiceStat.size > 65_536) {
+    throw new Error(`built child voice clip is outside its file boundary: ${name}`);
+  }
+  const header = (await readFile(voicePath)).subarray(0, 16).toString('latin1');
+  if (!header.includes('ftyp')) throw new Error(`built child voice clip is not an M4A file: ${name}`);
+}
 
 const assetRoot = path.join(distRoot, 'assets');
 const entries = await readdir(assetRoot, { withFileTypes: true });

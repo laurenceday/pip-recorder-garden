@@ -32,10 +32,11 @@ function actionExitEvidence() {
   const screens = CHILD_COPY_STATE_IDS.map((state) => ({ state, ...childCopyFor(state), learningActionCount: 1, exitCount: 1 }));
   const done = { mode: 'sound', phase: 'done', tapIndex: 4 };
   const more = actOnChildTurn(done, 4);
+  const playMade = actOnChildTurn(more.state, 4);
   const returnFromMore = exitChildTurn(more.state, 4);
   if (screens.length !== 6 || screens.some((screen) => !screen.action || !screen.exit)) throw new Error('a child screen is missing its action or exit');
-  if (more.state.phase !== 'more' || more.command !== 'none' || returnFromMore.state.phase !== 'done') throw new Error('the optional activity is not bounded and reversible');
-  return { screens, doneStops: exitChildTurn(done, 4).command === 'leave', moreIsOptional: true, returnFromMore: returnFromMore.state.phase };
+  if (more.state.phase !== 'more' || more.command !== 'none' || playMade.command !== 'play-made' || returnFromMore.state.phase !== 'done') throw new Error('the optional activity is not playable, bounded and reversible');
+  return { screens, doneStops: exitChildTurn(done, 4).command === 'leave', moreIsOptional: true, madeTuneCommand: playMade.command, returnFromMore: returnFromMore.state.phase };
 }
 
 export async function runChildFlowCheck(argv, root = process.cwd()) {
