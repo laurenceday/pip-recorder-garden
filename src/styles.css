@@ -294,7 +294,7 @@ button.note-stone { min-height: 64px; cursor: pointer; }
 .child-stage h1 {
   max-width: none;
   margin: 0;
-  font-size: clamp(2rem, 10vmin, 4.5rem);
+  font-size: clamp(1.25rem, 8vmin, 3.5rem);
   line-height: 1;
 }
 .child-stage .child-head { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 3vmin, 22px); }
@@ -309,6 +309,7 @@ button.note-stone { min-height: 64px; cursor: pointer; }
   color: inherit;
   background: transparent;
   cursor: pointer;
+  font-size: clamp(1rem, 4vmin, 1.5rem);
 }
 .child-stage .pip-help:disabled { cursor: default; opacity: 1; }
 .child-stage .pip-help__sound {
@@ -361,7 +362,7 @@ button.note-stone { min-height: 64px; cursor: pointer; }
   place-items: center;
   padding: 8px;
   border-radius: 18px;
-  font-size: clamp(1.5rem, 7vmin, 2.4rem);
+  font-size: clamp(1.25rem, 6vmin, 2.2rem);
   font-weight: 850;
   text-align: center;
 }
@@ -393,12 +394,12 @@ button.note-stone { min-height: 64px; cursor: pointer; }
   min-height: 64px;
   padding: 10px 14px;
   border-radius: 18px;
-  font-size: clamp(1.25rem, 5.5vmin, 2rem);
+  font-size: clamp(1.25rem, 4.8vmin, 1.75rem);
 }
 
 @media (max-height: 400px) and (orientation: landscape) {
   .child-stage .model-card {
-    grid-template-columns: minmax(130px, .55fr) minmax(190px, 1fr) minmax(180px, .8fr);
+    grid-template-columns: minmax(110px, .55fr) minmax(170px, 1fr) minmax(160px, .8fr);
     grid-template-rows: minmax(64px, auto) minmax(64px, auto);
     align-items: center;
     gap: 8px 14px;

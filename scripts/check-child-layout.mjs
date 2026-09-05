@@ -486,7 +486,10 @@ export async function runChildLayoutCheck(argv, root = process.cwd()) {
     const measurements = [];
     for (const scenario of CHILD_LAYOUT_SCENARIOS) measurements.push(...await replayScenario(client, url, scenario));
     const findings = measurements.flatMap(validateLayoutMeasurement);
-    if (findings.length > 0) throw new Error(`child layout measurements failed:\n${findings.map((finding) => `- ${finding}`).join('\n')}`);
+    if (findings.length > 0) {
+      const failedMeasurements = measurements.filter((measurement) => validateLayoutMeasurement(measurement).length > 0);
+      throw new Error(`child layout measurements failed:\n${findings.map((finding) => `- ${finding}`).join('\n')}\n${JSON.stringify(failedMeasurements, null, 2)}`);
+    }
     const report = {
       schema: 'child-layout-conformance/v1',
       candidate: EXPECTED_CANDIDATE,
